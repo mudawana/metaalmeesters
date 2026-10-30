@@ -64,3 +64,6 @@ De Vite-build gebruikt het subpad `/metaalmeesters/` bij `GITHUB_PAGES=true`. Ee
     GITHUB_PAGES=true npm run build
 
 De bestanden in deze repository zijn een eerste functionele demo en dienen technisch getest te worden vóór publieke livegang.
+
+### De demo online tonen via GitHub Pages
+Open de GitHub-repository > **Settings** > **Pages** en kies bij **Source** voor **GitHub Actions**. Daarna onder **Actions** > **Prepare GitHub Pages demo** > **Run workflow**. Bij een geslaagde deployment is de demo toegankelijk via `https://mudawana.github.io/metaalmeesters/`. Deze URL is pas live nadat Pages is geactiveerd en de workflow geslaagd is.

@@ -41,17 +41,17 @@ function Handle({x,y,color,kind}) {
   </group>;
 }
 
-function DoorLeaf({x,width,height,hinge,config}) {
+function DoorLeaf({x,width,height,hinge,config,pivotOffset=0}) {
   const color = FRAME_COLORS[config.frame] || FRAME_COLORS.zwart;
   const flip=hinge==='right';
   const sign=flip?-1:1;
-  const center=sign*width/2;
+  const center=sign*(width/2-pivotOffset);
   const frame=0.049;
   const innerWidth=Math.max(0.1,width-frame*2);
   const innerHeight=height-frame*2;
   const horizontal=Math.max(0,Math.min(5,config.horizontal));
   const vertical=Math.max(0,Math.min(4,config.vertical));
-  const angle=config.open && config.type!=='schuif' ? (flip?0.5:-0.5) : 0;
+  const angle=config.open && config.type!=='schuif' ? (flip?1:-1)*(config.type==='pivot'?0.72:0.5) : 0;
   return <group position={[x,0,0]} rotation={[0,angle,0]}>
     <group position={[center,height/2,0]}>
       <Glass width={innerWidth} height={innerHeight} kind={config.glass}/>
@@ -91,6 +91,8 @@ function Scene({config}) {
   const double=config.type==='dubbel';
   const slide=config.type==='schuif';
   const right=config.opening==='rechts';
+  const offset=config.type==='pivot'?0.12:0;
+  const singleX=right ? w/2-offset+(slide&&config.open?w*0.56:0) : -w/2+offset-(slide&&config.open?w*0.56:0);
   return <>
     <ambientLight intensity={1.45}/>
     <hemisphereLight args={['#fff9e9','#a7a29d',1.15]}/>
@@ -102,11 +104,11 @@ function Scene({config}) {
         <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config}/>
         <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config}/>
       </> : <>
-        <DoorLeaf x={right?w/2:-w/2+(slide&&config.open?w*0.58:0)} width={w} height={h} hinge={right?'right':'left'} config={slide?{...config,open:false}:config}/>
+        <DoorLeaf x={singleX} width={w} height={h} hinge={right?'right':'left'} pivotOffset={offset} config={slide?{...config,open:false}:config}/>
       </>}
       {slide && <Bar pos={[0,h+0.1,-0.02]} size={[w*1.8,0.06,0.08]} color={FRAME_COLORS[config.frame]}/>}
       {config.type==='pivot' && <>
-        <mesh position={[-w/2+0.1,0.035,0.01]}><cylinderGeometry args={[0.05,0.05,0.07,24]}/><meshStandardMaterial color="#9b9a93" metalness={0.8} roughness={0.3}/></mesh>
+        <mesh position={[right?w/2-0.12:-w/2+0.12,0.035,0.01]}><cylinderGeometry args={[0.05,0.05,0.07,24]}/><meshStandardMaterial color="#9b9a93" metalness={0.8} roughness={0.3}/></mesh>
       </>}
     </group>
     <ContactShadows position={[0,-0.025,0.25]} opacity={0.44} scale={9} blur={2.5} far={4}/>
