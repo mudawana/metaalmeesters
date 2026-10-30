@@ -62,3 +62,5 @@ React 18 · Vite 5 · Three.js · React Three Fiber · Drei · Lucide Icons · N
 De Vite-build gebruikt het subpad `/metaalmeesters/` bij `GITHUB_PAGES=true`. Een Pages-deploy moet afzonderlijk in GitHub ingesteld worden.
 
     GITHUB_PAGES=true npm run build
+
+De bestanden in deze repository zijn een eerste functionele demo en dienen technisch getest te worden vóór publieke livegang.
