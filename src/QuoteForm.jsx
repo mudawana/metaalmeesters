@@ -1,0 +1,51 @@
+import React,{useState} from 'react';
+import {Send,ShieldCheck} from 'lucide-react';
+
+function captureDoorImage(){
+  const source=document.querySelector('#door-canvas canvas');
+  if(!source?.width||!source?.height)throw Error('Er kon geen 3D-afbeelding gemaakt worden. Vernieuw de pagina en probeer opnieuw.');
+  const target=document.createElement('canvas');
+  const ratio=Math.min(1,860/Math.max(source.width,source.height));
+  target.width=Math.round(source.width*ratio);
+  target.height=Math.round(source.height*ratio);
+  const ctx=target.getContext('2d');
+  if(!ctx)throw Error('Deze browser ondersteunt geen afbeeldingsopslag.');
+  ctx.drawImage(source,0,0,target.width,target.height);
+  const image=target.toDataURL('image/jpeg',0.78);
+  if(!image.startsWith('data:image/jpeg;base64,')||image.length>1400000)
+    throw Error('De 3D-afbeelding kon niet worden opgeslagen. Probeer een andere browser.');
+  return image;
+}
+export default function QuoteForm({design}) {
+  const [name,setName]=useState(''),[email,setEmail]=useState(''),[phone,setPhone]=useState(''),[city,setCity]=useState(''),[notes,setNotes]=useState(''),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[success,setSuccess]=useState(false),[website,setWebsite]=useState('');
+  async function submit(e) {
+    e.preventDefault();if(!consent||busy||success)return;
+    setBusy(true);setStatus('');
+    try {
+      if(location.hostname.endsWith('github.io'))
+        throw Error('Dit is de openbare ontwerp-demo. Aanvragen worden pas opgeslagen nadat de privé-offerteserver op Netlify is aangesloten.');
+      const image=captureDoorImage();
+      const response=await fetch('/.netlify/functions/quotes',{
+        method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name,email,phone,city,notes,design,image,consent,website})
+      });
+      if(!(response.headers.get('content-type')||'').includes('application/json'))
+        throw Error('De offerteserver is nog niet aangesloten. Uw gegevens zijn niet verzonden.');
+      const result=await response.json();
+      if(!response.ok)throw Error(result.error||'De aanvraag kon niet worden opgeslagen.');
+      setSuccess(true);
+      setStatus('Uw aanvraag is veilig opgeslagen bij MetaalMeesters! Referentie: '+result.reference.slice(-12)+'. Wij nemen contact met u op.');
+    } catch(err) {setStatus(err.message||'Verzenden mislukt. Probeer opnieuw.');}
+    finally {setBusy(false);}
+  }
+  return <form className="quote-form" onSubmit={submit}>
+    <div className="quote-note"><ShieldCheck size={20}/><div><strong>Vrijblijvende offerte op maat</strong><span>Uw aanvraag wordt samen met een privéfoto van de 3D-deur opgeslagen bij MetaalMeesters. Er worden geen automatische prijzen berekend.</span></div></div>
+    <div className="field-grid"><label>Naam *<input required autoComplete="name" maxLength={150} value={name} onChange={e=>setName(e.target.value)} placeholder="Uw volledige naam"/></label><label>E-mailadres *<input required type="email" autoComplete="email" maxLength={260} value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label></div>
+    <div className="field-grid"><label>Telefoonnummer<input type="tel" autoComplete="tel" maxLength={100} value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+32 ..."/></label><label>Gemeente<input maxLength={150} value={city} onChange={e=>setCity(e.target.value)} placeholder="Waar komt de deur?"/></label></div>
+    <label>Extra informatie<textarea value={notes} maxLength={1800} onChange={e=>setNotes(e.target.value)} rows="3" placeholder="Vertel gerust wat meer over uw project..."/></label>
+    <div className="mm-honeypot" aria-hidden="true"><label>Laat dit veld leeg<input tabIndex="-1" autoComplete="off" value={website} onChange={e=>setWebsite(e.target.value)}/></label></div>
+    <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>Ik ga akkoord dat MetaalMeesters mijn contactgegevens, afmetingen en afbeelding van mijn ontwerp opslaat om deze offerteaanvraag te behandelen.</span></label>
+    <button type="submit" disabled={busy||!consent||success} className="btn btn-dark submit-btn">{busy?'Aanvraag veilig opslaan...':success?'Aanvraag opgeslagen':'Verzend offerteaanvraag'} <Send size={17}/></button>
+    {status&&<p className={'form-status '+(!success?'form-status-error':'')} role="status">{status}</p>}
+  </form>;
+}

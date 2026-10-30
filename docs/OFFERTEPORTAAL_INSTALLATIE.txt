@@ -1,0 +1,78 @@
+METAALMEESTERS — PRIVÉ OFFERTEPORTAAL (INSTALLATIE)
+====================================================
+
+WAT IS GEBOUWD
+- Klant configureert een 3D-deur en vult naam, e-mail, telefoon, gemeente, opmerkingen in.
+- Bij Verzenden wordt automatisch een JPEG-schermafbeelding van de 3D-deur gemaakt.
+- Opgeslagen samen met maten, glas, kader, beslag, decoratie en contactgegevens.
+- Offerte wordt als privérecord in Netlify Blobs opgeslagen, niet in openbare GitHub-bestanden.
+- Alleen met het beheerwachtwoord kan MetaalMeesters #/beheer openen.
+- Beheer toont alle aanvragen, een grote preview, klantgegevens, zoeken, filteren,
+  status aanpassen (nieuw, in behandeling, offerte verstuurd, afgerond), download
+  en definitief verwijderen. Het portaal vernieuwt automatisch elke 45 seconden.
+- Een nieuwe aanvraag kan een aparte e-mailmelding versturen via Resend.
+- De klant krijgt na veilig opslaan een referentie en bevestiging op het scherm.
+- Er wordt GEEN automatische prijs berekend.
+
+BELANGRIJK: GITHUB PAGES HEEFT GEEN BACKEND
+De huidige website op https://mudawana.github.io/metaalmeesters/ blijft een
+openbare ontwerp-demo en accepteert geen offerteaanvragen. Dit voorkomt dat
+privacygevoelige gegevens in een niet-werkende flow verdwijnen.
+Dezelfde broncode moet worden gedeployed op NETLIFY om de backend te activeren.
+
+1. MAAK EEN NETLIFY-SITE
+   - Log in op https://app.netlify.com/
+   - Add new project > Import an existing project > GitHub
+   - Selecteer mudawana/metaalmeesters, branch main
+   - Build: npm run build
+   - Publish: dist
+   - Functions: netlify/functions (staat al in netlify.toml)
+   - Deploy site
+   - Gebruik voor productie het eigen domein na testen.
+
+2. BEHEERLOGIN BEVEILIGEN
+   In Netlify: Project configuration > Environment variables.
+   Vul in (nooit in GitHub committen):
+   ADMIN_PASSWORD            sterk, uniek wachtwoord (min. 14 karakters)
+   ADMIN_SESSION_SECRET      willekeurige geheime tekst van 32+ karakters
+   BLOBS_REGION              eu-central-1
+   De client krijgt nooit ADMIN_PASSWORD of ADMIN_SESSION_SECRET te zien.
+   Na het instellen een nieuwe deployment uitvoeren.
+
+3. E-MAILMELDING VOOR ELKE NIEUWE OFFERTE
+   Maak een Resend-account en verifieer een afzenderdomein.
+   Voeg in Netlify Environment variables toe:
+   RESEND_API_KEY            persoonlijke API-key van Resend
+   QUOTE_FROM_EMAIL          bv. offertes@uw-geverifieerd-domein.be
+   QUOTE_TO_EMAIL            e-mail waarop MetaalMeesters notificaties wil ontvangen
+   Er wordt alleen een melding naar de eigenaar verstuurd.
+   De 3D-afbeelding en details zijn in te zien in het privébeheerportaal.
+   Zonder e-mailvariabelen wordt de aanvraag WEL opgeslagen, maar wordt er GEEN mail gestuurd.
+   Het portaal toont per aanvraag of de melding werd verstuurd.
+
+4. PRIVAAT PORTAAL OPENEN
+   Bezoek: https://<netlify-domein>/#/beheer
+   Log in met ADMIN_PASSWORD.
+   Ingelogde sessie wordt 8 uur in een HttpOnly, SameSite=Strict cookie bewaard.
+   De API geeft geen offertes vrij zonder geldige sessie.
+   Afbeeldingen staan in private blobrecords en worden alleen via de beheer-API gelezen.
+   Kies een status in de details van de aanvraag; antwoord de klant via de e-maillink.
+
+5. CONTROLEER DE VOLLEDIGE FLOW
+   - Maak een testdeur (bv. 900 × 2100 mm).
+   - Vul testcontactgegevens in; druk op "Verzend offerteaanvraag".
+   - Controleer of u een referentienummer ziet.
+   - Log in op /#/beheer en verifieer de foto, afmetingen en klantgegevens.
+   - Controleer of de melding in het juiste postvak aankomt.
+   - Wijzig status en test filters.
+   - Verwijder testaanvragen na controle.
+
+AANDACHT VOOR PRODUCTIE
+   - Netlify Blobs is geschikt als eenvoudige pilot. Bij hoge volumes is een
+     relationele database (met transacties, indexen en audits) beter.
+   - Voeg een echte CAPTCHA / Turnstile en sterke rate limiting toe voor publiek verkeer.
+   - Beveilig adminlogin met MFA of een identity-provider voor echte bedrijfsvoering.
+   - Bespreek AVG/GDPR, privacyverklaring, gegevensretentie, backups en inzage/verwijdering.
+   - De deurspecificaties zijn nog een demo en moeten technisch gevalideerd worden.
+   - De beheerpagina toont maximaal de 250 meest recente aanvragen.
+   - Deel de beheer-URL gerust, maar NOOIT het wachtwoord of de geheime keys.

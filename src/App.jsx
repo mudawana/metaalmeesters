@@ -1,6 +1,9 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Download, Mail, MapPin, Menu, Minus, Move3D, Phone, Plus, RotateCcw, Ruler, Send, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import DoorScene from './DoorScene.jsx';
+import QuoteForm from './QuoteForm.jsx';
+import Admin from './Admin.jsx';
+import './admin.css';
 import {assets,imageUrl,originalImageUrl,initialDesign,TYPES,FRAMES,GLASSES,formatDesign,downloadDesign} from './data.js';
 
 const routeFromHash=()=>location.hash.replace(/^#\/?/,'').split('?')[0]||'home';
@@ -41,7 +44,7 @@ function Footer() {
         <div><strong>Ontdek</strong><a href="#/diensten">Onze diensten</a><a href="#/projecten">Realisaties</a><a href="#/configurator">3D-deurconfigurator</a></div>
         <div><strong>Contact</strong><a href="mailto:info@metaalmeesters.eu">info@metaalmeesters.eu</a><a href="tel:+32472864888">+32 472 86 48 88</a><span>Smoutpot, Zwijndrecht</span></div>
       </div>
-      <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen.</span></div>
+      <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen. <a href="#/beheer" className="footer-admin-link">Beheerportaal</a></span></div>
     </div>
   </footer>;
 }
@@ -122,33 +125,6 @@ function ConfigSummary({d}) {
     <div><span>Handgreep</span><strong>{d.handle}</strong></div>
   </div>;
 }
-function QuoteForm({design}) {
-  const [name,setName]=useState(''),[email,setEmail]=useState(''),[phone,setPhone]=useState(''),[city,setCity]=useState(''),[notes,setNotes]=useState(''),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState('');
-  async function submit(e) {
-    e.preventDefault(); if(!consent||busy) return;
-    setBusy(true);setStatus('');
-    const payload={name,email,phone,city,notes,design};
-    try {
-      const response=await fetch('/.netlify/functions/send-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      if(!response.ok) throw new Error('Backend niet beschikbaar');
-      setStatus('Uw aanvraag werd verzonden. MetaalMeesters neemt contact met u op.');
-    } catch {
-      const body='Naam: '+name+'\nE-mail: '+email+'\nTelefoon: '+phone+'\nPlaats: '+city+'\nOpmerkingen: '+notes+'\n\n'+formatDesign(design);
-      const url='mailto:info@metaalmeesters.eu?subject='+encodeURIComponent('Offerteaanvraag stalen deur - '+name)+'&body='+encodeURIComponent(body);
-      window.location.href=url;
-      setStatus('Uw e-mailprogramma wordt geopend met de volledige configuratie. Verstuur de e-mail zelf om uw aanvraag in te dienen. Automatisch verzenden wordt geactiveerd na koppeling van de e-maildienst.');
-    } finally {setBusy(false);}
-  }
-  return <form className="quote-form" onSubmit={submit}>
-    <div className="quote-note"><ShieldCheck size={20}/><div><strong>Vrijblijvende offerte op maat</strong><span>U ziet hier geen automatische prijs. Onze specialisten controleren uw ontwerp en bezorgen een persoonlijke offerte.</span></div></div>
-    <div className="field-grid"><label>Naam *<input required autoComplete="name" value={name} onChange={e=>setName(e.target.value)} placeholder="Uw volledige naam"/></label><label>E-mailadres *<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label></div>
-    <div className="field-grid"><label>Telefoonnummer<input type="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+32 ..."/></label><label>Gemeente<input value={city} onChange={e=>setCity(e.target.value)} placeholder="Waar komt de deur?"/></label></div>
-    <label>Extra informatie<textarea value={notes} onChange={e=>setNotes(e.target.value)} rows="3" placeholder="Vertel gerust wat meer over uw project..."/></label>
-    <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>Ik ga akkoord dat MetaalMeesters mijn gegevens gebruikt om contact op te nemen over mijn offerteaanvraag.</span></label>
-    <button type="submit" disabled={busy||!consent} className="btn btn-dark submit-btn">{busy?'Aanvraag verwerken...':'Offerteaanvraag voorbereiden'} <Send size={17}/></button>
-    {status&&<p className="form-status" role="status">{status}</p>}
-  </form>;
-}
 function ConfigControls({d,change,step,setStep}) {
   const applyStyle=(style)=>{const presets={minimal:{vertical:0,horizontal:0},atelier:{vertical:1,horizontal:2},industrieel:{vertical:2,horizontal:3},klassiek:{vertical:0,horizontal:1}};change({style,...presets[style]});};
   return <div className="config-controls">
@@ -215,6 +191,6 @@ function Configurator() {
 export default function App() {
   const [route,setRoute]=useState(routeFromHash);
   useEffect(()=>{const change=()=>{setRoute(routeFromHash());window.scrollTo({top:0,behavior:'instant'});};window.addEventListener('hashchange',change);return()=>window.removeEventListener('hashchange',change);},[]);
-  const current=['home','diensten','projecten','contact','configurator'].includes(route)?route:'home';
-  return <><Header route={current}/>{current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:<Configurator/>}<Footer/></>;
+  const current=['home','diensten','projecten','contact','configurator','beheer'].includes(route)?route:'home';
+  return <><Header route={current}/>{current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='beheer'?<Admin/>:<Configurator/>}<Footer/></>;
 }

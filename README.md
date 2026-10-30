@@ -67,3 +67,11 @@ De bestanden in deze repository zijn een eerste functionele demo en dienen techn
 
 ### De demo online tonen via GitHub Pages
 Open de GitHub-repository > **Settings** > **Pages** en kies bij **Source** voor **GitHub Actions**. Daarna onder **Actions** > **Prepare GitHub Pages demo** > **Run workflow**. Bij een geslaagde deployment is de demo toegankelijk via `https://mudawana.github.io/metaalmeesters/`. Deze URL is pas live nadat Pages is geactiveerd en de workflow geslaagd is.
+
+## Nieuwe privé-offerteadministratie
+
+De demo bevat een beveiligde beheerpagina op `/#/beheer` en een offerteformulier dat automatisch een afbeelding van het 3D-ontwerp vastlegt. Een Netlify-function slaat de volledige aanvraag **privé** op in Netlify Blobs. De eigenaar kan na aanmelden alle aanvragen bekijken, zoeken, status wijzigen en beantwoorden. Optionele e-mailmeldingen worden gestuurd via Resend; er zijn geen publieke offerteprijzen.
+
+**Let op:** GitHub Pages ondersteunt geen server-side opslag of authenticatie. De GitHub Pages-link blijft dus alleen een demo; het offerteformulier toont een duidelijke fout in plaats van persoonlijke data te lekken of een valse bevestiging te geven. Voor echte aanvragen is een deployment op Netlify nodig.
+
+Alle configuratiestappen, omgevingsvariabelen, privacy-/beveiligingsaandachtspunten en testinstructies staan in [docs/OFFERTEPORTAAL_INSTALLATIE.txt](docs/OFFERTEPORTAAL_INSTALLATIE.txt).
