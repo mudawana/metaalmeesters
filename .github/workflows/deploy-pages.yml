@@ -1,5 +1,15 @@
-name: Prepare GitHub Pages demo
+name: Deploy MetaalMeesters demo to GitHub Pages
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.js'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +35,8 @@ jobs:
         env:
           GITHUB_PAGES: 'true'
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v4
         with:
           path: ./dist
