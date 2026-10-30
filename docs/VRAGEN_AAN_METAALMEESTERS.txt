@@ -1,0 +1,146 @@
+METAALMEESTERS — ALLE BRIEFINGVRAGEN
+Versie: 30 oktober 2026
+Status: werkdocument, bekende antwoorden bovenaan
+
+WAT AL VASTLIGT
+- Website houdt dezelfde diensten en algemene insteek als de huidige MetaalMeesters-site.
+- Eerste lancering: 3D-configurator enkel voor stalen deuren.
+- Latere uitbreiding mogelijk met een 3D-trappenconfigurator.
+- Klanten vullen afmetingen in en kiezen decoratie, glas en andere opties.
+- Geen online prijsberekening of online betaling.
+- Klant verstuurt een aanvraag; MetaalMeesters bekijkt deze en maakt zelf een offerte.
+- Alle configuraties zijn indicatief tot de technische controle en definitieve opmeting.
+
+A. DOELSTELLINGEN EN WEBSITE
+01. Welke onderdelen van de huidige site moeten identiek blijven?
+02. Welke onderdelen, teksten of pagina's mogen beter of anders worden?
+03. Welke doelgroepen zijn het belangrijkst (particulieren, architecten, aannemers, bedrijven)?
+04. Wat is het belangrijkste doel van de site: aanvragen, portfolio, contact of merkbeleving?
+05. Welke websites/configuratoren vinden jullie sterk?
+06. Wat onderscheidt jullie van andere metaalbedrijven?
+07. Welke pagina's moeten online blijven (Home, Diensten, Projecten, Contact, Offerte)?
+08. Moeten huidige URLs via redirects behouden blijven voor SEO?
+09. Moet de site NL/FR/EN ondersteunen?
+10. Hebben jullie huisstijlbestanden, logo in vectorformaat en lettertypen?
+11. Wie levert teksten, foto's, video's en projectinformatie?
+12. Mogen we alle afbeeldingen van de huidige website opnieuw gebruiken en opslaan?
+13. Willen jullie reviews, veelgestelde vragen of blogartikelen?
+14. Welke cookies/analytics/marketingtools willen jullie gebruiken?
+
+B. DEURTYPES EN TECHNISCHE REGELS
+15. Welke deurtypes komen bij lancering beschikbaar (enkel, dubbel, schuif, pivot)?
+16. Met welke deurtypes starten we als eerste?
+17. Welke bestaande basismodellen hebben jullie?
+18. Mag de klant ook van nul een eigen model ontwerpen?
+19. Welke minimale/maximale breedtes gelden per type?
+20. Welke minimale/maximale hoogtes gelden per type?
+21. Vanaf welke maten verandert het profiel, de constructie of de prijs?
+22. Mogen zijlichten en bovenlichten worden toegevoegd?
+23. Welke kader- en profielbreedtes zijn mogelijk?
+24. Welke profiel- en glasdiktes zijn toegestaan?
+25. Welke speciale eisen gelden voor zware of grote deuren?
+26. Welke deurtypes zijn binnen-/buitendeur?
+27. Welke opties zijn technisch niet combineerbaar?
+28. Maken jullie brandwerende, geluidsisolerende of inbraakvertragende deuren?
+29. Hoe moet de website omgaan met uitzonderlijke vragen buiten de standaarden?
+
+C. AFMETINGEN / OPMETINGEN
+30. Geeft de klant de maat van de opening of van de uiteindelijke deur in?
+31. Meet de klant zelf of komt MetaalMeesters altijd definitief opmeten?
+32. Welke meetinstructies moeten we tonen?
+33. Moet boven/midden/onder afzonderlijk gemeten worden?
+34. Is de muurdikte nodig?
+35. Is vloerafwerking of dorpelhoogte van belang?
+36. Moeten automatisch montagespelingen worden berekend?
+37. Welke fouten of onmogelijke maten moet het systeem blokkeren?
+38. Kunnen klanten foto's, schetsen of technische plannen uploaden?
+39. Kunnen klanten meerdere deuropeningen in een project samenstellen?
+40. Willen jullie later camerameting of AR-opmetingen toevoegen?
+
+D. REALISTISCHE 3D-CONFIGURATOR
+41. Moet de 3D-weergave fotorealistisch zijn of een gestileerde materiaalweergave?
+42. Moet de klant draaien, inzoomen en van voor/achter bekijken?
+43. Moet de deur in 3D kunnen openen en sluiten?
+44. Moet de klant kunnen wisselen tussen showroom en neutrale achtergrond?
+45. Moet het model direct met ingevoerde breedte/hoogte meescha len?
+46. Welke glasopties zijn toegestaan (helder, mat, rook, ribbel, ... )?
+47. Welke kleuren, poedercoatings en oppervlaktestructuren bestaan echt?
+48. Welke handgrepen, knoppen en sloten zijn mogelijk?
+49. Welke scharnier- en draaizijden moeten worden gekozen?
+50. Mag de klant horizontale/verticale profielen zelf toevoegen?
+51. Mag de klant de positie van ieder profiel vrij verslepen?
+52. Zijn decoratieve bogen, ruiten of patronen mogelijk?
+53. Moeten afbeeldingen van echte voorbeelden aan de opties worden gekoppeld?
+54. Moet de 3D-weergave ook op mobiele toestellen soepel werken?
+55. Zijn bestaande CAD/GLB/FBX/OBJ/STEP-bestanden beschikbaar?
+56. Wie keurt de geometrie en afwerking van de 3D-modellen goed?
+57. Mag een klant eigen modellen uploaden of alleen bestaande opties samenstellen?
+58. Moeten klanten ontwerpvarianten kunnen opslaan of delen?
+59. Moeten klanten een screenshot/PDF/technische samenvatting downloaden?
+60. Welke exacte materialen en glastype-eigenschappen maken de render geloofwaardig?
+
+E. OFFERTEPROCES
+61. Welke velden moeten klanten verplicht invullen?
+62. Moet men een telefoonnummer en plaats van installatie invullen?
+63. Naar welk e-mailadres/team moeten aanvragen gestuurd worden?
+64. Moet er een kopie/ontvangstbevestiging naar de klant?
+65. Moet de aanvraag de volledige configuratie, 3D-afbeelding en afmetingen bevatten?
+66. Willen jullie de offerteaanvragen ook in een beheerdashboard kunnen zien?
+67. Moet een medewerker de klant via dashboard kunnen contacteren?
+68. Moet een klant een aanvraag nadien kunnen aanpassen?
+69. Moeten meerdere deuren in één offerteaanvraag kunnen zitten?
+70. Moet er een status zijn: nieuw, in behandeling, offerte verstuurd, afgerond?
+71. Willen jullie koppeling met bestaande CRM/e-mailsoftware?
+72. Moeten klanten de privacyvoorwaarden goedkeuren voor verzending?
+73. Moet spambeveiliging worden voorzien?
+74. Hebben jullie een voorbeeld van een perfecte offerteaanvraag?
+
+F. BEHEER EN PRODUCTIE
+75. Wie gaat de website dagelijks beheren?
+76. Willen medewerkers zonder ontwikkelaar modellen kunnen toevoegen?
+77. Moeten ze zelf kleuren, glastypes, handgrepen en verdelingen beheren?
+78. Moeten ze maximale/minimale maten kunnen aanpassen in een dashboard?
+79. Moeten medewerkers eigen prijsregels kunnen vastleggen (ook al worden prijzen niet live getoond)?
+80. Willen ze uit een aanvraag productietekeningen of stuklijsten kunnen genereren?
+81. Welke gegevens zijn onmisbaar voor de interne werkplaats?
+82. Wie valideert of een klantontwerp effectief maakbaar is?
+83. Moeten gebruikersrollen worden ingesteld?
+84. Hoe worden backups en historiek van aanvragen geregeld?
+85. Wie heeft rechten op de 3D-modellen, broncode en fotobestanden?
+
+G. TECHNIEK, PRIVACY EN LANCERING
+86. Waar staan huidige domein, DNS en hosting?
+87. Welke hosting willen jullie voor de nieuwe site gebruiken?
+88. Welke mailprovider of backend moet aanvragen werkelijk versturen?
+89. Welke wettelijke/privacyteksten zijn beschikbaar?
+90. Welk beleid geldt voor foto's, uploadbestanden en bewaartermijnen?
+91. Zijn er specifieke toegankelijkheidseisen?
+92. Welke browsers en toestellen moeten worden ondersteund?
+93. Wat is het gewenste budget?
+94. Wat is de gewenste datum voor livegang?
+95. Welke features moeten beslist aanwezig zijn in versie 1?
+96. Welke features mogen pas na een pilot?
+97. Wie test modellen, technische regels en offertegegevens?
+98. Wie geeft finaal goedkeuring voor design en productie?
+99. Wie beheert de site na de livegang?
+100. Hoe worden updates en ondersteuning geregeld?
+
+H. LATERE UITBREIDING TRAPPEN
+101. Welke traptypes zouden later geconfigureerd worden (recht, draai, spil, steek)?
+102. Welke noodzakelijke maten moeten klanten invoeren?
+103. Welke materiaal-, trede- en leuningopties bestaan?
+104. Welke norm- en veiligheidsregels moeten automatisch worden getoetst?
+105. Kan hetzelfde aanvraagproces en dashboard worden hergebruikt?
+106. Zijn er al CAD-modellen en productievoorbeelden van trappen?
+107. Moeten trappen volledig parametisch worden of gebaseerd op vaste modellen?
+108. Wat is de gewenste tweede-faseplanning?
+
+BELANGRIJKE PRIORITEITEN OM NOG TE BEVESTIGEN
+- Exacte productiegrenzen en meetregels per deurtype.
+- Welke decoraties en profielverdelingen echt mogen.
+- Of handmatig ingerichte modellen of volledig vrije ontwerpen gewenst zijn.
+- Echte verzendbackend voor offertes (Resend/Netlify of bestaande server).
+- Toestemming voor hergebruik van bestaande foto's.
+- Definitieve lijst van glasopties, kleuren en handgrepen.
+
+OPMERKING: In de huidige demo zijn maten, kleuren en uitvoeringen voorbeeldwaarden. Er vindt geen automatische technische productievalidatie of prijsberekening plaats.

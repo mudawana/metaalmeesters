@@ -1,0 +1,29 @@
+name: Import original MetaalMeesters photos
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/import-images.yml'
+      - 'scripts/download-images.mjs'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Download photos from the official website
+        run: npm run download:images
+      - name: Commit downloaded photos
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images
+          if ! git diff --cached --quiet; then
+            git commit -m "Import original site photos [assets]"
+            git push
+          fi
