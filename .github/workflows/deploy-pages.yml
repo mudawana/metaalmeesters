@@ -5,14 +5,15 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
-      - 'index.html'
+      - 'site.source.html'
       - 'package.json'
       - 'package-lock.json'
+      - 'scripts/normalize-build.mjs'
       - 'vite.config.js'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 concurrency:
@@ -26,14 +27,41 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - run: npm install
-      - name: Build for GitHub Pages
+      - name: Compile React application for Pages
         run: npm run build
         env:
           GITHUB_PAGES: 'true'
+      - name: Validate compiled HTML
+        run: |
+          test -f dist/index.html
+          test -d dist/assets
+          if grep -q 'src/main.jsx' dist/index.html; then
+            echo 'ERROR: attempted to publish uncompiled React source'
+            exit 1
+          fi
+      # Repository Pages had *two competing deployments*: legacy Jekyll from
+      # main and our custom build. Publish compiled HTML to main as well so
+      # the legacy publisher cannot overwrite the app with uncompiled JSX.
+      - name: Synchronize compiled build with legacy Pages root
+        run: |
+          cp dist/index.html index.html
+          mkdir -p assets images
+          cp -R dist/assets/. assets/
+          if [ -d dist/images ]; then cp -R dist/images/. images/; fi
+          touch .nojekyll
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets images .nojekyll
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish compiled MetaalMeesters website [skip ci]"
+            git push
+          fi
       - uses: actions/configure-pages@v5
         with:
           enablement: true

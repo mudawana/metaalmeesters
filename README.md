@@ -79,3 +79,10 @@ Alle configuratiestappen, omgevingsvariabelen, privacy-/beveiligingsaandachtspun
 ## Woningweergave — live 3D-deur op echte foto's
 
 De nieuwe configurator toont standaard een 3D-deur **in een echte projectfoto** in plaats van een fictief 3D-huis. Klanten kunnen hun **eigen woningfoto uploaden**, de deur verplaatsen, schalen en in perspectief draaien, het origineel vergelijken en een samengestelde afbeelding downloaden. De kleuren, glasopties en deurmaten blijven live aanpasbaar. De foto is een visuele simulatie zonder gegarandeerde exacte geometrie. Zie [docs/FOTOREALISTISCHE_CONFIGURATOR.md](docs/FOTOREALISTISCHE_CONFIGURATOR.md) voor gebruik en beperkingen.
+
+## Oplossing voor blanco GitHub Pages-website
+Er liepen twee publicaties door elkaar: GitHub Pages (legacy Jekyll, broncode) en de custom Vite Actions-workflow. De laatste Jekyll-push kon het gecompileerde React-project overschrijven, wat een witte pagina veroorzaakte.
+
+Daarom staat de Vite-ingang in `site.source.html`, wordt de geproduceerde HTML door `scripts/normalize-build.mjs` altijd `dist/index.html`, en publiceert de workflow ook de gebouwde HTML/CSS/JS en foto's naar de root van `main`. Daardoor bevat zelfs de legacy branch-publicatie uitsluitend uitvoerbare JS-bestanden.
+
+**Aanbevolen definitieve GitHub-instelling:** Settings > Pages > Build and deployment > Source: **GitHub Actions**. Daarmee verdwijnt de dubbele publicatie. De back-up van de gecompileerde bestanden in `main` houdt de site ook werkend zolang legacy branch publishing nog aanstaat.
