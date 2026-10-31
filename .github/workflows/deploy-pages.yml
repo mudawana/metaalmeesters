@@ -51,13 +51,14 @@ jobs:
       - name: Synchronize compiled build with legacy Pages root
         run: |
           cp dist/index.html index.html
-          mkdir -p assets images
+          mkdir -p assets images homes
           cp -R dist/assets/. assets/
           if [ -d dist/images ]; then cp -R dist/images/. images/; fi
+          if [ -d dist/homes ]; then cp -R dist/homes/. homes/; fi
           touch .nojekyll
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html assets images .nojekyll
+          git add index.html assets images homes .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "Publish compiled MetaalMeesters website [skip ci]"
             git push
