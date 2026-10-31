@@ -10,6 +10,8 @@ on:
       - 'package-lock.json'
       - 'scripts/normalize-build.mjs'
       - 'vite.config.js'
+      - 'scripts/generate-seo-pages.mjs'
+      - 'src/seo-routes.js'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 permissions:
@@ -55,10 +57,15 @@ jobs:
           cp -R dist/assets/. assets/
           if [ -d dist/images ]; then cp -R dist/images/. images/; fi
           if [ -d dist/homes ]; then cp -R dist/homes/. homes/; fi
+          for page in diensten projecten contact offerte configurator portfolio; do
+            if [ -d "dist/$page" ]; then mkdir -p "$page"; cp -R "dist/$page/." "$page/"; fi
+          done
+          cp dist/robots.txt robots.txt
+          cp dist/sitemap.xml sitemap.xml
           touch .nojekyll
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html assets images homes .nojekyll
+          git add index.html assets images homes diensten projecten contact offerte configurator portfolio robots.txt sitemap.xml .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "Publish compiled MetaalMeesters website [skip ci]"
             git push

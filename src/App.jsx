@@ -1,18 +1,27 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Download, Mail, MapPin, Menu, Minus, Move3D, Phone, Plus, RotateCcw, Ruler, Send, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import HousePreview from './HousePreview.jsx';
+import {projects as portfolioProjects,pages as seoPages,pageHref,indexableRoutes} from './seo-routes.js';
 import QuoteForm from './QuoteForm.jsx';
 import Admin from './Admin.jsx';
 import './admin.css';
 import {assets,imageUrl,originalImageUrl,initialDesign,TYPES,FRAMES,GLASSES,formatDesign,downloadDesign} from './data.js';
 
-const routeFromHash=()=>location.hash.replace(/^#\/?/,'').split('?')[0]||'home';
-const nav=[['home','Home'],['diensten','Diensten'],['projecten','Realisaties'],['contact','Contact']];
+const routeFromLocation=()=>{
+  if(typeof window==='undefined')return 'home';
+  const legacy=window.location.hash.match(/^#\/(.+?)(?:\?|$)/)?.[1];
+  if(legacy&&(indexableRoutes.has(legacy)||legacy==='beheer'))return legacy;
+  const base=import.meta.env.BASE_URL||'/';
+  const path=window.location.pathname;
+  const segment=(path.startsWith(base)?path.slice(base.length):path).replace(/^\/|\/$/g,'');
+  return indexableRoutes.has(segment)||segment==='beheer'?segment:'home';
+};
+const nav=[['home','Home'],['diensten','Diensten'],['projecten','Realisaties'],['contact','Contact'],['offerte','Offerte']];
 function Img({name,alt='',...props}) {
   return <img src={imageUrl(name)} alt={alt} onError={e=>{if(e.currentTarget.src!==originalImageUrl(name)) e.currentTarget.src=originalImageUrl(name);}} {...props}/>;
 }
 function Logo({light=false}) {
-  return <a className={'brand '+(light?'brand-light':'')} href="#/home" aria-label="MetaalMeesters - home">
+  return <a className={'brand '+(light?'brand-light':'')} href={pageHref('home')} aria-label="MetaalMeesters - home">
     <span className="brand-symbol"><span></span><span></span><span></span></span>
     <span className="brand-name">METAAL<span>MEESTERS</span><small>MAATWERK IN METAAL</small></span>
   </a>;
@@ -24,10 +33,10 @@ function Header({route}) {
     <div className="header-inner container">
       <Logo light={route==='home'}/>
       <nav className={'site-nav '+(open?'nav-open':'')} aria-label="Hoofdnavigatie">
-        {nav.map(([url,label])=><a key={url} href={'#/'+url} className={route===url?'active':''}>{label}</a>)}
-        <a className="mobile-config" href="#/configurator">3D-configurator <ArrowUpRight size={16}/></a>
+        {nav.map(([url,label])=><a key={url} href={pageHref(url)} className={route===url?'active':''}>{label}</a>)}
+        <a className="mobile-config" href={pageHref('configurator')}>3D-configurator <ArrowUpRight size={16}/></a>
       </nav>
-      <a className="header-cta" href="#/configurator">Ontwerp uw deur <ArrowUpRight size={16}/></a>
+      <a className="header-cta" href={pageHref('configurator')}>Ontwerp uw deur <ArrowUpRight size={16}/></a>
       <button className="menu-toggle" onClick={()=>setOpen(v=>!v)} aria-label="Menu openen of sluiten">{open?<X/>:<Menu/>}</button>
     </div>
   </header>;
@@ -37,14 +46,14 @@ function Footer() {
     <div className="container">
       <div className="footer-top">
         <div><div className="eyebrow light">UW PROJECT, ONS VAKMANSCHAP</div><h2>Een idee in gedachten?<br/><em>Wij maken het waar.</em></h2></div>
-        <a href="#/contact" className="round-link" aria-label="Contact opnemen"><ArrowUpRight size={27}/></a>
+        <a href={pageHref('contact')} className="round-link" aria-label="Contact opnemen"><ArrowUpRight size={27}/></a>
       </div>
       <div className="footer-grid">
         <div><Logo light/><p>Hoogwaardig metaalwerk op maat.<br/>Ontworpen met oog voor detail, gemaakt om lang mee te gaan.</p></div>
-        <div><strong>Ontdek</strong><a href="#/diensten">Onze diensten</a><a href="#/projecten">Realisaties</a><a href="#/configurator">3D-deurconfigurator</a></div>
+        <div><strong>Ontdek</strong><a href={pageHref('diensten')}>Onze diensten</a><a href={pageHref('projecten')}>Realisaties</a><a href={pageHref('configurator')}>3D-deurconfigurator</a></div>
         <div><strong>Contact</strong><a href="mailto:info@metaalmeesters.eu">info@metaalmeesters.eu</a><a href="tel:+32472864888">+32 472 86 48 88</a><span>Smoutpot, Zwijndrecht</span></div>
       </div>
-      <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen. <a href="#/beheer" className="footer-admin-link">Beheerportaal</a></span></div>
+      <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen. <a href={pageHref('beheer')} className="footer-admin-link">Beheerportaal</a></span></div>
     </div>
   </footer>;
 }
@@ -60,27 +69,27 @@ function Home() {
         <div className="hero-eyebrow"><span className="line"/> METAALMEESTERS · ANTWERPEN</div>
         <h1>Metaal in zijn<br/><em>mooiste vorm.</em></h1>
         <p>Van verfijnde stalen deuren tot unieke constructies. Met passie ontworpen, met precisie vervaardigd.</p>
-        <div className="hero-actions"><a href="#/configurator" className="btn btn-cream">Ontwerp uw eigen deur <ArrowUpRight size={18}/></a><a className="hero-link" href="#/projecten">Ontdek onze realisaties <ArrowRight size={18}/></a></div>
+        <div className="hero-actions"><a href={pageHref('configurator')} className="btn btn-cream">Ontwerp uw eigen deur <ArrowUpRight size={18}/></a><a className="hero-link" href={pageHref('projecten')}>Ontdek onze realisaties <ArrowRight size={18}/></a></div>
       </div>
       <div className="hero-bottom container"><span>01 / UNIEK METAALWERK OP MAAT</span><span>SCROLL OM TE ONTDEKKEN <span className="scroll-line"/></span></div>
     </section>
     <section className="intro section-space container">
       <div className="intro-visual"><Img name="details" alt="Detail van een metalen constructie door MetaalMeesters"/><span className="visual-index">01 — VAKMANSCHAP</span></div>
-      <div className="intro-copy"><span className="eyebrow">OVER METAALMEESTERS</span><h2>Geen standaard werk.<br/><em>Wel karakter.</em></h2><p>Bij MetaalMeesters staat maatwerk centraal. Met liefde voor het materiaal en aandacht voor elk detail creëren we duurzame metalen constructies die ruimtes sterker en mooier maken.</p><p>Van het eerste idee tot de laatste afwerking denken onze vakmensen met u mee.</p><a className="text-link" href="#/diensten">Ontdek ons vakmanschap <ArrowUpRight size={18}/></a></div>
+      <div className="intro-copy"><span className="eyebrow">OVER METAALMEESTERS</span><h2>Geen standaard werk.<br/><em>Wel karakter.</em></h2><p>Bij MetaalMeesters staat maatwerk centraal. Met liefde voor het materiaal en aandacht voor elk detail creëren we duurzame metalen constructies die ruimtes sterker en mooier maken.</p><p>Van het eerste idee tot de laatste afwerking denken onze vakmensen met u mee.</p><a className="text-link" href={pageHref('diensten')}>Ontdek ons vakmanschap <ArrowUpRight size={18}/></a></div>
     </section>
     <section className="services-section section-space">
       <div className="container">
-        <SectionHeading label="WAT WE DOEN" title={<>Sterk in metaal.<br/><em>Fijn in detail.</em></>} description="Een selectie uit onze mogelijkheden. Elke realisatie begint met uw verhaal." action={['Alle diensten','#/diensten']}/>
+        <SectionHeading label="WAT WE DOEN" title={<>Sterk in metaal.<br/><em>Fijn in detail.</em></>} description="Een selectie uit onze mogelijkheden. Elke realisatie begint met uw verhaal." action={['Alle diensten',pageHref('diensten')]}/>
         <div className="service-grid">
-          <a href="#/configurator" className="service-card"><div className="service-photo"><Img name="door4" alt="Ontwerp voor stalen deuren"/><span className="service-count">01 / DEUREN</span></div><div className="service-card-bottom"><div><h3>Stalen deuren</h3><p>Op maat, tot in de kleinste details.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
-          <a href="#/diensten" className="service-card"><div className="service-photo"><Img name="railing" alt="Metalen balustrades in maatwerk"/><span className="service-count">02 / CONSTRUCTIES</span></div><div className="service-card-bottom"><div><h3>Constructies</h3><p>Van balustrades tot unieke projecten.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
-          <a href="#/diensten" className="service-card"><div className="service-photo"><Img name="hospitality" alt="Stalen glasconstructie voor horeca"/><span className="service-count">03 / INTERIEUR & HORECA</span></div><div className="service-card-bottom"><div><h3>Interieur & horeca</h3><p>Functioneel, verfijnd en duurzaam.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
+          <a href={pageHref('configurator')} className="service-card"><div className="service-photo"><Img name="door4" alt="Ontwerp voor stalen deuren"/><span className="service-count">01 / DEUREN</span></div><div className="service-card-bottom"><div><h3>Stalen deuren</h3><p>Op maat, tot in de kleinste details.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
+          <a href={pageHref('diensten')} className="service-card"><div className="service-photo"><Img name="railing" alt="Metalen balustrades in maatwerk"/><span className="service-count">02 / CONSTRUCTIES</span></div><div className="service-card-bottom"><div><h3>Constructies</h3><p>Van balustrades tot unieke projecten.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
+          <a href={pageHref('diensten')} className="service-card"><div className="service-photo"><Img name="hospitality" alt="Stalen glasconstructie voor horeca"/><span className="service-count">03 / INTERIEUR & HORECA</span></div><div className="service-card-bottom"><div><h3>Interieur & horeca</h3><p>Functioneel, verfijnd en duurzaam.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
         </div>
       </div>
     </section>
     <section className="config-banner">
       <div className="config-banner-image"><Img name="balcony" alt="Metaalwerk voor residentieel project"/></div>
-      <div className="config-banner-content"><span className="eyebrow light">NIEUW · INTERACTIEVE 3D-CONFIGURATOR</span><h2>Uw deur.<br/><em>Uw ontwerp.</em></h2><p>Kies het model, bepaal de afmetingen en combineer glas, indeling en afwerking. Bekijk uw eigen stalen deur van alle kanten in 3D.</p><a className="btn btn-cream" href="#/configurator">Start met ontwerpen <ArrowUpRight size={18}/></a><small>Vrijblijvend ontwerpen · Offerte op maat</small></div>
+      <div className="config-banner-content"><span className="eyebrow light">NIEUW · INTERACTIEVE 3D-CONFIGURATOR</span><h2>Uw deur.<br/><em>Uw ontwerp.</em></h2><p>Kies het model, bepaal de afmetingen en combineer glas, indeling en afwerking. Bekijk uw eigen stalen deur van alle kanten in 3D.</p><a className="btn btn-cream" href={pageHref('configurator')}>Start met ontwerpen <ArrowUpRight size={18}/></a><small>Vrijblijvend ontwerpen · Offerte op maat</small></div>
     </section>
     <section className="process-section section-space container">
       <SectionHeading label="ONZE AANPAK" title={<>Van eerste idee<br/><em>tot perfect resultaat.</em></>}/>
@@ -93,22 +102,39 @@ function Home() {
 function Diensten() {
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">EXPERTISE</span><h1>Maatwerk dat<br/><em>het verschil maakt.</em></h1><p>Voor particulieren, industrie, recreatie en horeca. Elk project krijgt onze volledige aandacht.</p></div>
     <div className="container service-detail-list">
-      {[['Stalen deuren','Unieke deuren, volledig naar uw wensen samengesteld. Van enkele en dubbele deuren tot schuif- en pivotdeuren.','door4'],['Trappen & balustrades','Karaktervolle metalen trappen en veilige balustrades, op maat voor uw woning of project.','balcony'],['Industrie & constructies','Degelijke metaalconstructies, laswerken en technische oplossingen voor professionele toepassingen.','railing'],['Horeca & maatwerk','Stalen elementen, terrassen en interieurdetails die uw zaak een eigen identiteit geven.','hospitality']].map(([title,txt,img],i)=><article className="service-detail" key={title}><div><span className="eyebrow">0{i+1} / METAALMEESTERS</span><h2>{title}</h2><p>{txt}</p><a className="text-link" href={i===0?'#/configurator':'#/contact'}>{i===0?'Configureer uw deur':'Bespreek uw project'} <ArrowUpRight size={16}/></a></div><Img name={img} alt={title}/></article>)}
+      {[['Stalen deuren','Unieke deuren, volledig naar uw wensen samengesteld. Van enkele en dubbele deuren tot schuif- en pivotdeuren.','door4'],['Trappen & balustrades','Karaktervolle metalen trappen en veilige balustrades, op maat voor uw woning of project.','balcony'],['Industrie & constructies','Degelijke metaalconstructies, laswerken en technische oplossingen voor professionele toepassingen.','railing'],['Horeca & maatwerk','Stalen elementen, terrassen en interieurdetails die uw zaak een eigen identiteit geven.','hospitality']].map(([title,txt,img],i)=><article className="service-detail" key={title}><div><span className="eyebrow">0{i+1} / METAALMEESTERS</span><h2>{title}</h2><p>{txt}</p><a className="text-link" href={pageHref(i===0?'configurator':'contact')}>{i===0?'Configureer uw deur':'Bespreek uw project'} <ArrowUpRight size={16}/></a></div><Img name={img} alt={title}/></article>)}
     </div>
   </main>;
 }
-const projects=[['Project Kontich','Residentieel · Kontich','balcony'],['Project BDP','Horeca · Antwerpen Eilandje','hospitality'],['Metaalwerk op maat','Constructies · Antwerpen','railing'],['Metalen detailwerk','Vakmanschap · Antwerpen','details']];
 function Projecten() {
-  return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">ONZE REALISATIES</span><h1>Werk dat voor<br/><em>zichzelf spreekt.</em></h1><p>Een greep uit de projecten die we met zorg en precisie gerealiseerd hebben.</p></div>
-    <section className="container project-grid">{projects.map(([name,txt,img])=><article className="project-card" key={name}><Img name={img} alt={name}/><div><span>{txt}</span><h3>{name}</h3></div></article>)}</section>
-    <div className="container page-outro"><p>Benieuwd naar uw mogelijkheden?</p><a className="btn btn-dark" href="#/contact">Vertel ons uw idee <ArrowUpRight size={17}/></a></div>
+  return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">ONZE REALISATIES</span><h1>Werk dat voor<br/><em>zichzelf spreekt.</em></h1><p>Bekijk projecten rond stalen deuren, balustrades, veranda's en metaalconstructies in Antwerpen en omgeving.</p></div>
+    <section className="container project-grid">{portfolioProjects.map(p=><a href={pageHref('portfolio/'+p.slug)} className="project-card project-card-seo" key={p.slug}>
+      <div className="project-card-content"><span>{p.category}</span><h3>{p.title}</h3><p>{p.summary}</p><strong>Bekijk het project <ArrowUpRight size={16}/></strong></div>
+    </a>)}</section>
+    <div className="container page-outro"><p>Benieuwd naar de mogelijkheden voor uw eigen project?</p><a className="btn btn-dark" href={pageHref('contact')}>Vertel ons uw idee <ArrowUpRight size={17}/></a></div>
+  </main>;
+}
+function ProjectDetail({project}) {
+  return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">REALISATIE · {project.category}</span><h1>{project.title}</h1><p>{project.summary}</p></div>
+    <section className="container project-detail-body"><p>Een maatwerkproject van MetaalMeesters. De afwerking en uitvoering worden afgestemd op de mogelijkheden en eisen van ieder project.</p>
+      {project.year&&<p><strong>Realisatiejaar:</strong> {project.year}</p>}
+      <p><strong>Sector:</strong> {project.category}</p>
+      <a className="text-link" href={pageHref('projecten')}>Bekijk alle realisaties <ArrowUpRight size={17}/></a>
+      <a className="btn btn-dark" href={pageHref('contact')}>Bespreek uw eigen project <ArrowUpRight size={16}/></a>
+    </section>
+  </main>;
+}
+function Offerte() {
+  return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">VRIJBLIJVEND MAATWERK</span><h1>Een offerte<br/><em>voor uw project.</em></h1><p>Wilt u een stalen deur of een ander metaalproject laten uitvoeren? Vertel ons wat u zoekt, dan bespreken we samen de mogelijkheden.</p></div>
+    <div className="container quote-landing"><div><h2>Ontwerp uw stalen deur in 3D</h2><p>Stel het type, de afmetingen, glaskeuze en afwerking samen. Bekijk uw ontwerp op een echte woningfoto.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Op de huidige demo is automatische offerteverzending nog niet beschikbaar.</small></div>
+    <div><h2>Een ander metaalproject?</h2><p>Voor trappen, balustrades, industriële constructies en horecawerken kunt u rechtstreeks contact opnemen.</p><a className="text-link" href={pageHref('contact')}>Contacteer MetaalMeesters <ArrowUpRight size={17}/></a></div></div>
   </main>;
 }
 function Contact() {
   const [name,setName]=useState(''),[email,setEmail]=useState(''),[message,setMessage]=useState('');
   const contact=e=>{e.preventDefault();location.href='mailto:info@metaalmeesters.eu?subject='+encodeURIComponent('Contactaanvraag MetaalMeesters - '+name)+'&body='+encodeURIComponent('Naam: '+name+'\nE-mail: '+email+'\n\n'+message);};
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">LATEN WE PRATEN</span><h1>Een goed project<br/><em>begint met een gesprek.</em></h1><p>Heeft u een vraag of een bijzonder idee? We helpen u graag verder.</p></div>
-    <div className="container contact-layout"><div className="contact-details"><h3>Contactgegevens</h3><a href="mailto:info@metaalmeesters.eu"><Mail/> info@metaalmeesters.eu</a><a href="tel:+32472864888"><Phone/> +32 472 86 48 88</a><p><MapPin/> Smoutpot, Zwijndrecht</p><div className="contact-aside"><span className="eyebrow">LIEVER EEN DEUR ONTWERPEN?</span><h3>Bekijk het eerst in 3D.</h3><a className="text-link" href="#/configurator">Open de deurconfigurator <ArrowUpRight size={16}/></a></div></div>
+    <div className="container contact-layout"><div className="contact-details"><h3>Contactgegevens</h3><a href="mailto:info@metaalmeesters.eu"><Mail/> info@metaalmeesters.eu</a><a href="tel:+32472864888"><Phone/> +32 472 86 48 88</a><p><MapPin/> Smoutpot, Zwijndrecht</p><div className="contact-aside"><span className="eyebrow">LIEVER EEN DEUR ONTWERPEN?</span><h3>Bekijk het eerst in 3D.</h3><a className="text-link" href={pageHref('configurator')}>Open de deurconfigurator <ArrowUpRight size={16}/></a></div></div>
     <form className="contact-form" onSubmit={contact}><h3>Stuur ons een bericht</h3><label>Uw naam<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Voor- en achternaam"/></label><label>E-mailadres<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label><label>Uw bericht<textarea required rows="6" value={message} onChange={e=>setMessage(e.target.value)} placeholder="Waarmee kunnen wij u helpen?"/></label><button className="btn btn-dark" type="submit">Open e-mailprogramma <ArrowUpRight size={17}/></button><small>Uw e-mailprogramma wordt geopend. Controleer en verstuur het bericht zelf.</small></form></div>
   </main>;
 }
@@ -174,9 +200,11 @@ function Configurator() {
     <div className="container config-bottom-note"><span>HANDGEMAAKT. PRECIES ZOALS U HET WILT.</span><a href="mailto:info@metaalmeesters.eu">Hulp nodig? Contacteer ons <ArrowUpRight size={16}/></a></div>
   </main>;
 }
-export default function App() {
-  const [route,setRoute]=useState(routeFromHash);
-  useEffect(()=>{const change=()=>{setRoute(routeFromHash());window.scrollTo({top:0,behavior:'instant'});};window.addEventListener('hashchange',change);return()=>window.removeEventListener('hashchange',change);},[]);
-  const current=['home','diensten','projecten','contact','configurator','beheer'].includes(route)?route:'home';
-  return <><Header route={current}/>{current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='beheer'?<Admin/>:<Configurator/>}<Footer/></>;
+export default function App({initialRoute}) {
+  const [route,setRoute]=useState(()=>initialRoute||routeFromLocation());
+  useEffect(()=>{const change=()=>{setRoute(routeFromLocation());window.scrollTo({top:0,behavior:'instant'});};window.addEventListener('hashchange',change);window.addEventListener('popstate',change);return()=>{window.removeEventListener('hashchange',change);window.removeEventListener('popstate',change);};},[]);
+  const current=indexableRoutes.has(route)||route==='beheer'?route:'home';
+  const portfolio=portfolioProjects.find(p=>'portfolio/'+p.slug===current);
+  const activeNav=portfolio?'projecten':current;
+  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='beheer'?<Admin/>:<Configurator/>}<Footer/></>;
 }
