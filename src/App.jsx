@@ -53,7 +53,7 @@ function Footer() {
         <div><strong>Ontdek</strong><a href={pageHref('diensten')}>Onze diensten</a><a href={pageHref('projecten')}>Realisaties</a><a href={pageHref('configurator')}>3D-deurconfigurator</a></div>
         <div><strong>Contact</strong><a href="mailto:info@metaalmeesters.eu">info@metaalmeesters.eu</a><a href="tel:+32472864888">+32 472 86 48 88</a><span>Smoutpot, Zwijndrecht</span></div>
       </div>
-      <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen. <a href={pageHref('beheer')} className="footer-admin-link">Beheerportaal</a></span></div>
+      <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen. <a href={pageHref('home')+'#/beheer'} className="footer-admin-link">Beheerportaal</a></span></div>
     </div>
   </footer>;
 }
