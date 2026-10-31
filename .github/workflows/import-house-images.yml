@@ -1,0 +1,29 @@
+name: Import licensed house images
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/download-house-images.mjs'
+      - '.github/workflows/import-house-images.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Download checked Pexels source photos
+        run: node scripts/download-house-images.mjs
+      - name: Commit photographs to repository
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/homes
+          if ! git diff --cached --quiet; then
+            git commit -m "Import licensed sample houses from Pexels [assets]"
+            git push
+          fi
