@@ -75,3 +75,7 @@ De demo bevat een beveiligde beheerpagina op `/#/beheer` en een offerteformulier
 **Let op:** GitHub Pages ondersteunt geen server-side opslag of authenticatie. De GitHub Pages-link blijft dus alleen een demo; het offerteformulier toont een duidelijke fout in plaats van persoonlijke data te lekken of een valse bevestiging te geven. Voor echte aanvragen is een deployment op Netlify nodig.
 
 Alle configuratiestappen, omgevingsvariabelen, privacy-/beveiligingsaandachtspunten en testinstructies staan in [docs/OFFERTEPORTAAL_INSTALLATIE.txt](docs/OFFERTEPORTAAL_INSTALLATIE.txt).
+
+## Woningweergave — live 3D-deur op echte foto's
+
+De nieuwe configurator toont standaard een 3D-deur **in een echte projectfoto** in plaats van een fictief 3D-huis. Klanten kunnen hun **eigen woningfoto uploaden**, de deur verplaatsen, schalen en in perspectief draaien, het origineel vergelijken en een samengestelde afbeelding downloaden. De kleuren, glasopties en deurmaten blijven live aanpasbaar. De foto is een visuele simulatie zonder gegarandeerde exacte geometrie. Zie [docs/FOTOREALISTISCHE_CONFIGURATOR.md](docs/FOTOREALISTISCHE_CONFIGURATOR.md) voor gebruik en beperkingen.
