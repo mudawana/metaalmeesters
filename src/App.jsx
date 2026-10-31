@@ -193,7 +193,7 @@ function Configurator() {
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">
-    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp uw stalen deur en bekijk deze in een echte projectfoto of op een foto van uw eigen woning.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
+    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp uw stalen deur en bekijk hoe een complete 3D-woning automatisch meegroeit met de afmetingen. Of gebruik een foto van uw eigen huis.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
       <div><Suspense fallback={<div className="viewer-loading">De 3D-configurator wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>

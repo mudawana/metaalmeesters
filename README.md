@@ -89,3 +89,7 @@ Daarom staat de Vite-ingang in `site.source.html`, wordt de geproduceerde HTML d
 
 ### Fotovoorbeelden van andere woningen (31 oktober 2026)
 De oude MetaalMeesters-projectbeelden zijn **volledig verwijderd uit de keuzelijst van woningachtergronden**. De configurator gebruikt vier zorgvuldig geselecteerde **Pexels-foto's** met toegestane commerciële toepassing: lichte echte deuropening, moderne gevel, klassieke woning en gezinswoning. Een bron- en fotografenvermelding staat in `public/homes/README.md` en in de configurator. Foto's met bestaande deuren worden niet automatisch leeg gemaakt; het 3D-model wordt over de bestaande opening geprojecteerd. De knop **Mijn eigen foto** blijft behouden en is de nauwkeurigste manier om de deur in de persoonlijke situatie te bekijken.
+
+### Nieuwe dynamische 3D-woning
+
+De configurator toont standaard een volledig procedurele 3D-woning met een **echte, meegroeibare muuropening** voor de gekozen stalen deur. De muren, ramen, dorpel en bovenbouw reageren op bredere en hogere afmetingen. Er zijn twee gevelafwerkingen en twee camerastandpunten. De bestaande optie **echte woningfoto / eigen foto** en het 3D-atelier blijven bestaan. Dit is een indicatieve architectuurvisualisatie en geen technische bouwtekening. Zie [docs/DYNAMISCHE_3D_WONING.md](docs/DYNAMISCHE_3D_WONING.md).

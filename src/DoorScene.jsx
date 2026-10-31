@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Canvas } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, RoundedBox } from '@react-three/drei';
+import ParametricHouse from './ParametricHouse.jsx';
+import {getHouseGeometry} from './house-geometry.mjs';
 
 function Metal({ color, roughness=0.38 }) {
   return <meshStandardMaterial color={color} metalness={0.78} roughness={roughness} envMapIntensity={1.4} />;
@@ -89,28 +91,47 @@ function Showroom({room}) {
   </>;
 }
 
-function PhotoCamera({height}) {
+function AdaptiveCamera({mode,width,height,view}) {
   const {camera}=useThree();
-  useEffect(()=>{camera.position.set(0,height/2,5.1);camera.lookAt(0,height/2,0);camera.updateProjectionMatrix();},[camera,height]);
+  useEffect(()=>{
+    if(mode==='photo'){
+      camera.position.set(0,height/2,5.1);
+      camera.lookAt(0,height/2,0);
+    } else if(mode==='house'){
+      const wall=getHouseGeometry(width*1000,height*1000);
+      const close=view==='detail';
+      const distance=close?Math.max(5.1,width*1.85+3.4):Math.max(10.6,wall.wallWidth*1.45);
+      const focus=close?height*.56:Math.min(2.65,wall.wallHeight*.48);
+      camera.position.set(close?distance*.23:distance*.30,focus+(close?1.05:2.3),distance);
+      camera.lookAt(0,focus,-.25);
+    } else {
+      camera.position.set(3.7,2.8,6.4);
+      camera.lookAt(0,1.17,0);
+    }
+    camera.updateProjectionMatrix();
+  },[camera,mode,width,height,view]);
   return null;
 }
 
-function Scene({config,photoMode=false,photoAngle=0}) {
+function Scene({config,photoMode=false,photoAngle=0,environment='studio',finish='warm',view='overview'}) {
   const w=Math.max(.5,Math.min(3.6,Number(config.width)/1000));
   const h=Math.max(1.3,Math.min(3.5,Number(config.height)/1000));
+  const inHouse=!photoMode&&environment==='house';
+  const house=getHouseGeometry(config.width,config.height);
   const double=config.type==='dubbel';
   const slide=config.type==='schuif';
   const right=config.opening==='rechts';
   const offset=config.type==='pivot'?0.12:0;
   const singleX=right ? w/2-offset+(slide&&config.open?w*0.56:0) : -w/2+offset-(slide&&config.open?w*0.56:0);
   return <>
-    {photoMode&&<PhotoCamera height={h}/>}
-    <ambientLight intensity={photoMode?1.7:1.45}/>
+    <AdaptiveCamera mode={photoMode?'photo':inHouse?'house':'studio'} width={w} height={h} view={view}/>
+    <ambientLight intensity={photoMode ? 1.7 : inHouse ? 0.85 : 1.45}/>
     <hemisphereLight args={['#fff9e9','#a7a29d',1.15]}/>
     <directionalLight position={[4,7,6]} intensity={2.2} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.0003}/>
     <directionalLight position={[-3,4,-1]} intensity={1.3} color="#e9f2fa"/>
-    {!photoMode&&<Showroom room={config.room}/>}
-    <group position={[0,0,photoMode?0:0.3]} rotation={[0,photoMode?photoAngle*Math.PI/180:0,0]}>
+    {inHouse&&<><color attach="background" args={['#dbe3e6']}/><fog attach="fog" args={['#dbe3e6',23,60]}/></>}
+    {inHouse?<ParametricHouse widthMm={config.width} heightMm={config.height} finish={finish}/>:!photoMode&&<Showroom room={config.room}/>}
+    <group position={[0,0,photoMode ? 0 : inHouse ? 0.13 : 0.3]} rotation={[0,photoMode?photoAngle*Math.PI/180:0,0]}>
       {double ? <>
         <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config} photoMode={photoMode}/>
         <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config} photoMode={photoMode}/>
@@ -122,13 +143,14 @@ function Scene({config,photoMode=false,photoAngle=0}) {
         <mesh position={[right?w/2-0.12:-w/2+0.12,0.035,0.01]}><cylinderGeometry args={[0.05,0.05,0.07,24]}/><meshStandardMaterial color="#9b9a93" metalness={0.8} roughness={0.3}/></mesh>
       </>}
     </group>
-    {!photoMode&&<ContactShadows position={[0,-0.025,0.25]} opacity={0.44} scale={9} blur={2.5} far={4}/>}
-    {!photoMode&&<OrbitControls makeDefault enablePan={false} minDistance={3.2} maxDistance={11} target={[0,1.17,0]} minPolarAngle={0.45} maxPolarAngle={Math.PI/2.04}/>}
+    {!photoMode&&!inHouse&&<ContactShadows position={[0,-0.025,0.25]} opacity={0.44} scale={9} blur={2.5} far={4}/>}
+    {!photoMode&&<OrbitControls makeDefault enablePan={false} minDistance={inHouse?3.1:3.2} maxDistance={inHouse?27:11} target={inHouse?[0,view==='detail'?h*.56:Math.min(2.65,house.wallHeight*.48),-.25]:[0,1.17,0]} minAzimuthAngle={inHouse?-1.1:-Infinity} maxAzimuthAngle={inHouse?1.1:Infinity} minPolarAngle={0.45} maxPolarAngle={Math.PI/2.04}/>}
   </>;
 }
 
-export default function DoorScene({config,resetToken,photoMode=false,photoAngle=0}) {
-  return <Canvas key={resetToken} shadows={!photoMode} dpr={[1,1.75]} camera={{position:photoMode?[0,1.1,5.1]:[3.7,2.8,6.4],fov:photoMode?32:41,near:0.1,far:100}} gl={{alpha:photoMode,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}} onCreated={({gl})=>{if(photoMode)gl.setClearColor('#ffffff',0);}} fallback={<div className="webgl-fallback">Uw browser ondersteunt geen WebGL. Probeer een recentere browser.</div>}>
-    <Scene config={config} photoMode={photoMode} photoAngle={photoAngle}/>
+export default function DoorScene({config,resetToken,photoMode=false,photoAngle=0,environment='studio',finish='warm',view='overview'}) {
+  const inHouse=environment==='house'&&!photoMode;
+  return <Canvas key={resetToken} shadows={!photoMode} dpr={[1,1.65]} camera={{position:photoMode?[0,1.1,5.1]:inHouse?[4.1,5,12]:[3.7,2.8,6.4],fov:photoMode?32:41,near:0.1,far:120}} gl={{alpha:photoMode,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}} onCreated={({gl})=>{if(photoMode)gl.setClearColor('#ffffff',0);}} fallback={<div className="webgl-fallback">Uw browser ondersteunt geen WebGL. Probeer een recentere browser.</div>}>
+    <Scene config={config} photoMode={photoMode} photoAngle={photoAngle} environment={environment} finish={finish} view={view}/>
   </Canvas>;
 }
