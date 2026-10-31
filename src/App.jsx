@@ -1,11 +1,12 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Download, Mail, MapPin, Menu, Minus, Move3D, Phone, Plus, RotateCcw, Ruler, Send, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react';
-import HousePreview from './HousePreview.jsx';
 import {projects as portfolioProjects,pages as seoPages,pageHref,indexableRoutes} from './seo-routes.js';
 import QuoteForm from './QuoteForm.jsx';
-import Admin from './Admin.jsx';
 import './admin.css';
-import {assets,imageUrl,originalImageUrl,initialDesign,TYPES,FRAMES,GLASSES,formatDesign,downloadDesign} from './data.js';
+// The heavy Three.js preview and private admin app are loaded only when needed.
+const HousePreview=React.lazy(()=>import('./HousePreview.jsx'));
+const Admin=React.lazy(()=>import('./Admin.jsx'));
+import {assets,imageUrl,initialDesign,TYPES,FRAMES,GLASSES,formatDesign,downloadDesign} from './data.js';
 
 const routeFromLocation=()=>{
   if(typeof window==='undefined')return 'home';
@@ -18,7 +19,7 @@ const routeFromLocation=()=>{
 };
 const nav=[['home','Home'],['diensten','Diensten'],['projecten','Realisaties'],['contact','Contact'],['offerte','Offerte']];
 function Img({name,alt='',...props}) {
-  return <img src={imageUrl(name)} alt={alt} onError={e=>{if(e.currentTarget.src!==originalImageUrl(name)) e.currentTarget.src=originalImageUrl(name);}} {...props}/>;
+  return <img src={imageUrl(name)} alt={alt} onError={e=>{const fallback=imageUrl('hero');if(!e.currentTarget.src.endsWith(fallback))e.currentTarget.src=fallback;}} {...props}/>;
 }
 function Logo({light=false}) {
   return <a className={'brand '+(light?'brand-light':'')} href={pageHref('home')} aria-label="MetaalMeesters - home">
@@ -195,7 +196,7 @@ function Configurator() {
     <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp uw stalen deur en bekijk deze in een echte projectfoto of op een foto van uw eigen woning.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
-      <div><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>
+      <div><Suspense fallback={<div className="viewer-loading">De 3D-configurator wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>
     </div>
     <div className="container config-bottom-note"><span>HANDGEMAAKT. PRECIES ZOALS U HET WILT.</span><a href="mailto:info@metaalmeesters.eu">Hulp nodig? Contacteer ons <ArrowUpRight size={16}/></a></div>
   </main>;
@@ -206,5 +207,5 @@ export default function App({initialRoute}) {
   const current=indexableRoutes.has(route)||route==='beheer'?route:'home';
   const portfolio=portfolioProjects.find(p=>'portfolio/'+p.slug===current);
   const activeNav=portfolio?'projecten':current;
-  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='beheer'?<Admin/>:<Configurator/>}<Footer/></>;
+  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<Configurator/>}<Footer/></>;
 }
