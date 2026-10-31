@@ -1,6 +1,5 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Download, Mail, MapPin, Menu, Minus, Move3D, Phone, Plus, RotateCcw, Ruler, Send, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react';
-import DoorScene from './DoorScene.jsx';
 import HousePreview from './HousePreview.jsx';
 import QuoteForm from './QuoteForm.jsx';
 import Admin from './Admin.jsx';
@@ -170,7 +169,7 @@ function Configurator() {
     <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp uw stalen deur en bekijk deze in een echte projectfoto of op een foto van uw eigen woning.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
-      <HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/>
+      <div><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>
     </div>
     <div className="container config-bottom-note"><span>HANDGEMAAKT. PRECIES ZOALS U HET WILT.</span><a href="mailto:info@metaalmeesters.eu">Hulp nodig? Contacteer ons <ArrowUpRight size={16}/></a></div>
   </main>;

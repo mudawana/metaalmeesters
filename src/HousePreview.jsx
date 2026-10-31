@@ -17,7 +17,7 @@ const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 function Control({label,value,min,max,onChange,unit='%'}) {
   return <label className="house-adjustment"><span>{label}<strong>{value}{unit}</strong></span><input type="range" min={min} max={max} value={value} onChange={e=>onChange(Number(e.target.value))}/></label>;
 }
-export default function HousePreview({config,resetToken,onNotice}) {
+export default function HousePreview({config,resetToken,onNotice,onChange}) {
   const [mode,setMode]=useState('huis');
   const [selected,setSelected]=useState(REAL_PHOTOS[0].id);
   const [ownPhoto,setOwnPhoto]=useState(null);
@@ -120,7 +120,7 @@ export default function HousePreview({config,resetToken,onNotice}) {
       </div>
     </>:<div className="door-canvas" id="door-canvas"><DoorScene config={config} resetToken={resetToken}/><div className="canvas-bottom"><Move size={16}/> Sleep om te draaien · Scroll om te zoomen</div></div>}
     <div className="viewer-actions">
-      <div><button className="viewer-btn" onClick={()=>onNotice('Open de deur via het ontwerp hierboven.') }><Eye size={16}/> {mode==='huis'?'Fotomontage':'3D-model'}</button><button className="viewer-btn" onClick={()=>setMode(v=>v==='huis'?'studio':'huis')}><House size={16}/>{mode==='huis'?'3D atelier':'In huis bekijken'}</button></div>
+      <div><button className="viewer-btn" onClick={()=>onChange({open:!config.open}) }><Eye size={16}/> {config.open?'Deur sluiten':config.type==='schuif'?'Deur verschuiven':'Deur openen'}</button><button className="viewer-btn" onClick={()=>setMode(v=>v==='huis'?'studio':'huis')}><House size={16}/>{mode==='huis'?'3D atelier':'In huis bekijken'}</button></div>
       <div><button className="icon-btn" title="Bewaar afbeelding" onClick={savePreview}><Download size={17}/></button><button className="viewer-btn muted" onClick={()=>downloadDesign(config)}><Download size={15}/> Ontwerpdata</button></div>
     </div>
     <div className="viewer-disclaimer"><Check size={15}/> De afmetingen en maakbaarheid worden bij een officiële offerte gecontroleerd door MetaalMeesters.</div>
