@@ -1,0 +1,42 @@
+/* Real photograph context and photorealistic 3D overlay */
+.house-viewer{overflow:hidden}
+.view-mode-tabs{height:57px;padding:7px 17px;display:flex;align-items:center;gap:8px;background:#faf9f6;border-bottom:1px solid #e6e4dc}
+.view-mode-tabs button{display:flex;align-items:center;justify-content:center;gap:9px;background:transparent;border:1px solid transparent;padding:10px 14px;font-size:11px;font-weight:800;color:#747c74;transition:background .2s}
+.view-mode-tabs button.current{background:#242a27;color:#fff;border-color:#242a27}
+.view-mode-tabs button:hover:not(.current){background:#ecebe6}
+.house-toolbar{height:50px}
+.house-stage{height:550px;background:#d8d4cb;overflow:hidden;position:relative;isolation:isolate}
+.house-real-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;pointer-events:none}
+.house-photo-vignette{position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,#161d2140,transparent 17%,transparent 78%,#0d15141d);pointer-events:none}
+.house-door-overlay{position:absolute;z-index:2;transform:translate(-50%,-50%);touch-action:none;cursor:grab;user-select:none;filter:drop-shadow(4px 8px 5px rgba(12,20,21,.24));will-change:left,top}
+.house-door-overlay:active{cursor:grabbing}
+.house-door-overlay canvas{pointer-events:none;outline:0;display:block}
+.house-photo-label{position:absolute;z-index:3;top:15px;left:17px;background:#ffffffdc;color:#263229;display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:9px;font-weight:800;letter-spacing:.1em;pointer-events:none}
+.house-drag-hint{position:absolute;z-index:3;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px;white-space:nowrap;background:#202822dd;backdrop-filter:blur(5px);color:white;padding:10px 15px;font-size:10px;pointer-events:none}
+.house-context-controls{background:#fafaf8;border-top:1px solid #e4e4dd;padding:22px 23px 18px}
+.house-context-top,.house-placement-head{display:flex;align-items:start;justify-content:space-between;gap:14px}
+.house-context-top>div,.house-placement-head>div{display:flex;flex-direction:column;gap:5px}
+.house-context-top strong,.house-placement-head strong{font-family:Manrope,sans-serif;font-size:12px;letter-spacing:-.035em}
+.house-context-top span,.house-placement-head span{color:#8c928a;font-size:10px}
+.house-compare,.house-reset{border:1px solid #daddd5;background:white;display:flex;align-items:center;gap:8px;padding:10px 11px;font-size:10px;font-weight:800;color:#49564b;white-space:nowrap}
+.house-compare:hover,.house-reset:hover{background:#e9e7df}
+.house-photo-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:17px;margin-bottom:19px}
+.house-photo-option{position:relative;border:2px solid transparent;background:white;padding:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;overflow:hidden;height:82px;color:#616a62}
+.house-photo-option img{width:100%;height:58px;object-fit:cover}
+.house-photo-option>span{font-size:9px;font-weight:800;min-width:0;max-width:100%;padding:6px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.house-photo-option.active{border-color:#a78c69}
+.house-photo-check{position:absolute;right:4px;top:5px;background:#26322b;color:white;border-radius:50%;padding:2px;width:20px;height:20px}
+.house-upload-tile{border:1px dashed #b8bcb2;background:#f3f2ec;gap:6px}
+.house-upload-tile svg{color:#988066}
+.house-placement-head{align-items:center;padding:17px 0 15px;border-top:1px solid #e6e6de}
+.house-adjust-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px;row-gap:15px}
+.house-adjustment{display:flex;flex-direction:column;gap:5px;min-width:0}
+.house-adjustment>span{display:flex;justify-content:space-between;gap:10px;font-size:10px;font-weight:700;color:#677169}
+.house-adjustment>span strong{color:#977b58}
+.house-adjustment input{width:100%;accent-color:#9d8666;cursor:pointer}
+.house-reality-note{border-left:2px solid #b49a78;padding:9px 12px;background:#f2f0e9;font-size:10px;line-height:1.65;color:#777f76;margin:20px 0 2px}
+.house-reality-note strong{color:#49554b}
+@media(max-width:1180px){.house-stage{height:480px}.house-context-controls{padding:18px}.house-photo-option{height:73px}.house-photo-option img{height:51px}}
+@media(max-width:940px){.house-stage{height:530px}}
+@media(max-width:640px){.house-toolbar{height:47px}.view-mode-tabs{height:53px;padding:6px 9px}.view-mode-tabs button{padding:10px 11px;font-size:10px}.house-stage{height:385px}.house-photo-label{top:11px;left:10px;font-size:8px}.house-context-controls{padding:17px 12px}.house-context-top{flex-direction:column;align-items:start;gap:12px}.house-photo-options{gap:6px;margin-top:13px}.house-photo-option{height:75px}.house-photo-option>span{font-size:8px}.house-photo-option img{height:54px}.house-adjust-grid{gap:11px 15px}.house-compare{padding:8px 10px}.house-drag-hint{font-size:9px}.house-reality-note{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.house-door-overlay{will-change:auto}}

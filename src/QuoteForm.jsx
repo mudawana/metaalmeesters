@@ -1,21 +1,7 @@
 import React,{useState} from 'react';
 import {Send,ShieldCheck} from 'lucide-react';
+import {capturePreviewImage} from './previewCapture.js';
 
-function captureDoorImage(){
-  const source=document.querySelector('#door-canvas canvas');
-  if(!source?.width||!source?.height)throw Error('Er kon geen 3D-afbeelding gemaakt worden. Vernieuw de pagina en probeer opnieuw.');
-  const target=document.createElement('canvas');
-  const ratio=Math.min(1,860/Math.max(source.width,source.height));
-  target.width=Math.round(source.width*ratio);
-  target.height=Math.round(source.height*ratio);
-  const ctx=target.getContext('2d');
-  if(!ctx)throw Error('Deze browser ondersteunt geen afbeeldingsopslag.');
-  ctx.drawImage(source,0,0,target.width,target.height);
-  const image=target.toDataURL('image/jpeg',0.78);
-  if(!image.startsWith('data:image/jpeg;base64,')||image.length>1400000)
-    throw Error('De 3D-afbeelding kon niet worden opgeslagen. Probeer een andere browser.');
-  return image;
-}
 export default function QuoteForm({design}) {
   const [name,setName]=useState(''),[email,setEmail]=useState(''),[phone,setPhone]=useState(''),[city,setCity]=useState(''),[notes,setNotes]=useState(''),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[success,setSuccess]=useState(false),[website,setWebsite]=useState('');
   async function submit(e) {
@@ -24,7 +10,7 @@ export default function QuoteForm({design}) {
     try {
       if(location.hostname.endsWith('github.io'))
         throw Error('Dit is de openbare ontwerp-demo. Aanvragen worden pas opgeslagen nadat de privé-offerteserver op Netlify is aangesloten.');
-      const image=captureDoorImage();
+      const image=await capturePreviewImage({max:860,quality:0.78});
       const response=await fetch('/.netlify/functions/quotes',{
         method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({name,email,phone,city,notes,design,image,consent,website})

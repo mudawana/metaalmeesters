@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Download, Mail, MapPin, Menu, Minus, Move3D, Phone, Plus, RotateCcw, Ruler, Send, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import DoorScene from './DoorScene.jsx';
+import HousePreview from './HousePreview.jsx';
 import QuoteForm from './QuoteForm.jsx';
 import Admin from './Admin.jsx';
 import './admin.css';
@@ -165,25 +166,11 @@ function Configurator() {
   const change=(patch)=>setD(old=>({...old,...patch}));
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
-  const screenshot=()=>{try{const canvas=document.querySelector('#door-canvas canvas');if(!canvas)throw Error('Geen afbeelding');const a=document.createElement('a');a.download='metaalmeesters-3d-ontwerp.png';a.href=canvas.toDataURL('image/png');a.click();setNotice('Afbeelding gedownload.');}catch{setNotice('Een schermafbeelding is niet beschikbaar op dit toestel.');}};
   return <main className="config-page">
-    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Een unieke stalen deur begint met uw idee. Geef het vorm in onze interactieve 3D-studio.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
+    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp uw stalen deur en bekijk deze in een echte projectfoto of op een foto van uw eigen woning.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
-      <section className="viewer-wrap" aria-label="Interactieve 3D-deurweergave">
-        <div className="viewer-toolbar"><div><span className="live-dot"/><strong>LIVE 3D PREVIEW</strong></div><span>INTERACTIEF MODEL</span></div>
-        <div className="door-canvas" id="door-canvas">
-          <DoorScene config={d} resetToken={resetToken}/>
-          <div className="canvas-top"><span>{TYPES.find(t=>t.id===d.type)?.label}</span><span>{d.width} × {d.height} mm</span></div>
-          <div className="canvas-bottom"><Move3D size={16}/> Sleep om te draaien · Scroll om in te zoomen</div>
-        </div>
-        <div className="viewer-actions">
-          <div><button className="viewer-btn" onClick={()=>change({open:!d.open})}><RotateCcw size={16}/> {d.open?'Sluit deur':d.type==='schuif'?'Schuif open':'Open deur'}</button><button className="viewer-btn" onClick={()=>change({room:d.room==='studio'?'neutraal':'studio'})}><Sparkles size={16}/> {d.room==='studio'?'Neutrale achtergrond':'Showroom'}</button></div>
-          <div><button className="icon-btn" title="Download 3D-afbeelding" onClick={screenshot}><Download size={18}/></button><button className="viewer-btn muted" onClick={()=>downloadDesign(d)}><Download size={16}/> Gegevens</button></div>
-        </div>
-        {notice&&<p className="viewer-notice" role="status">{notice}</p>}
-        <div className="viewer-disclaimer"><ShieldCheck size={15}/> 3D visualisatie ter illustratie. Afmetingen en uitvoerbaarheid worden bevestigd door het atelier.</div>
-      </section>
+      <HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/>
     </div>
     <div className="container config-bottom-note"><span>HANDGEMAAKT. PRECIES ZOALS U HET WILT.</span><a href="mailto:info@metaalmeesters.eu">Hulp nodig? Contacteer ons <ArrowUpRight size={16}/></a></div>
   </main>;

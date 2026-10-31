@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useEffect } from 'react';
+import { useThree } from '@react-three/fiber';
 import { Canvas } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, RoundedBox } from '@react-three/drei';
 
@@ -11,7 +12,7 @@ function Bar({pos,size,color,radius=0.004}) {
   return <RoundedBox args={size} position={pos} radius={radius} smoothness={3} castShadow receiveShadow><Metal color={color}/></RoundedBox>;
 }
 
-function Glass({width,height,kind}) {
+function Glass({width,height,kind,photoMode=false}) {
   const style = {
     helder:{color:'#d9edf2',roughness:0.045,transmission:0.92,opacity:1},
     mat:{color:'#d5d9d5',roughness:0.82,transmission:0.26,opacity:1},
@@ -21,7 +22,10 @@ function Glass({width,height,kind}) {
   return <group>
     <mesh position={[0,0,0]} castShadow>
       <boxGeometry args={[width,height,0.009]}/>
-      <meshPhysicalMaterial color={style.color} roughness={style.roughness} transmission={style.transmission} thickness={0.025} ior={1.52} metalness={0} transparent opacity={style.opacity} clearcoat={0.9} clearcoatRoughness={0.08} side={2}/>
+      {photoMode ?
+        <meshPhysicalMaterial color={style.color} roughness={style.roughness} metalness={0.05} transparent opacity={kind==='mat'?0.76:kind==='rook'?0.36:kind==='ribbel'?0.30:0.17} depthWrite={false} side={2} clearcoat={0.75} clearcoatRoughness={0.09}/> :
+        <meshPhysicalMaterial color={style.color} roughness={style.roughness} transmission={style.transmission} thickness={0.025} ior={1.52} metalness={0} transparent opacity={style.opacity} clearcoat={0.9} clearcoatRoughness={0.08} side={2}/>
+      }
     </mesh>
     {kind==='ribbel' && Array.from({length:Math.floor(width/0.032)},(_,i)=>(
       <mesh key={i} position={[-width/2 + (i+1)*0.032,0,0.007]}>
@@ -41,7 +45,7 @@ function Handle({x,y,color,kind}) {
   </group>;
 }
 
-function DoorLeaf({x,width,height,hinge,config,pivotOffset=0}) {
+function DoorLeaf({x,width,height,hinge,config,pivotOffset=0,photoMode=false}) {
   const color = FRAME_COLORS[config.frame] || FRAME_COLORS.zwart;
   const flip=hinge==='right';
   const sign=flip?-1:1;
@@ -54,7 +58,7 @@ function DoorLeaf({x,width,height,hinge,config,pivotOffset=0}) {
   const angle=config.open && config.type!=='schuif' ? (flip?1:-1)*(config.type==='pivot'?0.72:0.5) : 0;
   return <group position={[x,0,0]} rotation={[0,angle,0]}>
     <group position={[center,height/2,0]}>
-      <Glass width={innerWidth} height={innerHeight} kind={config.glass}/>
+      <Glass width={innerWidth} height={innerHeight} kind={config.glass} photoMode={photoMode}/>
       <Bar pos={[-width/2+frame/2,0,0.016]} size={[frame,height,0.065]} color={color}/>
       <Bar pos={[ width/2-frame/2,0,0.016]} size={[frame,height,0.065]} color={color}/>
       <Bar pos={[0,height/2-frame/2,0.016]} size={[width,frame,0.065]} color={color}/>
@@ -85,7 +89,13 @@ function Showroom({room}) {
   </>;
 }
 
-function Scene({config}) {
+function PhotoCamera({height}) {
+  const {camera}=useThree();
+  useEffect(()=>{camera.position.set(0,height/2,5.1);camera.lookAt(0,height/2,0);camera.updateProjectionMatrix();},[camera,height]);
+  return null;
+}
+
+function Scene({config,photoMode=false,photoAngle=0}) {
   const w=Math.max(.5,Math.min(3.6,Number(config.width)/1000));
   const h=Math.max(1.3,Math.min(3.5,Number(config.height)/1000));
   const double=config.type==='dubbel';
@@ -94,30 +104,31 @@ function Scene({config}) {
   const offset=config.type==='pivot'?0.12:0;
   const singleX=right ? w/2-offset+(slide&&config.open?w*0.56:0) : -w/2+offset-(slide&&config.open?w*0.56:0);
   return <>
-    <ambientLight intensity={1.45}/>
+    {photoMode&&<PhotoCamera height={h}/>}
+    <ambientLight intensity={photoMode?1.7:1.45}/>
     <hemisphereLight args={['#fff9e9','#a7a29d',1.15]}/>
     <directionalLight position={[4,7,6]} intensity={2.2} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.0003}/>
     <directionalLight position={[-3,4,-1]} intensity={1.3} color="#e9f2fa"/>
-    <Showroom room={config.room}/>
-    <group position={[0,0,0.3]}>
+    {!photoMode&&<Showroom room={config.room}/>}
+    <group position={[0,0,photoMode?0:0.3]} rotation={[0,photoMode?photoAngle*Math.PI/180:0,0]}>
       {double ? <>
-        <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config}/>
-        <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config}/>
+        <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config} photoMode={photoMode}/>
+        <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config} photoMode={photoMode}/>
       </> : <>
-        <DoorLeaf x={singleX} width={w} height={h} hinge={right?'right':'left'} pivotOffset={offset} config={slide?{...config,open:false}:config}/>
+        <DoorLeaf x={singleX} width={w} height={h} hinge={right?'right':'left'} pivotOffset={offset} config={slide?{...config,open:false}:config} photoMode={photoMode}/>
       </>}
       {slide && <Bar pos={[0,h+0.1,-0.02]} size={[w*1.8,0.06,0.08]} color={FRAME_COLORS[config.frame]}/>}
       {config.type==='pivot' && <>
         <mesh position={[right?w/2-0.12:-w/2+0.12,0.035,0.01]}><cylinderGeometry args={[0.05,0.05,0.07,24]}/><meshStandardMaterial color="#9b9a93" metalness={0.8} roughness={0.3}/></mesh>
       </>}
     </group>
-    <ContactShadows position={[0,-0.025,0.25]} opacity={0.44} scale={9} blur={2.5} far={4}/>
-    <OrbitControls makeDefault enablePan={false} minDistance={3.2} maxDistance={11} target={[0,1.17,0]} minPolarAngle={0.45} maxPolarAngle={Math.PI/2.04}/>
+    {!photoMode&&<ContactShadows position={[0,-0.025,0.25]} opacity={0.44} scale={9} blur={2.5} far={4}/>}
+    {!photoMode&&<OrbitControls makeDefault enablePan={false} minDistance={3.2} maxDistance={11} target={[0,1.17,0]} minPolarAngle={0.45} maxPolarAngle={Math.PI/2.04}/>}
   </>;
 }
 
-export default function DoorScene({config,resetToken}) {
-  return <Canvas key={resetToken} shadows dpr={[1,1.75]} camera={{position:[3.7,2.8,6.4],fov:41,near:0.1,far:100}} gl={{antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}} fallback={<div className="webgl-fallback">Uw browser ondersteunt geen WebGL. Probeer een recentere browser.</div>}>
-    <Scene config={config}/>
+export default function DoorScene({config,resetToken,photoMode=false,photoAngle=0}) {
+  return <Canvas key={resetToken} shadows={!photoMode} dpr={[1,1.75]} camera={{position:photoMode?[0,1.1,5.1]:[3.7,2.8,6.4],fov:photoMode?32:41,near:0.1,far:100}} gl={{alpha:photoMode,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}} onCreated={({gl})=>{if(photoMode)gl.setClearColor('#ffffff',0);}} fallback={<div className="webgl-fallback">Uw browser ondersteunt geen WebGL. Probeer een recentere browser.</div>}>
+    <Scene config={config} photoMode={photoMode} photoAngle={photoAngle}/>
   </Canvas>;
 }
