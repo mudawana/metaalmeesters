@@ -101,3 +101,6 @@ De klant bevestigde dat MetaalMeesters enkele deuren, dubbele deuren, pivotdeure
 **Balustrades** staan op de wensenlijst, maar de ontwikkeling van een balustradeconfigurator gebeurt in een **latere fase**, niet als onderdeel van deze eerste deurronde. De status van die afzonderlijke fase moet expliciet met de klant worden afgestemd, zeker als die in de afgesproken offerte was inbegrepen.
 
 De acht klantfoto's zijn afzonderlijk ontvangen. Ze tonen werkelijk maatwerk maar zijn niet geschikt als foto-achtergrond om een nieuwe deur te plaatsen. Ze kunnen na goedkeuring dienen als realisaties/portfolio, bij voorkeur zonder personen of gevoelige informatie in beeld.
+
+### Boogdeuren in de eerste fase
+De configurator ondersteunt nu **enkele boogdeuren, dubbele boogdeuren met één of twee bogen, pivotboogdeuren en glaswanden met geïntegreerde boogdeur**. Zowel de boogvormige profielen en het glas als de uitsparing in de 3D-woning zijn dynamisch. De booghoogte en boogindeling worden bewaard voor offertes. Meer informatie in [docs/BOOGDEUREN_3D.md](docs/BOOGDEUREN_3D.md). Balustrades blijven een aparte fase.

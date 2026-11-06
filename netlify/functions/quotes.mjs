@@ -12,6 +12,13 @@ function validDesign(d) {
      !Number.isInteger(d.height)||d.height<1400||d.height>4500)return false;
   if(d.type==='wand' && (!Number.isInteger(d.doorWidth) || d.doorWidth<500 || d.doorWidth>d.width-300 || !['links','rechts','beide'].includes(d.fixedPanelSide))) return false;
   if(d.frame==='andere' && (d.customColor!=null && typeof d.customColor!=='string'))return false;
+  const topShape=d.topShape||'recht';
+  if(!['recht','boog'].includes(topShape))return false;
+  if(topShape==='boog') {
+    if(d.type==='schuif')return false; // No misleading curved sliding rail.
+    if(!Number.isInteger(d.archHeight)||d.archHeight<80||d.archHeight>1000)return false;
+    if(d.type==='dubbel'&&!['doorlopend','apart'].includes(d.archPattern))return false;
+  }
   return Object.entries(permitted).every(([key,values])=>values.includes(d[key])) &&
     Number.isInteger(d.vertical)&&d.vertical>=0&&d.vertical<=4 &&
     Number.isInteger(d.horizontal)&&d.horizontal>=0&&d.horizontal<=5;
@@ -40,6 +47,8 @@ async function mailNotification(quote,req) {
     ...(d.type==='wand'?['Geïntegreerde deur: '+d.doorWidth+' mm','Vaste panelen: '+d.fixedPanelSide]:[]),
     'Breedte: '+d.width+' mm',
     'Hoogte: '+d.height+' mm',
+    'Bovenvorm: '+(d.topShape==='boog'?'Boog':'Recht'),
+    ...(d.topShape==='boog'?['Booghoogte: '+d.archHeight+' mm',...(d.type==='dubbel'?['Bogen: '+(d.archPattern==='apart'?'twee apart':'doorlopend')]:[])]:[]),
     'Glas: '+d.glass,
     'Kader: '+d.frame+(d.customColor?' · '+d.customColor:''),
     '',
@@ -84,7 +93,7 @@ async function processSubmission(req) {
     name:clean(name,150),email:clean(email,260),phone:clean(phone,100),
     city:clean(city,150),notes:clean(notes,1800),
     design:{
-      ...Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening'].includes(k)).map(k=>[k,design[k]])),
+      ...Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening','topShape','archHeight','archPattern'].includes(k)).map(k=>[k,design[k]])),
       ...(design.type==='wand'?{doorWidth:design.doorWidth,fixedPanelSide:design.fixedPanelSide}:{}),
       ...(design.frame==='andere'?{customColor:clean(design.customColor,70)}:{})
     },

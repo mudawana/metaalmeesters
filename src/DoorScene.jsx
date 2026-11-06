@@ -6,6 +6,7 @@ import ParametricHouse from './ParametricHouse.jsx';
 import {getHouseGeometry} from './house-geometry.mjs';
 import {modelDimensions} from './door-dimensions.mjs';
 import {FRAMES} from './data.js';
+import {ArchedDoorLeaf,ArchedFixedPanel} from './ArchedElements.jsx';
 
 function Metal({ color, roughness=0.38 }) {
   return <meshStandardMaterial color={color} metalness={0.78} roughness={roughness} envMapIntensity={1.4} />;
@@ -142,6 +143,8 @@ function Scene({config,photoMode=false,photoAngle=0,environment='studio',finish=
   const house=getHouseGeometry(config.width,config.height);
   const double=config.type==='dubbel';
   const isWall=config.type==='wand';
+  const curved=config.topShape==='boog'&&config.type!=='schuif';
+  const archLobes=double&&config.archPattern==='apart'?2:1;
   const slide=config.type==='schuif';
   const right=config.opening==='rechts';
   const offset=config.type==='pivot'?0.12:0;
@@ -153,17 +156,30 @@ function Scene({config,photoMode=false,photoAngle=0,environment='studio',finish=
     <directionalLight position={[4,7,6]} intensity={2.2} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.0003}/>
     <directionalLight position={[-3,4,-1]} intensity={1.3} color="#e9f2fa"/>
     {inHouse&&<><color attach="background" args={['#dbe3e6']}/><fog attach="fog" args={['#dbe3e6',23,60]}/></>}
-    {inHouse?<ParametricHouse widthMm={config.width} heightMm={config.height} finish={finish}/>:!photoMode&&<Showroom room={config.room}/>}
+    {inHouse?<ParametricHouse widthMm={config.width} heightMm={config.height} finish={finish} topShape={curved?'boog':'recht'} archHeight={config.archHeight} archPattern={config.archPattern} doorType={config.type}/>:!photoMode&&<Showroom room={config.room}/>}
     <group position={[0,0,photoMode ? 0 : inHouse ? 0.13 : 0.3]} rotation={[0,photoMode?photoAngle*Math.PI/180:0,0]}>
       {isWall ? <>
-        {dims.left>1&&<FixedGlassPanel x={-w/2+dims.left/2000} width={dims.left/1000} height={h} config={config} photoMode={photoMode}/>}
-        {dims.right>1&&<FixedGlassPanel x={w/2-dims.right/2000} width={dims.right/1000} height={h} config={config} photoMode={photoMode}/>}
-        <DoorLeaf x={config.opening==='rechts'?(-w/2+dims.left/1000+dims.doorWidth/1000):(-w/2+dims.left/1000)} width={dims.doorWidth/1000} height={h} hinge={right?'right':'left'} config={config} photoMode={photoMode}/>
+        {dims.left>1&&(curved
+          ?<ArchedFixedPanel x={-w/2+dims.left/2000} width={dims.left/1000} height={h} globalWidth={w} globalX={-w/2+dims.left/2000} config={config} frameColor={FRAME_COLORS[config.frame]} photoMode={photoMode}/>
+          :<FixedGlassPanel x={-w/2+dims.left/2000} width={dims.left/1000} height={h} config={config} photoMode={photoMode}/>)}
+        {dims.right>1&&(curved
+          ?<ArchedFixedPanel x={w/2-dims.right/2000} width={dims.right/1000} height={h} globalWidth={w} globalX={w/2-dims.right/2000} config={config} frameColor={FRAME_COLORS[config.frame]} photoMode={photoMode}/>
+          :<FixedGlassPanel x={w/2-dims.right/2000} width={dims.right/1000} height={h} config={config} photoMode={photoMode}/>)}
+        {curved
+          ?<ArchedDoorLeaf x={right?(-w/2+(dims.left+dims.doorWidth)/1000):(-w/2+dims.left/1000)} width={dims.doorWidth/1000} height={h} globalWidth={w} globalX={-w/2+(dims.left+dims.doorWidth/2)/1000} hinge={right?'right':'left'} config={config} frameColor={FRAME_COLORS[config.frame]} photoMode={photoMode}/>
+          :<DoorLeaf x={right?(-w/2+(dims.left+dims.doorWidth)/1000):(-w/2+dims.left/1000)} width={dims.doorWidth/1000} height={h} hinge={right?'right':'left'} config={config} photoMode={photoMode}/>}
       </> : double ? <>
-        <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config} photoMode={photoMode}/>
-        <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config} photoMode={photoMode}/>
+        {curved?<>
+          <ArchedDoorLeaf x={-w/2} width={w/2} height={h} globalWidth={w} globalX={-w/4} lobes={archLobes} hinge="left" config={config} frameColor={FRAME_COLORS[config.frame]} photoMode={photoMode}/>
+          <ArchedDoorLeaf x={w/2} width={w/2} height={h} globalWidth={w} globalX={w/4} lobes={archLobes} hinge="right" config={config} frameColor={FRAME_COLORS[config.frame]} photoMode={photoMode}/>
+        </>:<>
+          <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config} photoMode={photoMode}/>
+          <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config} photoMode={photoMode}/>
+        </>}
       </> : <>
-        <DoorLeaf x={singleX} width={w} height={h} hinge={right?'right':'left'} pivotOffset={offset} config={slide?{...config,open:false}:config} photoMode={photoMode}/>
+        {curved
+          ?<ArchedDoorLeaf x={singleX} width={w} height={h} hinge={right?'right':'left'} globalWidth={w} globalX={0} pivotOffset={offset} config={config} frameColor={FRAME_COLORS[config.frame]} photoMode={photoMode}/>
+          :<DoorLeaf x={singleX} width={w} height={h} hinge={right?'right':'left'} pivotOffset={offset} config={slide?{...config,open:false}:config} photoMode={photoMode}/>}
       </>}
       {slide && <Bar pos={[0,h+0.1,-0.02]} size={[w*1.8,0.06,0.08]} color={FRAME_COLORS[config.frame]}/>}
       {config.type==='pivot' && <>

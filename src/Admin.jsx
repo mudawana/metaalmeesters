@@ -11,7 +11,7 @@ async function jsonRequest(path,options={}) {
   return data;
 }
 const readableDate=date=>{try{return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(date));}catch{return date;}};
-const typeLabel={enkel:'Enkele deur',dubbel:'Dubbele deur',schuif:'Schuifdeur',pivot:'Pivotdeur'};
+const typeLabel={enkel:'Enkele deur',dubbel:'Dubbele deur',schuif:'Schuifdeur',pivot:'Pivotdeur',wand:'Glaswand met deur'};
 const glassLabel={helder:'Helder',mat:'Mat',rook:'Rook',ribbel:'Ribbel'};
 function Detail({quote,onBack,onChanged}) {
   const [status,setStatus]=useState(quote.status),[saving,setSaving]=useState(false),[message,setMessage]=useState('');
@@ -38,6 +38,9 @@ function Detail({quote,onBack,onChanged}) {
         <section className="admin-white-card"><h3>Deurspecificaties</h3>{[
           ['Type',typeLabel[quote.design?.type]||'—'],
           ['Breedte',quote.design?.width+' mm'],['Hoogte',quote.design?.height+' mm'],
+          ['Bovenvorm',quote.design?.topShape==='boog'?'Boog':'Recht'],
+          ...(quote.design?.topShape==='boog'?[['Booghoogte',(quote.design.archHeight||'—')+' mm'],...(quote.design.type==='dubbel'?[['Boogindeling',quote.design.archPattern==='apart'?'Twee aparte bogen':'Eén doorlopende boog']]:[])]:[]),
+          ...(quote.design?.type==='wand'?[['Geïntegreerde deur',(quote.design.doorWidth||'—')+' mm']]:[]),
           ['Glas',glassLabel[quote.design?.glass]||quote.design?.glass],
           ['Kader',quote.design?.frame],['Verticaal',quote.design?.vertical+' verdelingen'],
           ['Horizontaal',quote.design?.horizontal+' verdelingen'],

@@ -148,6 +148,7 @@ function ConfigSummary({d}) {
     <div><span>Deurtype</span><strong>{TYPES.find(x=>x.id===d.type)?.label}</strong></div>
     <div><span>{d.type==='wand'?'Totale glaswand':'Afmetingen'}</span><strong>{d.width} × {d.height} mm</strong></div>
     {d.type==='wand'&&<div><span>Geïntegreerde deur</span><strong>{d.doorWidth} mm breed · vaste panelen {d.fixedPanelSide}</strong></div>}
+    <div><span>Bovenvorm</span><strong>{d.topShape==='boog'?'Boog · '+d.archHeight+' mm'+(d.type==='dubbel'?(d.archPattern==='apart'?' · twee bogen':' · één boog'):''):'Recht'}</strong></div>
     <div><span>Glas</span><strong>{GLASSES.find(x=>x.id===d.glass)?.label}</strong></div>
     <div><span>Kleur</span><strong>{FRAMES.find(x=>x.id===d.frame)?.label}{d.frame==='andere'&&d.customColor?' · '+d.customColor:''}</strong></div>
     <div><span>Indeling</span><strong>{d.vertical} verticaal · {d.horizontal} horizontaal</strong></div>
@@ -161,13 +162,38 @@ function ConfigControls({d,change,step,setStep}) {
     <div className="steps">{steps.map(([n,name],i)=><button key={n} className={'step '+(step===i?'active':'')+(step>i?' done':'')} onClick={()=>setStep(i)}><span>{step>i?<Check size={13}/>:n}</span><span>{name}</span></button>)}</div>
     <div className="config-fields">
       {step===0&&<>
-        <h3>Welk type deur wenst u?</h3><p className="field-hint">Kies het model dat bij uw ruimte past.</p><div className="options-two">{TYPES.map(t=><OptionCard key={t.id} title={t.label} sub={t.caption} active={d.type===t.id} onClick={()=>change({type:t.id,width:t.id==='wand'&&d.width<1400?2600:t.id==='dubbel'&&d.width<1200?1600:d.width,doorWidth:t.id==='wand'?Math.min(d.doorWidth||900,Math.max(500,(t.id==='wand'&&d.width<1400?2600:d.width)-300)):d.doorWidth})}/>)}</div>
+        <h3>Welk type deur wenst u?</h3><p className="field-hint">Kies het model dat bij uw ruimte past.</p><div className="options-two">{TYPES.map(t=><OptionCard key={t.id} title={t.label} sub={t.caption} active={d.type===t.id} onClick={()=>change({type:t.id,topShape:t.id==='schuif'?'recht':d.topShape,width:t.id==='wand'&&d.width<1400?2600:t.id==='dubbel'&&d.width<1200?1600:d.width,doorWidth:t.id==='wand'?Math.min(d.doorWidth||900,Math.max(500,(t.id==='wand'&&d.width<1400?2600:d.width)-300)):d.doorWidth})}/>)}</div>
+        <h3 className="subsection-title">Welke bovenvorm?</h3>
+        <p className="field-hint">Een echte gebogen stalen deur, ook in de 3D-muuropening.</p>
+        {d.type!=='schuif'?<div className="options-two">
+          <OptionCard title="Rechte bovenkant" sub="Klassieke rechte deur" active={d.topShape!=='boog'} onClick={()=>change({topShape:'recht'})}/>
+          <OptionCard title="Boogdeur" sub="Gebogen glas, profiel en opening" active={d.topShape==='boog'} onClick={()=>change({topShape:'boog'})}/>
+        </div>:<p className="field-hint">Schuifdeuren worden voorlopig enkel met rechte bovenkant getoond.</p>}
         <h3 className="subsection-title">Kies een startontwerp</h3><div className="options-two">{[['minimal','Minimal','Zonder onderverdeling'],['atelier','Atelier','Een verfijnd raster'],['industrieel','Industrieel','Een strak lijnenspel'],['klassiek','Klassiek','Één horizontale lijn']].map(([id,title,sub])=><OptionCard key={id} title={title} sub={sub} active={d.style===id} onClick={()=>applyStyle(id)}/>)}</div>
       </>}
       {step===1&&<>
         <h3>Uw deur op maat</h3><p className="field-hint">Vul de maten van de deuropening in, in millimeters.</p>
         <div className="measure-field"><label htmlFor="width">{d.type==='wand'?'Totale breedte van de glaswand':'Breedte van de deuropening'}</label><div className="input-unit"><input id="width" type="number" min={VISUAL_RANGE.widthMin} max={VISUAL_RANGE.widthMax} step="10" value={d.width} onChange={e=>change({width:Math.max(VISUAL_RANGE.widthMin,Math.min(VISUAL_RANGE.widthMax,Number(e.target.value)||VISUAL_RANGE.widthMin))})}/><span>mm</span></div><small>Visualisatie: {VISUAL_RANGE.widthMin}–{VISUAL_RANGE.widthMax} mm</small></div>
         <div className="measure-field"><label htmlFor="height">Hoogte van de opening</label><div className="input-unit"><input id="height" type="number" min={VISUAL_RANGE.heightMin} max={VISUAL_RANGE.heightMax} step="10" value={d.height} onChange={e=>change({height:Math.max(VISUAL_RANGE.heightMin,Math.min(VISUAL_RANGE.heightMax,Number(e.target.value)||VISUAL_RANGE.heightMin))})}/><span>mm</span></div><small>Visualisatie: {VISUAL_RANGE.heightMin}–{VISUAL_RANGE.heightMax} mm</small></div>
+        {d.topShape==='boog'&&d.type!=='schuif'&&<section className="arch-config-options">
+          <h4>Booghoogte</h4>
+          <p className="field-hint">Stel in hoe sterk de deur bovenaan gebogen is. De hoogte hierboven is de totale hoogte inclusief de boog.</p>
+          <div className="arch-height-readout"><span>Hoogte van de boog</span><strong>{Math.min(d.archHeight||300,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))} mm</strong></div>
+          <input className="arch-height-slider" aria-label="Booghoogte in millimeters" type="range" min="80" step="10"
+            max={Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45)))}
+            value={Math.min(d.archHeight||300,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))}
+            onChange={e=>change({archHeight:Number(e.target.value)})}/>
+          <div className="arch-presets">{[['Laag',160],['Standaard',300],['Hoog',550]].map(([label,rise])=>
+            <button type="button" key={label} onClick={()=>change({archHeight:Math.min(rise,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))})}>{label}</button>)}</div>
+          {d.type==='dubbel'&&<>
+            <h4>Boogverdeling bij dubbele deuren</h4>
+            <div className="options-two">
+              <OptionCard title="Eén doorlopende boog" sub="Grote gezamenlijke boog boven beide vleugels" active={d.archPattern!=='apart'} onClick={()=>change({archPattern:'doorlopend'})}/>
+              <OptionCard title="Twee afzonderlijke bogen" sub="Elke vleugel zijn eigen boog" active={d.archPattern==='apart'} onClick={()=>change({archPattern:'apart'})}/>
+            </div>
+          </>}
+          <p className="field-hint">Boogvorm en kromming zijn een indicatie. Het atelier controleert de technische uitvoerbaarheid.</p>
+        </section>}
         {d.type==='wand'&&<div className="wall-options">
           <h4>Deur geïntegreerd in de vaste glaswand</h4>
           <div className="measure-field"><label htmlFor="doorWidth">Breedte van de bewegende deur</label><div className="input-unit"><input id="doorWidth" type="number" min="500" max={Math.max(500,d.width-300)} step="10" value={Math.min(d.doorWidth||900,Math.max(500,d.width-300))} onChange={e=>change({doorWidth:Math.max(500,Math.min(Math.max(500,d.width-300),Number(e.target.value)||500))})}/><span>mm</span></div></div>
@@ -203,7 +229,7 @@ function Configurator() {
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">
-    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp een enkele deur, dubbele deur, pivotdeur of glazen wand met geïntegreerde deur. De 3D-woning schaalt mee, of voeg uw eigen woningfoto toe.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
+    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp ook boogdeuren: enkel, dubbel, pivot of een glaswand met geïntegreerde deur. De 3D-woning schaalt mee, of voeg uw eigen woningfoto toe.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
       <div><Suspense fallback={<div className="viewer-loading">De 3D-configurator wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>

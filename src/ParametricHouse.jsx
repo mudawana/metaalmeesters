@@ -1,4 +1,6 @@
-import React from 'react';
+import React,{useMemo,useEffect} from 'react';
+import * as THREE from 'three';
+import {archPoints} from './arch-geometry.mjs';
 import {getHouseGeometry} from './house-geometry.mjs';
 
 function Block({position,size,color,roughness=.9,metalness=0,castShadow=true}) {
@@ -74,7 +76,34 @@ function HouseInterior({wallWidth,wallHeight}) {
   </group>;
 }
 
-function ArchitecturalDetails({g,stone,dark}) {
+// Actual architectural wall infill between the curved opening and lintel.
+// This extruded stone mesh fills the corners above the arch without closing the doorway.
+function ArchedOpeningRecess({width,height,archHeight,lobes,paint,trim}) {
+  const {mesh,curve}=useMemo(()=>{
+    const pts=archPoints(width,height,archHeight,lobes,96);
+    const shape=new THREE.Shape();
+    shape.moveTo(-width/2,height);
+    shape.lineTo(width/2,height);
+    for(let i=pts.length-1;i>=0;i--)shape.lineTo(pts[i].x,pts[i].y);
+    shape.closePath();
+    return {
+      mesh:new THREE.ExtrudeGeometry(shape,{steps:1,depth:.32,bevelEnabled:false,curveSegments:48}),
+      curve:new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(p.x,p.y,.10)),false,'centripetal')
+    };
+  },[width,height,archHeight,lobes]);
+  useEffect(()=>()=>mesh.dispose(),[mesh]);
+  return <group>
+    <mesh geometry={mesh} position={[0,0,-.30]} castShadow receiveShadow>
+      <meshStandardMaterial color={paint} roughness={.95}/>
+    </mesh>
+    <mesh castShadow>
+      <tubeGeometry args={[curve,96,.034,8,false]}/>
+      <meshStandardMaterial color={trim} metalness={.22} roughness={.66}/>
+    </mesh>
+  </group>;
+}
+
+function ArchitecturalDetails({g,stone,dark,topShape='recht',archHeight=300,lobes=1}) {
   const {wallWidth,wallHeight,openingWidth,openingHeight}=g;
   const wingCenter=openingWidth/2+g.wingWidth/2;
   const windowWidth=Math.min(1.20,g.wingWidth-.82);
@@ -101,6 +130,7 @@ function ArchitecturalDetails({g,stone,dark}) {
       <Block position={[side*(openingWidth/2+.008),openingHeight/2,.075]}
         size={[.012,openingHeight,.035]} color="#b7aa93" castShadow={false}/>
     </React.Fragment>)}
+    {topShape==='boog'&&<ArchedOpeningRecess width={openingWidth} height={openingHeight} archHeight={archHeight} lobes={lobes} paint={stone} trim={dark}/>}
     <Block position={[0,openingHeight+.064,-.07]} size={[openingWidth+.26,.128,.29]} color={dark}/>
     <Block position={[0,.008,.14]} size={[openingWidth+.16,.035,.42]} color="#aba99e"/>
     {/* Contemporary roof fascia and timber soffit stay aligned with the growing house. */}
@@ -118,7 +148,7 @@ function ArchitecturalDetails({g,stone,dark}) {
   </group>;
 }
 
-export default function ParametricHouse({widthMm,heightMm,finish='warm'}) {
+export default function ParametricHouse({widthMm,heightMm,finish='warm',topShape='recht',archHeight=300,archPattern='doorlopend',doorType='enkel'}) {
   const g=getHouseGeometry(widthMm,heightMm);
   const stone=finish==='dark'?'#777974':'#ded4c5';
   const dark=finish==='dark'?'#292f30':'#464846';
@@ -134,7 +164,7 @@ export default function ParametricHouse({widthMm,heightMm,finish='warm'}) {
     <Block position={[0,.085,.63]} size={[frontStepWidth,.20,.83]} color="#a9a69f"/>
     <Block position={[0,.008,.98]} size={[frontStepWidth+.25,.08,.65]} color="#c9c4bb"/>
     <HouseInterior wallWidth={g.wallWidth} wallHeight={g.wallHeight}/>
-    <ArchitecturalDetails g={g} stone={stone} dark={dark}/>
+    <ArchitecturalDetails g={g} stone={stone} dark={dark} topShape={topShape} archHeight={archHeight} lobes={doorType==='dubbel'&&archPattern==='apart'?2:1}/>
     <Planter x={-(g.openingWidth/2+.95)} z={.96}/>
     <Planter x={(g.openingWidth/2+.95)} z={.96}/>
   </group>;

@@ -42,3 +42,15 @@
 .swatches{flex-wrap:wrap;row-gap:13px}
 .swatch{max-width:112px;min-width:68px;flex:1 1 68px}
 .swatch small{line-height:1.3;overflow-wrap:anywhere}
+
+/* Arch shaping controls – first-phase custom curved steel doors. */
+.arch-config-options{padding:20px 16px;margin:16px 0 20px;background:#f3f0e9;border:1px solid #e2ddd3}
+.arch-config-options h4{font-size:13px;font-weight:800;margin:4px 0 9px}
+.arch-config-options h4:not(:first-child){margin-top:19px}
+.arch-height-readout{display:flex;align-items:center;justify-content:space-between;font-size:11px;margin:13px 0 8px;color:#6e776d}
+.arch-height-readout strong{font-size:14px;color:#303c34;font-variant-numeric:tabular-nums}
+.arch-height-slider{display:block;width:100%;accent-color:#a48767;cursor:pointer}
+.arch-presets{display:flex;gap:8px;margin:11px 0 12px}
+.arch-presets button{border:1px solid #d4d0c5;padding:9px 13px;background:#fff;color:#51584f;font-size:11px;cursor:pointer}
+.arch-presets button:hover{background:#e8dfd4}
+.arch-config-options .options-two{margin-top:10px}
