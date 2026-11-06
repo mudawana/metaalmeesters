@@ -29,6 +29,7 @@ export function archSpec(width,height,archHeightMm=300,lobes=1) {
 // Points along the true top edge, including spring points and the crown.
 export function archPoints(width,height,archHeightMm=300,lobes=1,segments=72) {
   const spec=archSpec(width,height,archHeightMm,lobes);
+  const n=spec.lobes;
   const steps=Math.max(16,Math.floor(segments/n)*n);
   return Array.from({length:steps+1},(_,i)=>{
     const x=-width/2+width*i/steps;
