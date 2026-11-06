@@ -4,11 +4,13 @@ import { Canvas } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, RoundedBox } from '@react-three/drei';
 import ParametricHouse from './ParametricHouse.jsx';
 import {getHouseGeometry} from './house-geometry.mjs';
+import {modelDimensions} from './door-dimensions.mjs';
+import {FRAMES} from './data.js';
 
 function Metal({ color, roughness=0.38 }) {
   return <meshStandardMaterial color={color} metalness={0.78} roughness={roughness} envMapIntensity={1.4} />;
 }
-const FRAME_COLORS = {zwart:'#242728',antraciet:'#51565a',brons:'#94745c',wit:'#d9d7cf'};
+const FRAME_COLORS = Object.fromEntries(FRAMES.map(c=>[c.id,c.color]));
 
 function Bar({pos,size,color,radius=0.004}) {
   return <RoundedBox args={size} position={pos} radius={radius} smoothness={3} castShadow receiveShadow><Metal color={color}/></RoundedBox>;
@@ -73,6 +75,25 @@ function DoorLeaf({x,width,height,hinge,config,pivotOffset=0,photoMode=false}) {
   </group>;
 }
 
+function FixedGlassPanel({x,width,height,config,photoMode=false}) {
+  if(width<=.075)return null;
+  const color=FRAME_COLORS[config.frame]||FRAME_COLORS.zwart;
+  const frame=Math.min(.049,width*.18);
+  const innerWidth=Math.max(.025,width-frame*2);
+  const innerHeight=height-frame*2;
+  return <group position={[x,height/2,0]}>
+    <Glass width={innerWidth} height={innerHeight} kind={config.glass} photoMode={photoMode}/>
+    <Bar pos={[-width/2+frame/2,0,.016]} size={[frame,height,.065]} color={color}/>
+    <Bar pos={[width/2-frame/2,0,.016]} size={[frame,height,.065]} color={color}/>
+    <Bar pos={[0,height/2-frame/2,.016]} size={[width,frame,.065]} color={color}/>
+    <Bar pos={[0,-height/2+frame/2,.016]} size={[width,frame,.065]} color={color}/>
+    {Array.from({length:Math.min(3,Math.max(0,Math.floor(width/1.05)))},(_,i)=>
+      <Bar key={i} pos={[-innerWidth/2+innerWidth*(i+1)/(Math.min(3,Math.floor(width/1.05))+1),0,.035]} size={[.025,innerHeight,.046]} color={color}/>)}
+    {Array.from({length:Math.max(0,Math.min(4,Number(config.horizontal)||0))},(_,i)=>
+      <Bar key={i} pos={[0,-innerHeight/2+innerHeight*(i+1)/(Math.max(0,Math.min(4,Number(config.horizontal)||0))+1),.032]} size={[innerWidth,.025,.046]} color={color}/>)}
+  </group>;
+}
+
 function Showroom({room}) {
   if(room==='neutraal') return <>
     <color attach="background" args={['#e8e7e3']}/>
@@ -114,11 +135,13 @@ function AdaptiveCamera({mode,width,height,view}) {
 }
 
 function Scene({config,photoMode=false,photoAngle=0,environment='studio',finish='warm',view='overview'}) {
-  const w=Math.max(.5,Math.min(3.6,Number(config.width)/1000));
-  const h=Math.max(1.3,Math.min(3.5,Number(config.height)/1000));
+  const dims=modelDimensions(config);
+  const w=dims.width/1000;
+  const h=dims.height/1000;
   const inHouse=!photoMode&&environment==='house';
   const house=getHouseGeometry(config.width,config.height);
   const double=config.type==='dubbel';
+  const isWall=config.type==='wand';
   const slide=config.type==='schuif';
   const right=config.opening==='rechts';
   const offset=config.type==='pivot'?0.12:0;
@@ -132,7 +155,11 @@ function Scene({config,photoMode=false,photoAngle=0,environment='studio',finish=
     {inHouse&&<><color attach="background" args={['#dbe3e6']}/><fog attach="fog" args={['#dbe3e6',23,60]}/></>}
     {inHouse?<ParametricHouse widthMm={config.width} heightMm={config.height} finish={finish}/>:!photoMode&&<Showroom room={config.room}/>}
     <group position={[0,0,photoMode ? 0 : inHouse ? 0.13 : 0.3]} rotation={[0,photoMode?photoAngle*Math.PI/180:0,0]}>
-      {double ? <>
+      {isWall ? <>
+        {dims.left>1&&<FixedGlassPanel x={-w/2+dims.left/2000} width={dims.left/1000} height={h} config={config} photoMode={photoMode}/>}
+        {dims.right>1&&<FixedGlassPanel x={w/2-dims.right/2000} width={dims.right/1000} height={h} config={config} photoMode={photoMode}/>}
+        <DoorLeaf x={config.opening==='rechts'?(-w/2+dims.left/1000+dims.doorWidth/1000):(-w/2+dims.left/1000)} width={dims.doorWidth/1000} height={h} hinge={right?'right':'left'} config={config} photoMode={photoMode}/>
+      </> : double ? <>
         <DoorLeaf x={-w/2} width={w/2} height={h} hinge="left" config={config} photoMode={photoMode}/>
         <DoorLeaf x={w/2} width={w/2} height={h} hinge="right" config={config} photoMode={photoMode}/>
       </> : <>

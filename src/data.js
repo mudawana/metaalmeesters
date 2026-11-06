@@ -17,6 +17,8 @@ export const originalImageUrl = (key) => 'https://metaalmeesters.eu/wp-content/u
 
 export const initialDesign = {
   type: 'enkel',
+  doorWidth: 900,
+  fixedPanelSide: 'beide',
   width: 900,
   height: 2200,
   style: 'atelier',
@@ -28,21 +30,28 @@ export const initialDesign = {
   opening: 'rechts',
   open: false,
   room: 'studio',
+  customColor: '',
   notes: ''
 };
 
 export const TYPES = [
   {id:'enkel',label:'Enkele deur',caption:'Tijdloos & strak'},
   {id:'dubbel',label:'Dubbele deur',caption:'Ruimtelijk & elegant'},
-  {id:'schuif',label:'Schuifdeur',caption:'Praktisch & verfijnd'},
-  {id:'pivot',label:'Pivotdeur',caption:'Architecturaal statement'}
+  {id:'pivot',label:'Pivotdeur',caption:'Architecturaal statement'},
+  {id:'wand',label:'Glaswand met deur',caption:'Vaste glasdelen en een geïntegreerde deur'},
+  {id:'schuif',label:'Schuifdeur',caption:'Optie, technische uitvoering te bevestigen'}
 ];
 
 export const FRAMES = [
-  {id:'zwart',label:'Mat zwart',color:'#232625'},
-  {id:'antraciet',label:'Antraciet',color:'#4d5354'},
-  {id:'brons',label:'Geborsteld brons',color:'#8a715b'},
-  {id:'wit',label:'Gebroken wit',color:'#dedbd3'}
+  {id:'zwart',label:'RAL 9005 · Zwart',color:'#232625'},
+  {id:'antraciet',label:'RAL 7016 · Antraciet',color:'#414549'},
+  {id:'wit',label:'RAL 9010 · Wit',color:'#e6e3d8'},
+  {id:'ral7035',label:'RAL 7035 · Lichtgrijs',color:'#b8babe'},
+  {id:'ral6005',label:'RAL 6005 · Groen',color:'#244e36'},
+  {id:'ral5008',label:'RAL 5008 · Blauw',color:'#303e4b'},
+  {id:'brons',label:'Anodic · Brons (indicatief)',color:'#937457'},
+  {id:'anodic-naturel',label:'Anodic · Naturel (indicatief)',color:'#a9aaa3'},
+  {id:'andere',label:'Andere RAL/anodic kleur op aanvraag',color:'#a2a19d'}
 ];
 
 export const GLASSES = [
@@ -60,9 +69,10 @@ export function formatDesign(d) {
     'METAALMEESTERS — DEURCONFIGURATIE',
     '',
     'Deurtype: ' + type,
-    'Breedte opening: ' + d.width + ' mm',
+    'Breedte totale opening: ' + d.width + ' mm',
+    ...(d.type==='wand' ? ['Breedte geïntegreerde deur: '+d.doorWidth+' mm','Vaste glasdelen: '+d.fixedPanelSide] : []),
     'Hoogte opening: ' + d.height + ' mm',
-    'Afwerking: ' + frame,
+    'Afwerking: ' + frame+(d.frame==='andere' ? (' ('+(d.customColor||'te bepalen')+')') : ''),
     'Glas: ' + glass,
     'Verticale verdelingen: ' + d.vertical,
     'Horizontale verdelingen: ' + d.horizontal,
@@ -71,7 +81,7 @@ export function formatDesign(d) {
     'Stijl: ' + d.style,
     'Opmerkingen: ' + (d.notes || 'Geen'),
     '',
-    'Indicatieve afmetingen; technisch te valideren door MetaalMeesters.',
+    'Alle productiematen, kleurcodes en technische haalbaarheid worden gevalideerd door MetaalMeesters.',
     'Dit document is geen productieplan en bevat geen prijs.'
   ].join('\n');
 }

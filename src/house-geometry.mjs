@@ -2,8 +2,8 @@
 // This calculation is shared by the Three.js house and the automated tests.
 export function getHouseGeometry(widthMm=900,heightMm=2200) {
   const requestedWidth=Number(widthMm),requestedHeight=Number(heightMm);
-  const width=Number.isFinite(requestedWidth)?Math.max(.5,Math.min(3.6,requestedWidth/1000)):.9;
-  const height=Number.isFinite(requestedHeight)?Math.max(1.4,Math.min(3.5,requestedHeight/1000)):2.2;
+  const width=Number.isFinite(requestedWidth)?Math.max(.5,Math.min(8,requestedWidth/1000)):.9;
+  const height=Number.isFinite(requestedHeight)?Math.max(1.4,Math.min(4.5,requestedHeight/1000)):2.2;
   // A small installation gap between the design and the 3D architectural reveal.
   const openingWidth=width+.04;
   const openingHeight=height+.025;

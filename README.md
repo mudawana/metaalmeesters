@@ -93,3 +93,11 @@ De oude MetaalMeesters-projectbeelden zijn **volledig verwijderd uit de keuzelij
 ### Nieuwe dynamische 3D-woning
 
 De configurator toont standaard een volledig procedurele 3D-woning met een **echte, meegroeibare muuropening** voor de gekozen stalen deur. De muren, ramen, dorpel en bovenbouw reageren op bredere en hogere afmetingen. Er zijn twee gevelafwerkingen en twee camerastandpunten. De bestaande optie **echte woningfoto / eigen foto** en het 3D-atelier blijven bestaan. Dit is een indicatieve architectuurvisualisatie en geen technische bouwtekening. Zie [docs/DYNAMISCHE_3D_WONING.md](docs/DYNAMISCHE_3D_WONING.md).
+
+### Klantfeedback 4 november 2026 — deursoorten en kleuren
+
+De klant bevestigde dat MetaalMeesters enkele deuren, dubbele deuren, pivotdeuren en wanden met geïntegreerde deuren aanbiedt. Ook afwijkende maten en alle RAL/anodic kleuren zijn bespreekbaar. Daarom toont de configurator een **glaswand met beweegbare deur en vaste zijpanelen**, een uitbreidbare **selectie populaire RAL/anodic voorbeelden** en een **andere kleur op aanvraag**-veld. De weergegeven kleuren zijn indicatief tot de officiële kleurenkaarten beschikbaar zijn. Voor de 3D-rendering geldt een visualisatiebereik 500–8000 mm breed, 1400–4500 mm hoog; dit is geen productiegrens.
+
+**Balustrades** staan op de wensenlijst, maar de ontwikkeling van een balustradeconfigurator gebeurt in een **latere fase**, niet als onderdeel van deze eerste deurronde. De status van die afzonderlijke fase moet expliciet met de klant worden afgestemd, zeker als die in de afgesproken offerte was inbegrepen.
+
+De acht klantfoto's zijn afzonderlijk ontvangen. Ze tonen werkelijk maatwerk maar zijn niet geschikt als foto-achtergrond om een nieuwe deur te plaatsen. Ze kunnen na goedkeuring dienen als realisaties/portfolio, bij voorkeur zonder personen of gevoelige informatie in beeld.

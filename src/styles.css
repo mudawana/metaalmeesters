@@ -31,3 +31,14 @@
 .quote-landing .btn{align-self:flex-start}
 .quote-landing small{font-size:11px;color:#727b71}
 @media(max-width:760px){.quote-landing{grid-template-columns:1fr}.project-card-content{padding:25px}}
+
+/* Doorwall dimension controls and the curated client colour catalog */
+.wall-options{padding:19px 16px;margin:15px 0 18px;background:#f0eee7;border:1px solid #e2ddd1}
+.wall-options h4{font-size:13px;line-height:1.5;margin:0 0 12px}
+.wall-fixed-label{display:block;color:#646d63;font-size:11px;font-weight:700;margin:15px 0 9px}
+.wall-options .option-row{flex-wrap:wrap;gap:7px}
+.wall-options .option-row button{padding:10px 12px}
+.wall-options .field-hint{margin-top:12px;line-height:1.6}
+.swatches{flex-wrap:wrap;row-gap:13px}
+.swatch{max-width:112px;min-width:68px;flex:1 1 68px}
+.swatch small{line-height:1.3;overflow-wrap:anywhere}

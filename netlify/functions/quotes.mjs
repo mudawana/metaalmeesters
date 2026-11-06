@@ -3,13 +3,15 @@ import {authorized,safeOrigin,apiJSON} from '../lib/session.mjs';
 import {putQuote,getQuote,listQuotes,deleteQuote,STAGES} from '../lib/quotes-data.mjs';
 
 const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const permitted={type:['enkel','dubbel','schuif','pivot'],frame:['zwart','antraciet','brons','wit'],glass:['helder','mat','rook','ribbel'],handle:['lang','kort','knop'],opening:['links','rechts']};
+const permitted={type:['enkel','dubbel','schuif','pivot','wand'],frame:['zwart','antraciet','brons','wit','ral7035','ral6005','ral5008','anodic-naturel','andere'],glass:['helder','mat','rook','ribbel'],handle:['lang','kort','knop'],opening:['links','rechts']};
 const clean=(value,max=300)=>String(value||'').trim().slice(0,max);
 const error=(msg,code=400)=>apiJSON({error:msg},code);
 function validDesign(d) {
   if(!d || typeof d!=='object')return false;
-  if(!Number.isInteger(d.width)||d.width<500||d.width>3600 ||
-     !Number.isInteger(d.height)||d.height<1400||d.height>3500)return false;
+  if(!Number.isInteger(d.width)||d.width<500||d.width>8000 ||
+     !Number.isInteger(d.height)||d.height<1400||d.height>4500)return false;
+  if(d.type==='wand' && (!Number.isInteger(d.doorWidth) || d.doorWidth<500 || d.doorWidth>d.width-300 || !['links','rechts','beide'].includes(d.fixedPanelSide))) return false;
+  if(d.frame==='andere' && (d.customColor!=null && typeof d.customColor!=='string'))return false;
   return Object.entries(permitted).every(([key,values])=>values.includes(d[key])) &&
     Number.isInteger(d.vertical)&&d.vertical>=0&&d.vertical<=4 &&
     Number.isInteger(d.horizontal)&&d.horizontal>=0&&d.horizontal<=5;
@@ -35,10 +37,11 @@ async function mailNotification(quote,req) {
     'Telefoon: '+(quote.phone||'-'),
     'Locatie: '+(quote.city||'-'),
     'Deurtype: '+d.type,
+    ...(d.type==='wand'?['Geïntegreerde deur: '+d.doorWidth+' mm','Vaste panelen: '+d.fixedPanelSide]:[]),
     'Breedte: '+d.width+' mm',
     'Hoogte: '+d.height+' mm',
     'Glas: '+d.glass,
-    'Kader: '+d.frame,
+    'Kader: '+d.frame+(d.customColor?' · '+d.customColor:''),
     '',
     'Bekijk de volledige configuratie en de privé-afbeelding in uw beheerportaal:',
     new URL('/#/beheer',req.url).href,
@@ -80,7 +83,11 @@ async function processSubmission(req) {
     id,createdAt:new Date().toISOString(),status:'nieuw',
     name:clean(name,150),email:clean(email,260),phone:clean(phone,100),
     city:clean(city,150),notes:clean(notes,1800),
-    design:Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening'].includes(k)).map(k=>[k,design[k]])),
+    design:{
+      ...Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening'].includes(k)).map(k=>[k,design[k]])),
+      ...(design.type==='wand'?{doorWidth:design.doorWidth,fixedPanelSide:design.fixedPanelSide}:{}),
+      ...(design.frame==='andere'?{customColor:clean(design.customColor,70)}:{})
+    },
     image:photo,notification:'in behandeling'
   };
   await putQuote(quote);
