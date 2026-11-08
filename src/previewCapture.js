@@ -25,7 +25,14 @@ export async function capturePreviewImage({max=860,quality=.78}={}) {
   }
   const doorBounds=source.getBoundingClientRect();
   const left=doorBounds.left-bounds.left,top=doorBounds.top-bounds.top;
-  try{ctx.drawImage(source,left,top,doorBounds.width,doorBounds.height);}
-  catch{throw Error('De 3D-deur kon niet samen met de foto worden opgeslagen.');}
+  try{
+    // Match the browser overlay's light/shadow adjustments in downloaded JPGs.
+    const overlay=stage.querySelector('.house-door-overlay');
+    const visualFilter=overlay?window.getComputedStyle(overlay).filter:'none';
+    ctx.save();
+    if(visualFilter&&visualFilter!=='none')ctx.filter=visualFilter;
+    ctx.drawImage(source,left,top,doorBounds.width,doorBounds.height);
+    ctx.restore();
+  }catch{throw Error('De 3D-deur kon niet samen met de foto worden opgeslagen.');}
   return output.toDataURL('image/jpeg',quality);
 }

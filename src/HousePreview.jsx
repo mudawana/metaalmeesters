@@ -90,7 +90,15 @@ export default function HousePreview({config,resetToken,onNotice,onChange}) {
         <img className="house-real-photo" src={scenePhoto} alt={selected==='eigen'?'Eigen woningfoto van de klant':('Voorbeeldwoning: '+(sample?.name||'lichte inkom'))} draggable="false"/>
         <div className="house-photo-vignette"/>
         {!compare&&<div className="house-door-overlay"
-           style={{left:placement.x+'%',top:placement.y+'%',height:doorHeightPx+'px',width:overlayWidth+'px'}}
+           style={{
+             left:placement.x+'%',top:placement.y+'%',
+             height:doorHeightPx+'px',width:overlayWidth+'px',
+             filter:'brightness('+((placement.light??100)/100).toFixed(2)+') drop-shadow('+
+               Math.round(2+(placement.shadow??45)*.08)+'px '+
+               Math.round(4+(placement.shadow??45)*.13)+'px '+
+               Math.round(3+(placement.shadow??45)*.075)+'px rgba(15,24,21,'+
+               (Math.min(.55,(placement.shadow??45)*.006)).toFixed(2)+'))'
+           }}
            onPointerDown={moveStart} onPointerMove={moveDoor}
            onPointerUp={()=>{dragRef.current=null;}} onPointerCancel={()=>{dragRef.current=null;}}
            aria-label="Versleep de deur over de woningfoto" title="Versleep om de deur op de juiste plek te zetten">
@@ -120,6 +128,8 @@ export default function HousePreview({config,resetToken,onNotice,onChange}) {
           <Control label="Perspectief" value={placement.angle} min={-35} max={35} unit="°" onChange={v=>update({angle:v})}/>
           <Control label="Horizontaal" value={placement.x} min={4} max={96} onChange={v=>update({x:v})}/>
           <Control label="Verticaal" value={placement.y} min={5} max={97} onChange={v=>update({y:v})}/>
+          <Control label="Belichting" value={placement.light??100} min={60} max={140} onChange={v=>update({light:v})}/>
+          <Control label="Schaduw" value={placement.shadow??45} min={0} max={90} onChange={v=>update({shadow:v})}/>
         </div>
         <p className="house-reality-note"><strong>Zo ziet uw ontwerp er ongeveer uit.</strong> Dit zijn echte stockfoto's van woningen, geen realisaties van MetaalMeesters. Op foto's met een bestaande deur wordt die niet automatisch verwijderd: uw 3D-ontwerp komt er visueel overheen. Versleep de deur naar de bestaande opening. Grootte, perspectief, glas en belichting zijn indicatief, niet geschikt voor technische maatopname. Een eigen foto blijft in uw browser totdat u zelf een offerte verstuurt.</p>
       </div>

@@ -69,3 +69,7 @@
 @media(max-width:1180px){.architect-scene{height:485px}}
 @media(max-width:940px){.architect-scene{height:525px}}
 @media(max-width:640px){.view-mode-tabs{padding:6px 6px;gap:3px}.view-mode-tabs button{font-size:9px;padding:9px 5px;gap:5px}.view-mode-tabs button svg{width:14px;height:14px;flex-shrink:0}.architect-scene{height:390px}.architect-status{top:10px;left:10px;padding:9px 10px;gap:7px}.architect-status strong{font-size:9px}.architect-status span{font-size:10px}.architect-settings{padding:17px 12px}.architect-settings-grid{grid-template-columns:1fr;gap:17px}.architect-choices{gap:6px}}
+
+/* User-adjustable photographic light/shadow matching for the 3D overlay. */
+.house-door-overlay{transition:filter .16s ease-out}
+.house-door-overlay:active{transition:none}

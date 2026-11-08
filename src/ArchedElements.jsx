@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import {RoundedBox} from '@react-three/drei';
 import {archSpec} from './arch-geometry.mjs';
 import {GlassMaterial,GlassPattern} from './GlassVisual.jsx';
-import {DoorHardware} from './DoorHardware.jsx';
+import {DoorHardware,DoorHinge} from './DoorHardware.jsx';
+import {SteelInfill} from './SteelInfill.jsx';
 import {lowerSteelMeters} from './product-options.mjs';
 
 // An arched panel is genuine cut-to-shape geometry. No rectangular glass
@@ -11,7 +12,7 @@ import {lowerSteelMeters} from './product-options.mjs';
 function MetalBar({x,y,w,h,z=.065,color}) {
   if(w<=0||h<=0)return null;
   return <RoundedBox args={[w,h,.042]} position={[x,y,z]} radius={Math.min(.006,w*.15,h*.15)} smoothness={2} castShadow>
-    <meshStandardMaterial color={color} metalness={.74} roughness={.37}/>
+    <meshPhysicalMaterial color={color} metalness={.86} roughness={.35} envMapIntensity={1.6} clearcoat={.18} clearcoatRoughness={.14}/>
   </RoundedBox>;
 }
 
@@ -32,13 +33,13 @@ function panelGeometry(width,height,archHeight,totalWidth,centerX,lobes,frame,st
   frameOuter.closePath();
 
   const inner=new THREE.Path();
-  inner.moveTo(-innerHalf,glassBottom);
+  inner.moveTo(-innerHalf,frame);
   inner.lineTo(-innerHalf,top(-innerHalf)-frame);
   for(let i=1;i<=segments;i++){
     const x=-innerHalf+innerHalf*2*i/segments;
     inner.lineTo(x,top(x)-frame);
   }
-  inner.lineTo(innerHalf,glassBottom);
+  inner.lineTo(innerHalf,frame);
   inner.closePath();
   frameOuter.holes.push(inner);
   const glass=new THREE.Shape();
@@ -70,13 +71,14 @@ export function ArchedPanel({width,height,archHeight=300,totalWidth=width,center
   const rowCount=steel>0?1:horiz;
   return <group>
     <mesh geometry={profile.glass} position={[0,0,.052]} castShadow={!photoMode}>
-      <GlassMaterial kind={config.glass} photoMode={photoMode}/>
+      <GlassMaterial kind={config.glass} photoMode={photoMode} width={profile.innerHalf*2} height={height} uvMeters/>
     </mesh>
     <GlassPattern kind={config.glass} width={profile.innerHalf*2} height={height} bottom={profile.glassBottom}
       topAt={profile.topAt} frame={profile.frame}/>
     <mesh geometry={profile.outline} position={[0,0,-.026]} castShadow receiveShadow>
-      <meshStandardMaterial color={frameColor} metalness={.78} roughness={.36}/>
+      <meshPhysicalMaterial color={frameColor} metalness={.88} roughness={.34} envMapIntensity={1.60} clearcoat={.20} clearcoatRoughness={.14}/>
     </mesh>
+    {steel>0&&<SteelInfill width={profile.innerHalf*2} height={steel} centerY={profile.frame+steel/2} color={frameColor} photoMode={photoMode}/>}
     {Array.from({length:vert},(_,i)=>{
       const x=-profile.innerHalf+profile.innerHalf*2*(i+1)/(vert+1);
       const top=Math.max(profile.frame,profile.topAt(x)-profile.frame);
@@ -101,7 +103,7 @@ export function ArchedDoorLeaf({x,width,height,hinge,config,pivotOffset=0,photoM
       <ArchedPanel width={width} height={height} archHeight={config.archHeight} totalWidth={globalWidth} centerX={globalX} lobes={lobes}
         config={config} frameColor={frameColor} photoMode={photoMode}/>
       <DoorHardware x={handleX} y={height*.5} handle={config.handle} closure={config.closure} color={frameColor} right={right}/>
-      {[.18,.83].map((f,i)=><MetalBar key={i} x={right?width/2-.006:-width/2+.006} y={height*f} w={.019} h={.095} z={-.03} color={frameColor}/>)}
+      {[.18,.83].map((f,i)=><DoorHinge key={i} x={right?width/2-.006:-width/2+.006} y={height*f} color={frameColor}/>)}
     </group>
   </group>;
 }
