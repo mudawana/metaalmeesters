@@ -7,6 +7,9 @@ import {getHouseGeometry} from './house-geometry.mjs';
 import {modelDimensions} from './door-dimensions.mjs';
 import {FRAMES} from './data.js';
 import {ArchedDoorLeaf,ArchedFixedPanel} from './ArchedElements.jsx';
+import {GlassSurface} from './GlassVisual.jsx';
+import {DoorHardware} from './DoorHardware.jsx';
+import {lowerSteelMeters} from './product-options.mjs';
 
 function Metal({ color, roughness=0.38 }) {
   return <meshStandardMaterial color={color} metalness={0.78} roughness={roughness} envMapIntensity={1.4} />;
@@ -18,60 +21,44 @@ function Bar({pos,size,color,radius=0.004}) {
 }
 
 function Glass({width,height,kind,photoMode=false}) {
-  const style = {
-    helder:{color:'#d9edf2',roughness:0.045,transmission:0.92,opacity:1},
-    mat:{color:'#d5d9d5',roughness:0.82,transmission:0.26,opacity:1},
-    rook:{color:'#777876',roughness:0.13,transmission:0.52,opacity:1},
-    ribbel:{color:'#c7dbe0',roughness:0.24,transmission:0.65,opacity:1}
-  }[kind] || {color:'#d9edf2',roughness:0.045,transmission:0.9,opacity:1};
-  return <group>
-    <mesh position={[0,0,0]} castShadow>
-      <boxGeometry args={[width,height,0.009]}/>
-      {photoMode ?
-        <meshPhysicalMaterial color={style.color} roughness={style.roughness} metalness={0.05} transparent opacity={kind==='mat'?0.76:kind==='rook'?0.36:kind==='ribbel'?0.30:0.17} depthWrite={false} side={2} clearcoat={0.75} clearcoatRoughness={0.09}/> :
-        <meshPhysicalMaterial color={style.color} roughness={style.roughness} transmission={style.transmission} thickness={0.025} ior={1.52} metalness={0} transparent opacity={style.opacity} clearcoat={0.9} clearcoatRoughness={0.08} side={2}/>
-      }
-    </mesh>
-    {kind==='ribbel' && Array.from({length:Math.floor(width/0.032)},(_,i)=>(
-      <mesh key={i} position={[-width/2 + (i+1)*0.032,0,0.007]}>
-        <boxGeometry args={[0.003,height,0.003]}/>
-        <meshStandardMaterial color="#dbe6e7" transparent opacity={0.2} roughness={0.4}/>
-      </mesh>
-    ))}
-  </group>;
-}
-
-function Handle({x,y,color,kind}) {
-  const metal = kind==='knop' ? '#aa9682' : '#b5a38d';
-  return <group position={[x,y,0.064]}>
-    <Bar pos={[0,0,-0.012]} size={[0.04,0.054,0.05]} color={color}/>
-    {kind==='knop' ? <mesh castShadow><sphereGeometry args={[0.035,16,16]}/><meshStandardMaterial color={metal} metalness={0.8} roughness={0.25}/></mesh>
-    : <Bar pos={[0,0,0.035]} size={[0.017,kind==='lang'?0.37:0.18,0.023]} color={metal} radius={0.006}/>}
-  </group>;
+  return <GlassSurface width={width} height={height} kind={kind} photoMode={photoMode}/>;
 }
 
 function DoorLeaf({x,width,height,hinge,config,pivotOffset=0,photoMode=false}) {
-  const color = FRAME_COLORS[config.frame] || FRAME_COLORS.zwart;
+  const color=FRAME_COLORS[config.frame]||FRAME_COLORS.zwart;
   const flip=hinge==='right';
   const sign=flip?-1:1;
   const center=sign*(width/2-pivotOffset);
-  const frame=0.049;
-  const innerWidth=Math.max(0.1,width-frame*2);
-  const innerHeight=height-frame*2;
-  const horizontal=Math.max(0,Math.min(5,config.horizontal));
-  const vertical=Math.max(0,Math.min(4,config.vertical));
-  const angle=config.open && config.type!=='schuif' ? (flip?1:-1)*(config.type==='pivot'?0.72:0.5) : 0;
+  const frame=.049;
+  const innerWidth=Math.max(.1,width-2*frame),innerHeight=height-2*frame;
+  const steel=lowerSteelMeters(config,height);
+  const glassHeight=Math.max(.08,innerHeight-steel);
+  const glassCenter=steel/2;
+  const horizontal=Math.max(0,Math.min(5,Number(config.horizontal)||0));
+  const vertical=Math.max(0,Math.min(4,Number(config.vertical)||0));
+  const angle=config.open&&config.type!=='schuif'?(flip?1:-1)*(config.type==='pivot'?.72:.5):0;
+  const steelTop=-height/2+frame+steel;
   return <group position={[x,0,0]} rotation={[0,angle,0]}>
     <group position={[center,height/2,0]}>
-      <Glass width={innerWidth} height={innerHeight} kind={config.glass} photoMode={photoMode}/>
-      <Bar pos={[-width/2+frame/2,0,0.016]} size={[frame,height,0.065]} color={color}/>
-      <Bar pos={[ width/2-frame/2,0,0.016]} size={[frame,height,0.065]} color={color}/>
-      <Bar pos={[0,height/2-frame/2,0.016]} size={[width,frame,0.065]} color={color}/>
-      <Bar pos={[0,-height/2+frame/2,0.016]} size={[width,frame,0.065]} color={color}/>
-      {Array.from({length:vertical},(_,i)=><Bar key={'v'+i} pos={[-innerWidth/2+innerWidth*(i+1)/(vertical+1),0,0.031]} size={[0.023,innerHeight,0.04]} color={color}/>)}
-      {Array.from({length:horizontal},(_,i)=><Bar key={'h'+i} pos={[0,-innerHeight/2+innerHeight*(i+1)/(horizontal+1),0.031]} size={[innerWidth,0.024,0.04]} color={color}/>)}
-      <Handle x={flip?-width/2+0.115:width/2-0.115} y={0} color={color} kind={config.handle}/>
-      {[0.16,0.82].map((f,i)=><Bar key={i} pos={[flip?width/2+0.009:-width/2-0.009,-height/2+height*f,0.008]} size={[0.019,0.087,0.09]} color={color}/>)}
+      <group position={[0,glassCenter,0]}><Glass width={innerWidth} height={glassHeight} kind={config.glass} photoMode={photoMode}/></group>
+      {steel>0&&<>
+        <Bar pos={[0,-height/2+frame+steel/2,.031]} size={[innerWidth,steel,.058]} color={color}/>
+        <Bar pos={[0,steelTop,.052]} size={[width,.035,.068]} color={color}/>
+        {/* Three vertical zones: solid steel below, two separate glass panes above. */}
+        <Bar pos={[0,(steelTop+height/2-frame)/2,.052]} size={[width,.027,.055]} color={color}/>
+      </>}
+      <Bar pos={[-width/2+frame/2,0,.016]} size={[frame,height,.065]} color={color}/>
+      <Bar pos={[width/2-frame/2,0,.016]} size={[frame,height,.065]} color={color}/>
+      <Bar pos={[0,height/2-frame/2,.016]} size={[width,frame,.065]} color={color}/>
+      <Bar pos={[0,-height/2+frame/2,.016]} size={[width,frame,.065]} color={color}/>
+      {Array.from({length:vertical},(_,i)=><Bar key={'v'+i}
+        pos={[-innerWidth/2+innerWidth*(i+1)/(vertical+1),glassCenter,.043]}
+        size={[.023,glassHeight,.044]} color={color}/>)}
+      {steel===0&&Array.from({length:horizontal},(_,i)=><Bar key={'h'+i}
+        pos={[0,-innerHeight/2+innerHeight*(i+1)/(horizontal+1),.045]}
+        size={[innerWidth,.024,.046]} color={color}/>)}
+      <DoorHardware x={flip?-width/2+.115:width/2-.115} y={0} color={color} handle={config.handle} closure={config.closure} right={flip}/>
+      {[.16,.82].map((f,i)=><Bar key={i} pos={[flip?width/2+.009:-width/2-.009,-height/2+height*f,.008]} size={[.019,.087,.09]} color={color}/>)}
     </group>
   </group>;
 }

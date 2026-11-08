@@ -6,7 +6,7 @@ import './admin.css';
 // The heavy Three.js preview and private admin app are loaded only when needed.
 const HousePreview=React.lazy(()=>import('./HousePreview.jsx'));
 const Admin=React.lazy(()=>import('./Admin.jsx'));
-import {assets,imageUrl,initialDesign,TYPES,FRAMES,GLASSES,formatDesign,downloadDesign} from './data.js';
+import {assets,imageUrl,initialDesign,TYPES,FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS,formatDesign,downloadDesign} from './data.js';
 import {VISUAL_RANGE} from './door-dimensions.mjs';
 
 const routeFromLocation=()=>{
@@ -143,16 +143,26 @@ function Contact() {
 const steps=[['01','Model'],['02','Afmetingen'],['03','Glas & indeling'],['04','Afwerking'],['05','Offerte']];
 function OptionCard({active,onClick,title,sub}){return <button type="button" className={'option-card '+(active?'selected':'')} onClick={onClick}><span className="option-radio">{active&&<Check size={12}/>}</span><strong>{title}</strong>{sub&&<small>{sub}</small>}</button>;}
 function RangeControl({title,value,min,max,onChange}){return <div className="range-control"><div className="range-head"><strong>{title}</strong><span>{value}</span></div><input type="range" min={min} max={max} step="1" value={value} onChange={e=>onChange(Number(e.target.value))}/><div className="range-labels"><span>Geen</span><span>{max} verdelingen</span></div></div>;}
+function GlassChoice({glass,selected,onClick}) {
+  return <button type="button" className={'glass-choice '+(selected?'selected':'')} aria-pressed={selected} onClick={onClick}>
+    <span className={'glass-example glass-example-'+glass.visual} style={{'--glass-color':glass.color}} aria-hidden="true"><i/></span>
+    <span className="glass-option-copy"><strong>{glass.label}</strong><small>{glass.description}</small><em>{glass.safety}</em></span>
+    {selected&&<Check className="glass-check" size={17}/>}
+  </button>;
+}
 function ConfigSummary({d}) {
   return <div className="summary">
     <div><span>Deurtype</span><strong>{TYPES.find(x=>x.id===d.type)?.label}</strong></div>
     <div><span>{d.type==='wand'?'Totale glaswand':'Afmetingen'}</span><strong>{d.width} × {d.height} mm</strong></div>
     {d.type==='wand'&&<div><span>Geïntegreerde deur</span><strong>{d.doorWidth} mm breed · vaste panelen {d.fixedPanelSide}</strong></div>}
     <div><span>Bovenvorm</span><strong>{d.topShape==='boog'?'Boog · '+d.archHeight+' mm'+(d.type==='dubbel'?(d.archPattern==='apart'?' · twee bogen':' · één boog'):''):'Recht'}</strong></div>
-    <div><span>Glas</span><strong>{GLASSES.find(x=>x.id===d.glass)?.label}</strong></div>
-    <div><span>Kleur</span><strong>{FRAMES.find(x=>x.id===d.frame)?.label}{d.frame==='andere'&&d.customColor?' · '+d.customColor:''}</strong></div>
-    <div><span>Indeling</span><strong>{d.vertical} verticaal · {d.horizontal} horizontaal</strong></div>
-    <div><span>Handgreep</span><strong>{d.handle}</strong></div>
+    <div><span>Glassoort</span><strong>{GLASSES.find(x=>x.id===d.glass)?.label}</strong></div>
+    <div><span>Glasopbouw</span><strong>{GLASSES.find(x=>x.id===d.glass)?.safety||'Te bevestigen'}</strong></div>
+    <div><span>Kleur staal</span><strong>{FRAMES.find(x=>x.id===d.frame)?.label}{d.frame==='andere'&&d.customColor?' · '+d.customColor:''}</strong></div>
+    <div><span>Deurvulling</span><strong>{PANEL_LAYOUTS.find(x=>x.id===(d.panelLayout||'glas'))?.label}{d.panelLayout==='staal-onder'?' · '+d.lowerPanelHeight+' mm staal':''}</strong></div>
+    <div><span>Indeling</span><strong>{d.vertical} verticaal · {d.panelLayout==='staal-onder'?'drie horizontale vakken':d.horizontal+' horizontaal'}</strong></div>
+    <div><span>Handgreep</span><strong>{HANDLES.find(x=>x.id===d.handle)?.label||d.handle}</strong></div>
+    <div><span>Sluiting</span><strong>{CLOSURES.find(x=>x.id===d.closure)?.label||'Nog te bepalen'}</strong></div>
   </div>;
 }
 function ConfigControls({d,change,step,setStep}) {
@@ -205,16 +215,50 @@ function ConfigControls({d,change,step,setStep}) {
       </>}
       {step===2&&<>
         <h3>Glas & verdeling</h3><p className="field-hint">Creëer het perfecte samenspel van licht en lijnen.</p>
-        <div className="options-two">{GLASSES.map(t=><OptionCard key={t.id} title={t.label} sub={t.description} active={d.glass===t.id} onClick={()=>change({glass:t.id})}/>)}</div>
+        <p className="glass-intro">Kies de structuur en tint die u mooi vindt. De voorbeeldweergave toont het effect bij benadering; echt glas en de veiligheidsopbouw worden per bestelling bevestigd.</p>
+        {['Basis','Mat & getint','Structuurglas'].map(group=><section className="glass-group" key={group}>
+          <h4>{group==='Basis'?'Helder en gelaagd glas':group==='Mat & getint'?'Mat en gekleurd gelaagd glas':'Decoratief structuurglas'}</h4>
+          <div className="glass-grid">{GLASSES.filter(glass=>glass.group===group&&(!glass.legacy||glass.id===d.glass)).map(glass=>
+            <GlassChoice key={glass.id} glass={glass} selected={d.glass===glass.id} onClick={()=>change({glass:glass.id})}/>)}</div>
+        </section>)}
+        <p className="glass-tech-note"><ShieldCheck size={16}/> <span><strong>Veiligheidsglas:</strong> matte en getinte varianten worden volgens de opgave van MetaalMeesters gelaagd aangeboden. Voor de andere soorten bevestigt het atelier of de gekozen toepassing gehard of gelaagd glas vereist. Draadglas is niet automatisch veiligheidsglas.</span></p>
+        <h3 className="subsection-title">Indeling en stalen onderpaneel</h3>
+        <p className="field-hint">Kies volledig glas of een deur in drie delen: twee glasvakken bovenaan en een gesloten paneel van staal onderaan.</p>
+        <div className="options-two">{PANEL_LAYOUTS.map(t=><OptionCard key={t.id} title={t.label} sub={t.description} active={(d.panelLayout||'glas')===t.id} onClick={()=>change({panelLayout:t.id})}/>)}</div>
+        {d.panelLayout==='staal-onder'&&<div className="panel-height-option">
+          <label htmlFor="lowerPanelHeight">Hoogte stalen onderpaneel</label>
+          <div className="input-unit"><input id="lowerPanelHeight" type="number" step="10" min="250" max={Math.floor(d.height*.60)} value={Math.min(d.lowerPanelHeight||650,Math.floor(d.height*.60))}
+            onChange={e=>change({lowerPanelHeight:Math.max(250,Math.min(Math.floor(d.height*.60),Number(e.target.value)||650))})}/><span>mm</span></div>
+          <small>Het stalen paneel vervangt echt het onderste glasvak in de 3D-weergave. De drie horizontale vakken zijn automatisch verdeeld.</small>
+        </div>}
         <div className="divider-soft"/><RangeControl title="Verticale verdelingen" value={d.vertical} min={0} max={4} onChange={v=>change({vertical:v,style:'eigen'})}/>
-        <RangeControl title="Horizontale verdelingen" value={d.horizontal} min={0} max={5} onChange={v=>change({horizontal:v,style:'eigen'})}/>
+        {d.panelLayout!=='staal-onder'?<RangeControl title="Horizontale verdelingen" value={d.horizontal} min={0} max={5} onChange={v=>change({horizontal:v,style:'eigen'})}/>:<p className="field-hint">Bij een stalen onderpaneel toont de 3D-deur drie horizontale vakken. De twee bovenste vakken zijn glas.</p>}
         <div className="measure-tip"><SlidersHorizontal size={19}/><div><strong>Volledig op maat</strong><p>De zichtbare lijnverdeling is een visuele indicatie. De technische haalbaarheid wordt later gecontroleerd.</p></div></div>
       </>}
       {step===3&&<>
         <h3>De finishing touch</h3><p className="field-hint">Een subtiel detail maakt het verschil.</p>
-        <h4>Kaderkleur · populaire RAL- en anodic voorbeelden</h4><p className="field-hint">De kleuren op uw scherm zijn indicatief. Een echte kleurenkaart van MetaalMeesters is bepalend.</p><div className="swatches">{FRAMES.map(t=><button type="button" className={'swatch '+(d.frame===t.id?'selected':'')} key={t.id} onClick={()=>change({frame:t.id})}><span style={{backgroundColor:t.color}}>{d.frame===t.id&&<Check size={16} color={t.id==='wit'||t.id==='ral7035'||t.id==='anodic-naturel'?'#222':'#fff'}/>}</span><small>{t.label}</small></button>)}</div>
+        <h4>Kaderkleur · RAL en Anodic Collection</h4>
+        <p className="field-hint">De anodic-kleuren volgen de namen van de fysieke kleurkaart die MetaalMeesters doorgaf. Digitale swatches zijn indicatief; de officiële stalen bepalen de uiteindelijke kleur.</p>
+        {['RAL','Anodic','Overig'].map(group=><div className="frame-colour-group" key={group}>
+          <h5>{group==='RAL'?'RAL-kleuren':group==='Anodic'?'Anodic Collection · 8 kleuren':'Een andere afwerking'}</h5>
+          <div className="swatches">{FRAMES.filter(t=>t.group===group&&(!t.legacy||t.id===d.frame)).map(t=>
+            <button type="button" className={'swatch '+(d.frame===t.id?'selected':'')} key={t.id} onClick={()=>change({frame:t.id})} aria-pressed={d.frame===t.id}>
+              <span style={{backgroundColor:t.color}}>{d.frame===t.id&&<Check size={16} color={['wit','ral7035','anodic-natura','anodic-champagne','anodic-naturel'].includes(t.id)?'#222':'#fff'}/>}</span><small>{t.label}</small>
+            </button>)}</div>
+        </div>)}
         {d.frame==='andere'&&<div className="measure-field"><label htmlFor="customColor">Uw RAL-code of anodic kleurnaam</label><input id="customColor" type="text" maxLength="70" placeholder="Bijv. RAL 9001 of anodic ..." value={d.customColor||''} onChange={e=>change({customColor:e.target.value})}/><small>De exacte kleur wordt door het atelier bevestigd.</small></div>}
-        <h4>Handgreep</h4><div className="option-row">{[['lang','Lange greep'],['kort','Korte greep'],['knop','Knop']].map(([id,name])=><button key={id} className={d.handle===id?'picked':''} onClick={()=>change({handle:id})}>{name}</button>)}</div>
+        <h4>Handgreep · verschillende modellen</h4>
+        <p className="field-hint">Kies een voorbeeld van de greep. De exacte afmetingen en het beslag zijn onder voorbehoud van technische bevestiging.</p>
+        <div className="hardware-grid">{HANDLES.map(t=>
+          <button type="button" key={t.id} className={'hardware-choice '+(d.handle===t.id?'selected':'')} onClick={()=>change({handle:t.id})} aria-pressed={d.handle===t.id}>
+            <span className={'hardware-illustration hardware-'+t.id} aria-hidden="true"><i/><b/></span>
+            <span><strong>{t.label}</strong><small>{t.description}</small></span>
+          </button>)}</div>
+        <h4>Sluiting</h4>
+        <div className="hardware-closure-grid">{CLOSURES.map(t=>
+          <button type="button" key={t.id} className={'closure-choice '+((d.closure||'magneet')===t.id?'selected':'')} onClick={()=>change({closure:t.id})} aria-pressed={(d.closure||'magneet')===t.id}>
+            <strong>{t.label}</strong><small>{t.description}</small>
+          </button>)}</div>
         <h4>Draairichting</h4><div className="option-row">{[['links','Links'],['rechts','Rechts']].map(([id,name])=><button key={id} className={d.opening===id?'picked':''} onClick={()=>change({opening:id})}>{name}</button>)}</div>
       </>}
       {step===4&&<><h3>Uw deur is ontworpen.</h3><p className="field-hint">Controleer uw keuzes en vraag een vrijblijvende offerte aan.</p><ConfigSummary d={d}/><QuoteForm design={d}/></>}
@@ -229,7 +273,7 @@ function Configurator() {
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">
-    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp ook boogdeuren: enkel, dubbel, pivot of een glaswand met geïntegreerde deur. De 3D-woning schaalt mee, of voeg uw eigen woningfoto toe.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
+    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp een enkele, dubbele of pivotdeur, boogdeur of glaswand met geïntegreerde deur. Ontdek onze glasvarianten, de Anodic Collection en stalen onderpanelen. De 3D-woning schaalt mee, of voeg uw eigen woningfoto toe.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
       <div><Suspense fallback={<div className="viewer-loading">De 3D-configurator wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>

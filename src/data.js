@@ -1,3 +1,5 @@
+import {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
+export {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
 export const basePath = import.meta.env.BASE_URL || '/';
 
 export const assets = {
@@ -30,6 +32,9 @@ export const initialDesign = {
   vertical: 1,
   horizontal: 2,
   handle: 'lang',
+  closure: 'magneet',
+  panelLayout: 'glas',
+  lowerPanelHeight: 650,
   opening: 'rechts',
   open: false,
   room: 'studio',
@@ -43,25 +48,6 @@ export const TYPES = [
   {id:'pivot',label:'Pivotdeur',caption:'Architecturaal statement'},
   {id:'wand',label:'Glaswand met deur',caption:'Vaste glasdelen en een geïntegreerde deur'},
   {id:'schuif',label:'Schuifdeur',caption:'Optie, technische uitvoering te bevestigen'}
-];
-
-export const FRAMES = [
-  {id:'zwart',label:'RAL 9005 · Zwart',color:'#232625'},
-  {id:'antraciet',label:'RAL 7016 · Antraciet',color:'#414549'},
-  {id:'wit',label:'RAL 9010 · Wit',color:'#e6e3d8'},
-  {id:'ral7035',label:'RAL 7035 · Lichtgrijs',color:'#b8babe'},
-  {id:'ral6005',label:'RAL 6005 · Groen',color:'#244e36'},
-  {id:'ral5008',label:'RAL 5008 · Blauw',color:'#303e4b'},
-  {id:'brons',label:'Anodic · Brons (indicatief)',color:'#937457'},
-  {id:'anodic-naturel',label:'Anodic · Naturel (indicatief)',color:'#a9aaa3'},
-  {id:'andere',label:'Andere RAL/anodic kleur op aanvraag',color:'#a2a19d'}
-];
-
-export const GLASSES = [
-  {id:'helder',label:'Helder glas',description:'Open & licht'},
-  {id:'mat',label:'Mat glas',description:'Meer privacy'},
-  {id:'rook',label:'Rookglas',description:'Warm & subtiel'},
-  {id:'ribbel',label:'Ribbelglas',description:'Sfeervol reliëf'}
 ];
 
 export function formatDesign(d) {
@@ -79,9 +65,13 @@ export function formatDesign(d) {
     ...(d.topShape==='boog' ? ['Booghoogte: '+d.archHeight+' mm',...(d.type==='dubbel'?['Boogverdeling: '+(d.archPattern==='apart'?'Twee aparte bogen':'Eén doorlopende boog')]:[])] : []),
     'Afwerking: ' + frame+(d.frame==='andere' ? (' ('+(d.customColor||'te bepalen')+')') : ''),
     'Glas: ' + glass,
+    'Glasopbouw: ' + (GLASSES.find(t=>t.id===d.glass)?.safety||'Nog te bevestigen'),
+    'Deurvulling: ' + (PANEL_LAYOUTS.find(t=>t.id===d.panelLayout)?.label||'Volledig glas'),
+    ...(d.panelLayout==='staal-onder'?['Hoogte stalen onderpaneel: '+d.lowerPanelHeight+' mm']:[]),
     'Verticale verdelingen: ' + d.vertical,
     'Horizontale verdelingen: ' + d.horizontal,
-    'Handgreep: ' + d.handle,
+    'Handgreep: ' + (HANDLES.find(t=>t.id===d.handle)?.label||d.handle),
+    'Sluiting: ' + (CLOSURES.find(t=>t.id===d.closure)?.label||'Te bepalen'),
     'Draairichting: ' + d.opening,
     'Stijl: ' + d.style,
     'Opmerkingen: ' + (d.notes || 'Geen'),

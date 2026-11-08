@@ -54,3 +54,61 @@
 .arch-presets button{border:1px solid #d4d0c5;padding:9px 13px;background:#fff;color:#51584f;font-size:11px;cursor:pointer}
 .arch-presets button:hover{background:#e8dfd4}
 .arch-config-options .options-two{margin-top:10px}
+
+
+/* Actual MetaalMeesters product choices: glass, anodic shades and hardware. */
+.glass-intro{font-size:12px;color:#64726a;line-height:1.75;margin:8px 0 18px}
+.glass-group{margin:20px 0}
+.glass-group>h4{margin:0 0 12px;font-size:12px;letter-spacing:.01em;color:#314135}
+.glass-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.glass-choice{appearance:none;border:1px solid #e3e3da;background:#fff;display:flex;flex-direction:column;gap:11px;align-items:stretch;min-height:182px;text-align:left;padding:12px;position:relative;transition:border-color .2s,background .2s}
+.glass-choice:hover{border-color:#afa48e;background:#faf9f6}
+.glass-choice.selected{border:2px solid #968265;padding:11px;background:#f8f6f0}
+.glass-example{display:block;position:relative;height:86px;overflow:hidden;border:1px solid #ced3ce;background:var(--glass-color,#d8e8eb);box-shadow:inset 0 1px 10px #ffffff55}
+.glass-example:before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,#ffffff82 44%,transparent 49%),linear-gradient(100deg,#344a4730,transparent 65%);pointer-events:none}
+.glass-example i{position:absolute;inset:0;background:transparent;opacity:.77}
+.glass-example-frost i{background:linear-gradient(125deg,#ffffffbb,#8c9d9845),repeating-linear-gradient(35deg,#ffffff40 0 3px,#c9ceca44 5px 8px)}
+.glass-example-tint{background:linear-gradient(150deg,var(--glass-color),#303f4666)}
+.glass-example-dark{background:linear-gradient(125deg,#393b3e,#1d262a)}
+.glass-example-crepe i{background:repeating-radial-gradient(ellipse at 20% 40%,#ffffffb4 0px,#789ca11a 2px,transparent 7px,#ffffff91 9px,transparent 12px);opacity:.8}
+.glass-example-wire i{background:repeating-linear-gradient(0deg,transparent 0 14px,#728288ab 15px 16px),repeating-linear-gradient(90deg,transparent 0 14px,#728288a9 15px 16px)}
+.glass-example-ocean i{background:repeating-radial-gradient(ellipse at 0% -15%,#ffffffb7 0 3px,transparent 6px 19px,#82b8bf5c 21px 25px,transparent 27px 43px)}
+.glass-example-hammer i{background:radial-gradient(circle at 20% 20%,#ffffffaa,transparent 15px),radial-gradient(circle at 60% 60%,#718f955c,transparent 21px),repeating-radial-gradient(circle at 75% 20%,#c6d9d8 0 3px,#739a9a69 6px,#e3ffff71 11px,transparent 16px)}
+.glass-example-canale i{background:repeating-linear-gradient(90deg,#4d818d4f 0 3px,#ffffffc7 9px,#92b7ba59 15px,transparent 27px);opacity:.85}
+.glass-example-flute i{background:repeating-linear-gradient(90deg,#5d9fab5c 0 2px,#ffffffdb 5px,#9cc6c56b 8px,transparent 13px);opacity:.85}
+.glass-option-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.glass-option-copy strong{font-size:11px;color:#26372e;font-weight:800}
+.glass-option-copy small{font-size:10px;line-height:1.5;color:#657269}
+.glass-option-copy em{font-size:9px;font-style:normal;line-height:1.3;color:#8b765e;font-weight:700}
+.glass-check{position:absolute;top:17px;right:17px;background:#fff;border-radius:50%;color:#927857;padding:2px}
+.glass-tech-note{display:flex;gap:9px;align-items:flex-start;background:#f1f2ed;border:1px solid #dedfd8;padding:12px;font-size:10px;color:#526255;line-height:1.65}
+.glass-tech-note svg{flex-shrink:0;margin-top:2px;color:#7c9376}
+.panel-height-option{margin:16px 0;padding:15px;background:#f5f1e9;display:flex;flex-direction:column;gap:9px}
+.panel-height-option label{font-size:11px;font-weight:800}
+.panel-height-option small{font-size:10px;line-height:1.6;color:#66706a}
+.frame-colour-group{margin-top:19px}
+.frame-colour-group h5{margin:0 0 12px;font-size:11px;font-weight:800;color:#657468}
+.frame-colour-group .swatches{margin-top:0}
+.frame-colour-group .swatches .swatch small{line-height:1.3}
+.hardware-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hardware-choice{border:1px solid #e0e2db;background:#fdfdfb;padding:13px 11px;display:flex;align-items:center;gap:11px;min-height:76px;text-align:left}
+.hardware-choice.selected{border:2px solid #a48d70;background:#f4f1ea;padding:12px 10px}
+.hardware-choice span:last-child{display:flex;flex-direction:column;gap:5px}
+.hardware-choice strong{font-size:11px;color:#2e3a32}
+.hardware-choice small{font-size:9px;color:#758076;line-height:1.5}
+.hardware-illustration{position:relative;display:block;flex:0 0 31px;height:51px;border:1px solid #d2d6cf;background:#e8e9e5}
+.hardware-illustration i,.hardware-illustration b{position:absolute;display:block;background:#968d78;border-radius:4px;left:14px;top:11px;height:28px;width:4px}
+.hardware-kort i{height:16px;top:17px}
+.hardware-knop i{width:12px;height:12px;top:19px;left:9px;border-radius:50%}
+.hardware-kruk i{width:19px;height:4px;top:24px;left:8px}
+.hardware-greep-rond i,.hardware-greep-vierkant i{width:14px;height:30px;left:8px;top:10px;background:transparent;border:3px solid #968d78;border-radius:12px}
+.hardware-greep-vierkant i{border-radius:1px}
+.hardware-greep-plat i{width:8px;left:11px}
+.hardware-greep-dubbel i{left:10px}
+.hardware-greep-dubbel b{left:19px}
+.hardware-closure-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.closure-choice{padding:12px;text-align:left;background:#fff;border:1px solid #e3e3da;display:flex;flex-direction:column;gap:8px;min-height:81px}
+.closure-choice.selected{border:2px solid #a48d70;background:#f6f3ed;padding:11px}
+.closure-choice strong{font-size:11px;color:#314039}
+.closure-choice small{font-size:10px;color:#758077;line-height:1.4}
+@media(max-width:470px){.glass-choice{padding:8px;min-height:190px}.glass-choice.selected{padding:7px}.glass-example{height:70px}.hardware-choice{padding:10px;gap:8px}.hardware-choice.selected{padding:9px}.glass-option-copy strong{font-size:10px}.glass-option-copy small{font-size:9px}}

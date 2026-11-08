@@ -6,7 +6,7 @@ const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const permitted={type:['enkel','dubbel','schuif','pivot','wand'],frame:['zwart','antraciet','brons','wit','ral7035','ral6005','ral5008','anodic-naturel','andere'],glass:['helder','mat','rook','ribbel'],handle:['lang','kort','knop'],opening:['links','rechts']};
 const clean=(value,max=300)=>String(value||'').trim().slice(0,max);
 const error=(msg,code=400)=>apiJSON({error:msg},code);
-function validDesign(d) {
+export function validDesign(d) {
   if(!d || typeof d!=='object')return false;
   if(!Number.isInteger(d.width)||d.width<500||d.width>8000 ||
      !Number.isInteger(d.height)||d.height<1400||d.height>4500)return false;

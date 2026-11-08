@@ -1,4 +1,5 @@
 import React, {useCallback,useEffect,useRef,useState} from 'react';
+import {GLASSES,FRAMES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
 import {ArrowLeft,ArrowRight,Archive,CheckCircle2,Clock3,Download,Eye,Inbox,LockKeyhole,LogOut,Mail,Phone,RefreshCcw,Search,ShieldCheck,Trash2, X} from 'lucide-react';
 
 const API='/.netlify/functions/';
@@ -12,7 +13,7 @@ async function jsonRequest(path,options={}) {
 }
 const readableDate=date=>{try{return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(date));}catch{return date;}};
 const typeLabel={enkel:'Enkele deur',dubbel:'Dubbele deur',schuif:'Schuifdeur',pivot:'Pivotdeur',wand:'Glaswand met deur'};
-const glassLabel={helder:'Helder',mat:'Mat',rook:'Rook',ribbel:'Ribbel'};
+
 function Detail({quote,onBack,onChanged}) {
   const [status,setStatus]=useState(quote.status),[saving,setSaving]=useState(false),[message,setMessage]=useState('');
   async function updateStatus(next) {
@@ -41,10 +42,16 @@ function Detail({quote,onBack,onChanged}) {
           ['Bovenvorm',quote.design?.topShape==='boog'?'Boog':'Recht'],
           ...(quote.design?.topShape==='boog'?[['Booghoogte',(quote.design.archHeight||'—')+' mm'],...(quote.design.type==='dubbel'?[['Boogindeling',quote.design.archPattern==='apart'?'Twee aparte bogen':'Eén doorlopende boog']]:[])]:[]),
           ...(quote.design?.type==='wand'?[['Geïntegreerde deur',(quote.design.doorWidth||'—')+' mm']]:[]),
-          ['Glas',glassLabel[quote.design?.glass]||quote.design?.glass],
-          ['Kader',quote.design?.frame],['Verticaal',quote.design?.vertical+' verdelingen'],
+          ['Glas',GLASSES.find(x=>x.id===quote.design?.glass)?.label||quote.design?.glass],
+          ['Glasopbouw',GLASSES.find(x=>x.id===quote.design?.glass)?.safety||'Te bevestigen'],
+          ['Kader',FRAMES.find(x=>x.id===quote.design?.frame)?.label||quote.design?.frame],
+          ['Deurvulling',PANEL_LAYOUTS.find(x=>x.id===quote.design?.panelLayout)?.label||'Volledig glas'],
+          ...(quote.design?.panelLayout==='staal-onder'?[['Stalen onderpaneel',quote.design.lowerPanelHeight+' mm']]:[]),
+          ['Verticaal',quote.design?.vertical+' verdelingen'],
           ['Horizontaal',quote.design?.horizontal+' verdelingen'],
-          ['Handgreep',quote.design?.handle],['Draairichting',quote.design?.opening]
+          ['Handgreep',HANDLES.find(x=>x.id===quote.design?.handle)?.label||quote.design?.handle],
+          ['Sluiting',CLOSURES.find(x=>x.id===quote.design?.closure)?.label||'Nog niet opgegeven'],
+          ['Draairichting',quote.design?.opening]
         ].map(([key,value])=><div className="admin-data-row" key={key}><span>{key}</span><strong>{value}</strong></div>)}</section>
         <section className="admin-white-card"><h3>Verwerking</h3><label className="admin-label">Status van deze offerte<select value={status} disabled={saving} onChange={e=>updateStatus(e.target.value)}>{STAGES.map(x=><option key={x}>{x}</option>)}</select></label><p className="admin-mini">E-mailmelding: {quote.notification||'onbekend'}.</p><a className="admin-email-link" href={'mailto:'+quote.email+'?subject='+encodeURIComponent('Uw offerteaanvraag bij MetaalMeesters')}>Beantwoord deze klant <Mail size={16}/></a>{message&&<p className="admin-error">{message}</p>}</section>
       </div>
