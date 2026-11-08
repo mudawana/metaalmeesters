@@ -269,7 +269,16 @@ function ConfigControls({d,change,step,setStep}) {
 function Configurator() {
   const [d,setD]=useState(()=>{try {const saved=JSON.parse(localStorage.getItem('mm-door-design'));return {...initialDesign,...saved};}catch{return initialDesign;}});
   const [step,setStep]=useState(0),[resetToken,setResetToken]=useState(0),[notice,setNotice]=useState('');
-  const change=(patch)=>setD(old=>({...old,...patch}));
+  const change=(patch)=>setD(old=>{
+    const next={...old,...patch};
+    // Keep solid steel panel sizes feasible for the currently selected height,
+    // including when the user reduces overall dimensions after choosing a panel.
+    if(next.panelLayout==='staal-onder'){
+      const limit=Math.max(250,Math.floor((Number(next.height)||2200)*.60));
+      next.lowerPanelHeight=Math.max(250,Math.min(limit,Number(next.lowerPanelHeight)||650));
+    }
+    return next;
+  });
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">
