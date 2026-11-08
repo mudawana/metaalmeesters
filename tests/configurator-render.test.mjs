@@ -14,7 +14,7 @@ test('interactive configurator renders the first step without runtime errors',as
  try {
    const {default:App}=await vite.ssrLoadModule('/src/App.jsx');
    const html=renderToString(React.createElement(App,{initialRoute:'configurator'}));
-   assert.match(html,/Stap 1 van 5/);
+   assert.match(html,/aria-valuenow="1"/); // React SSR inserts comment nodes between numeric text
    assert.match(html,/Uw deur in/);
    assert.match(html,/Volgende: Afmetingen/);
    assert.match(html,/Bekijk uw 3D-voorbeeld/);
