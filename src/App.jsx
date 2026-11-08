@@ -8,6 +8,7 @@ const HousePreview=React.lazy(()=>import('./HousePreview.jsx'));
 const Admin=React.lazy(()=>import('./Admin.jsx'));
 import {assets,imageUrl,initialDesign,TYPES,FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS,formatDesign,downloadDesign} from './data.js';
 import {VISUAL_RANGE} from './door-dimensions.mjs';
+import {STEPS,FAVOURITES,featuredOptions,extraOptions,countExtra,sizesForType} from './configurator-ux.mjs';
 
 const routeFromLocation=()=>{
   if(typeof window==='undefined')return 'home';
@@ -140,8 +141,8 @@ function Contact() {
     <form className="contact-form" onSubmit={contact}><h3>Stuur ons een bericht</h3><label>Uw naam<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Voor- en achternaam"/></label><label>E-mailadres<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label><label>Uw bericht<textarea required rows="6" value={message} onChange={e=>setMessage(e.target.value)} placeholder="Waarmee kunnen wij u helpen?"/></label><button className="btn btn-dark" type="submit">Open e-mailprogramma <ArrowUpRight size={17}/></button><small>Uw e-mailprogramma wordt geopend. Controleer en verstuur het bericht zelf.</small></form></div>
   </main>;
 }
-const steps=[['01','Model'],['02','Afmetingen'],['03','Glas & indeling'],['04','Afwerking'],['05','Offerte']];
-function OptionCard({active,onClick,title,sub}){return <button type="button" className={'option-card '+(active?'selected':'')} onClick={onClick}><span className="option-radio">{active&&<Check size={12}/>}</span><strong>{title}</strong>{sub&&<small>{sub}</small>}</button>;}
+const steps=STEPS.map((s,i)=>[String(i+1).padStart(2,'0'),s.title]);
+function OptionCard({active,onClick,title,sub}){return <button type="button" className={'option-card '+(active?'selected':'')} onClick={onClick} aria-pressed={active}><span className="option-radio">{active&&<Check size={12}/>}</span><strong>{title}</strong>{sub&&<small>{sub}</small>}</button>;}
 function RangeControl({title,value,min,max,onChange}){return <div className="range-control"><div className="range-head"><strong>{title}</strong><span>{value}</span></div><input type="range" min={min} max={max} step="1" value={value} onChange={e=>onChange(Number(e.target.value))}/><div className="range-labels"><span>Geen</span><span>{max} verdelingen</span></div></div>;}
 function GlassChoice({glass,selected,onClick}) {
   return <button type="button" className={'glass-choice '+(selected?'selected':'')} aria-pressed={selected} onClick={onClick}>
@@ -166,26 +167,45 @@ function ConfigSummary({d}) {
   </div>;
 }
 function ConfigControls({d,change,step,setStep}) {
+  const [showAllGlass,setShowAllGlass]=useState(false);
+  const [showAllColors,setShowAllColors]=useState(false);
+  const [showAllHandles,setShowAllHandles]=useState(false);
+  const [showExtraTypes,setShowExtraTypes]=useState(false);
   const applyStyle=(style)=>{const presets={minimal:{vertical:0,horizontal:0},atelier:{vertical:1,horizontal:2},industrieel:{vertical:2,horizontal:3},klassiek:{vertical:0,horizontal:1}};change({style,...presets[style]});};
-  return <div className="config-controls">
-    <div className="config-controls-top"><span className="eyebrow">UW ONTWERP</span><h2>Maak het <em>eigen.</em></h2><p>Elk detail, helemaal naar uw wens.</p></div>
-    <div className="steps">{steps.map(([n,name],i)=><button key={n} className={'step '+(step===i?'active':'')+(step>i?' done':'')} onClick={()=>setStep(i)}><span>{step>i?<Check size={13}/>:n}</span><span>{name}</span></button>)}</div>
+  return <div className="config-controls" id="mm-config-controls">
+    <div className="config-controls-top"><span className="eyebrow">UW DEUR OP MAAT</span><h2>Zo eenvoudig <em>kan het.</em></h2><p>Kies wat u mooi vindt. De details regelen we samen.</p></div>
+    <div className="wizard-progress-area">
+      <div className="wizard-progress-label"><strong>Stap {step+1} van {STEPS.length}</strong><span>{STEPS[step].title}</span></div>
+      <div className="wizard-progress-track" role="progressbar" aria-label="Voortgang van uw deurontwerp" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step+1}><span style={{width:((step+1)/STEPS.length*100)+'%'}}/></div>
+    </div>
+    <nav className="steps" aria-label="Navigatie tussen de stappen">{steps.map(([n,name],i)=><button type="button" key={n} className={'step '+(step===i?'active':'')+(step>i?' done':'')} aria-current={step===i?'step':undefined} aria-label={'Stap '+(i+1)+': '+name} onClick={()=>setStep(i)}><span>{step>i?<Check size={13}/>:n}</span><span>{name}</span></button>)}</nav>
+    <p className="wizard-guidance">{STEPS[step].hint}</p>
+    <button type="button" className="wizard-preview-shortcut" onClick={()=>document.getElementById('mm-live-preview')?.scrollIntoView({behavior:'smooth',block:'start'})}><Eye size={16}/> Bekijk uw 3D-voorbeeld <ArrowRight size={15}/></button>
     <div className="config-fields">
       {step===0&&<>
-        <h3>Welk type deur wenst u?</h3><p className="field-hint">Kies het model dat bij uw ruimte past.</p><div className="options-two">{TYPES.map(t=><OptionCard key={t.id} title={t.label} sub={t.caption} active={d.type===t.id} onClick={()=>change({type:t.id,topShape:t.id==='schuif'?'recht':d.topShape,width:t.id==='wand'&&d.width<1400?2600:t.id==='dubbel'&&d.width<1200?1600:d.width,doorWidth:t.id==='wand'?Math.min(d.doorWidth||900,Math.max(500,(t.id==='wand'&&d.width<1400?2600:d.width)-300)):d.doorWidth})}/>)}</div>
+        <h3>Welk type deur wenst u?</h3><p className="field-hint">Kies het model dat bij uw ruimte past.</p><div className="options-two">{TYPES.filter(t=>t.id!=='schuif'||showExtraTypes||d.type==='schuif').map(t=><OptionCard key={t.id} title={t.label} sub={t.caption} active={d.type===t.id} onClick={()=>change({type:t.id,topShape:t.id==='schuif'?'recht':d.topShape,width:t.id==='wand'&&d.width<1400?2600:t.id==='dubbel'&&d.width<1200?1600:d.width,doorWidth:t.id==='wand'?Math.min(d.doorWidth||900,Math.max(500,(t.id==='wand'&&d.width<1400?2600:d.width)-300)):d.doorWidth})}/>)}</div>
+        <button type="button" className="show-more-options" aria-expanded={showExtraTypes} onClick={()=>setShowExtraTypes(v=>!v)}>{showExtraTypes?'Minder deurtypes':'Ook een schuifdeur bekijken'} <ChevronDown size={16}/></button>
         <h3 className="subsection-title">Welke bovenvorm?</h3>
         <p className="field-hint">Een echte gebogen stalen deur, ook in de 3D-muuropening.</p>
         {d.type!=='schuif'?<div className="options-two">
           <OptionCard title="Rechte bovenkant" sub="Klassieke rechte deur" active={d.topShape!=='boog'} onClick={()=>change({topShape:'recht'})}/>
           <OptionCard title="Boogdeur" sub="Gebogen glas, profiel en opening" active={d.topShape==='boog'} onClick={()=>change({topShape:'boog'})}/>
         </div>:<p className="field-hint">Schuifdeuren worden voorlopig enkel met rechte bovenkant getoond.</p>}
-        <h3 className="subsection-title">Kies een startontwerp</h3><div className="options-two">{[['minimal','Minimal','Zonder onderverdeling'],['atelier','Atelier','Een verfijnd raster'],['industrieel','Industrieel','Een strak lijnenspel'],['klassiek','Klassiek','Één horizontale lijn']].map(([id,title,sub])=><OptionCard key={id} title={title} sub={sub} active={d.style===id} onClick={()=>applyStyle(id)}/>)}</div>
+        <details className="config-extra"><summary><span>Roedenstijl aanpassen (optioneel)</span><small>{d.style==='eigen'?'Eigen verdeling':d.style==='minimal'?'Zonder roeden':d.style==='atelier'?'Atelier':d.style==='industrieel'?'Industrieel':'Klassiek'}</small></summary>
+          <div className="options-two">{[['minimal','Minimal','Zonder onderverdeling'],['atelier','Atelier','Een verfijnd raster'],['industrieel','Industrieel','Een strak lijnenspel'],['klassiek','Klassiek','Één horizontale lijn']].map(([id,title,sub])=><OptionCard key={id} title={title} sub={sub} active={d.style===id} onClick={()=>applyStyle(id)}/>)}</div>
+        </details>
       </>}
       {step===1&&<>
-        <h3>Uw deur op maat</h3><p className="field-hint">Vul de maten van de deuropening in, in millimeters.</p>
+        <h3>Hoe groot wordt uw deur?</h3><p className="field-hint">Een schatting is voldoende om te beginnen. Exact opmeten gebeurt later.</p>
+        <div className="size-presets">
+          <span>Of kies snel een voorbeeldmaat</span>
+          <div>{sizesForType(d.type).map(size=><button type="button" key={size.label} aria-pressed={d.width===size.width&&d.height===size.height} className={d.width===size.width&&d.height===size.height?'selected':''}
+            onClick={()=>change({width:size.width,height:size.height,doorWidth:Math.min(d.doorWidth||900,Math.max(500,size.width-300))})}>
+            <strong>{size.label}</strong><small>{size.width} × {size.height} mm</small></button>)}</div>
+        </div>
         <div className="measure-field"><label htmlFor="width">{d.type==='wand'?'Totale breedte van de glaswand':'Breedte van de deuropening'}</label><div className="input-unit"><input id="width" type="number" min={VISUAL_RANGE.widthMin} max={VISUAL_RANGE.widthMax} step="10" value={d.width} onChange={e=>change({width:Math.max(VISUAL_RANGE.widthMin,Math.min(VISUAL_RANGE.widthMax,Number(e.target.value)||VISUAL_RANGE.widthMin))})}/><span>mm</span></div><small>Visualisatie: {VISUAL_RANGE.widthMin}–{VISUAL_RANGE.widthMax} mm</small></div>
         <div className="measure-field"><label htmlFor="height">Hoogte van de opening</label><div className="input-unit"><input id="height" type="number" min={VISUAL_RANGE.heightMin} max={VISUAL_RANGE.heightMax} step="10" value={d.height} onChange={e=>change({height:Math.max(VISUAL_RANGE.heightMin,Math.min(VISUAL_RANGE.heightMax,Number(e.target.value)||VISUAL_RANGE.heightMin))})}/><span>mm</span></div><small>Visualisatie: {VISUAL_RANGE.heightMin}–{VISUAL_RANGE.heightMax} mm</small></div>
-        {d.topShape==='boog'&&d.type!=='schuif'&&<section className="arch-config-options">
+        {d.topShape==='boog'&&d.type!=='schuif'&&<details className="config-extra"><summary><span>Booghoogte instellen</span><small>Standaard {d.archHeight} mm · aanpassen mag</small></summary><section className="arch-config-options">
           <h4>Booghoogte</h4>
           <p className="field-hint">Stel in hoe sterk de deur bovenaan gebogen is. De hoogte hierboven is de totale hoogte inclusief de boog.</p>
           <div className="arch-height-readout"><span>Hoogte van de boog</span><strong>{Math.min(d.archHeight||300,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))} mm</strong></div>
@@ -203,7 +223,7 @@ function ConfigControls({d,change,step,setStep}) {
             </div>
           </>}
           <p className="field-hint">Boogvorm en kromming zijn een indicatie. Het atelier controleert de technische uitvoerbaarheid.</p>
-        </section>}
+        </section></details>}
         {d.type==='wand'&&<div className="wall-options">
           <h4>Deur geïntegreerd in de vaste glaswand</h4>
           <div className="measure-field"><label htmlFor="doorWidth">Breedte van de bewegende deur</label><div className="input-unit"><input id="doorWidth" type="number" min="500" max={Math.max(500,d.width-300)} step="10" value={Math.min(d.doorWidth||900,Math.max(500,d.width-300))} onChange={e=>change({doorWidth:Math.max(500,Math.min(Math.max(500,d.width-300),Number(e.target.value)||500))})}/><span>mm</span></div></div>
@@ -215,13 +235,22 @@ function ConfigControls({d,change,step,setStep}) {
       </>}
       {step===2&&<>
         <h3>Glas & verdeling</h3><p className="field-hint">Creëer het perfecte samenspel van licht en lijnen.</p>
-        <p className="glass-intro">Kies de structuur en tint die u mooi vindt. De voorbeeldweergave toont het effect bij benadering; echt glas en de veiligheidsopbouw worden per bestelling bevestigd.</p>
-        {['Basis','Mat & getint','Structuurglas'].map(group=><section className="glass-group" key={group}>
-          <h4>{group==='Basis'?'Helder en gelaagd glas':group==='Mat & getint'?'Mat en gekleurd gelaagd glas':'Decoratief structuurglas'}</h4>
-          <div className="glass-grid">{GLASSES.filter(glass=>glass.group===group&&(!glass.legacy||glass.id===d.glass)).map(glass=>
-            <GlassChoice key={glass.id} glass={glass} selected={d.glass===glass.id} onClick={()=>change({glass:glass.id})}/>)}</div>
-        </section>)}
-        <p className="glass-tech-note"><ShieldCheck size={16}/> <span><strong>Veiligheidsglas:</strong> matte en getinte varianten worden volgens de opgave van MetaalMeesters gelaagd aangeboden. Voor de andere soorten bevestigt het atelier of de gekozen toepassing gehard of gelaagd glas vereist. Draadglas is niet automatisch veiligheidsglas.</span></p>
+        <p className="glass-intro">Begin met een van de populaire glassoorten. Wilt u iets bijzonders? Bekijk dan de volledige collectie.</p>
+        <div className="glass-grid glass-featured">{featuredOptions(GLASSES,FAVOURITES.glass,d.glass).map(glass=>
+          <GlassChoice key={glass.id} glass={glass} selected={d.glass===glass.id} onClick={()=>change({glass:glass.id})}/>)}</div>
+        <button type="button" className="show-more-options" aria-expanded={showAllGlass} onClick={()=>setShowAllGlass(v=>!v)}>
+          {showAllGlass?'Minder glassoorten tonen':'Bekijk alle andere glassoorten ('+countExtra(GLASSES,FAVOURITES.glass,d.glass)+')'} <ChevronDown size={16}/>
+        </button>
+        {showAllGlass&&<div className="expanded-choices">{['Basis','Mat & getint','Structuurglas'].map(group=>{
+          const options=extraOptions(GLASSES,FAVOURITES.glass,d.glass).filter(glass=>glass.group===group);
+          return options.length?<section className="glass-group" key={group}>
+            <h4>{group==='Basis'?'Extra helder glas':group==='Mat & getint'?'Gekleurd glas':'Bijzondere glasstructuren'}</h4>
+            <div className="glass-grid">{options.map(glass=><GlassChoice key={glass.id} glass={glass} selected={false} onClick={()=>change({glass:glass.id})}/>)}</div>
+          </section>:null;
+        })}</div>}
+        <details className="config-extra config-info"><summary><span>Wat is gehard of gelaagd glas?</span><small>Veiligheid en materiaal</small></summary>
+          <p className="glass-tech-note"><ShieldCheck size={16}/> <span>Mat en getint glas is volgens MetaalMeesters gelaagd. Voor de andere soorten bevestigt het atelier of de toepassing gehard of gelaagd glas vereist. Draadglas is niet automatisch veiligheidsglas.</span></p>
+        </details>
         <h3 className="subsection-title">Indeling en stalen onderpaneel</h3>
         <p className="field-hint">Kies volledig glas of een deur in drie delen: twee glasvakken bovenaan en een gesloten paneel van staal onderaan.</p>
         <div className="options-two">{PANEL_LAYOUTS.map(t=><OptionCard key={t.id} title={t.label} sub={t.description} active={(d.panelLayout||'glas')===t.id} onClick={()=>change({panelLayout:t.id})}/>)}</div>
@@ -231,44 +260,74 @@ function ConfigControls({d,change,step,setStep}) {
             onChange={e=>change({lowerPanelHeight:Math.max(250,Math.min(Math.floor(d.height*.60),Number(e.target.value)||650))})}/><span>mm</span></div>
           <small>Het stalen paneel vervangt echt het onderste glasvak in de 3D-weergave. De drie horizontale vakken zijn automatisch verdeeld.</small>
         </div>}
-        <div className="divider-soft"/><RangeControl title="Verticale verdelingen" value={d.vertical} min={0} max={4} onChange={v=>change({vertical:v,style:'eigen'})}/>
-        {d.panelLayout!=='staal-onder'?<RangeControl title="Horizontale verdelingen" value={d.horizontal} min={0} max={5} onChange={v=>change({horizontal:v,style:'eigen'})}/>:<p className="field-hint">Bij een stalen onderpaneel toont de 3D-deur drie horizontale vakken. De twee bovenste vakken zijn glas.</p>}
-        <div className="measure-tip"><SlidersHorizontal size={19}/><div><strong>Volledig op maat</strong><p>De zichtbare lijnverdeling is een visuele indicatie. De technische haalbaarheid wordt later gecontroleerd.</p></div></div>
+        <details className="config-extra"><summary><span>Roeden precies instellen (optioneel)</span><small>{d.vertical} verticaal · {d.panelLayout==='staal-onder'?'vaste drie vakken':d.horizontal+' horizontaal'}</small></summary>
+          <RangeControl title="Verticale verdelingen" value={d.vertical} min={0} max={4} onChange={v=>change({vertical:v,style:'eigen'})}/>
+          {d.panelLayout!=='staal-onder'?<RangeControl title="Horizontale verdelingen" value={d.horizontal} min={0} max={5} onChange={v=>change({horizontal:v,style:'eigen'})}/>:<p className="field-hint">Bij een stalen onderpaneel zijn de drie horizontale vakken automatisch verdeeld.</p>}
+        </details>
+        <p className="wizard-small-help">Uw keuzes worden meteen zichtbaar in het 3D-voorbeeld.</p>
       </>}
       {step===3&&<>
         <h3>De finishing touch</h3><p className="field-hint">Een subtiel detail maakt het verschil.</p>
-        <h4>Kaderkleur · RAL en Anodic Collection</h4>
-        <p className="field-hint">De anodic-kleuren volgen de namen van de fysieke kleurkaart die MetaalMeesters doorgaf. Digitale swatches zijn indicatief; de officiële stalen bepalen de uiteindelijke kleur.</p>
-        {['RAL','Anodic','Overig'].map(group=><div className="frame-colour-group" key={group}>
-          <h5>{group==='RAL'?'RAL-kleuren':group==='Anodic'?'Anodic Collection · 8 kleuren':'Een andere afwerking'}</h5>
-          <div className="swatches">{FRAMES.filter(t=>t.group===group&&(!t.legacy||t.id===d.frame)).map(t=>
-            <button type="button" className={'swatch '+(d.frame===t.id?'selected':'')} key={t.id} onClick={()=>change({frame:t.id})} aria-pressed={d.frame===t.id}>
-              <span style={{backgroundColor:t.color}}>{d.frame===t.id&&<Check size={16} color={['wit','ral7035','anodic-natura','anodic-champagne','anodic-naturel'].includes(t.id)?'#222':'#fff'}/>}</span><small>{t.label}</small>
-            </button>)}</div>
-        </div>)}
+        <h4>Kies uw staalkleur</h4>
+        <p className="field-hint">De populairste kleuren staan hier. Andere RAL- en anodic-afwerkingen vindt u onder 'Meer kleuren'.</p>
+        <div className="swatches swatches-featured">{featuredOptions(FRAMES,FAVOURITES.frame,d.frame).map(t=>
+          <button type="button" className={'swatch '+(d.frame===t.id?'selected':'')} key={t.id} onClick={()=>change({frame:t.id})} aria-pressed={d.frame===t.id}>
+            <span style={{backgroundColor:t.color}}>{d.frame===t.id&&<Check size={16} color={['wit','ral7035','anodic-natura','anodic-champagne','anodic-naturel'].includes(t.id)?'#222':'#fff'}/>}</span><small>{t.label}</small>
+          </button>)}</div>
+        <button type="button" className="show-more-options" aria-expanded={showAllColors} onClick={()=>setShowAllColors(v=>!v)}>
+          {showAllColors?'Minder kleuren tonen':'Meer RAL- en anodic-kleuren ('+countExtra(FRAMES,FAVOURITES.frame,d.frame)+')'} <ChevronDown size={16}/>
+        </button>
+        {showAllColors&&<div className="expanded-choices">{['RAL','Anodic','Overig'].map(group=>{
+          const options=extraOptions(FRAMES,FAVOURITES.frame,d.frame).filter(t=>t.group===group);
+          return options.length?<div className="frame-colour-group" key={group}>
+            <h5>{group==='RAL'?'Andere RAL-kleuren':group==='Anodic'?'Anodic Collection':'Andere afwerking op aanvraag'}</h5>
+            <div className="swatches">{options.map(t=>
+              <button type="button" className={'swatch '+(d.frame===t.id?'selected':'')} key={t.id} onClick={()=>change({frame:t.id})} aria-pressed={d.frame===t.id}>
+                <span style={{backgroundColor:t.color}}>{d.frame===t.id&&<Check size={16} color="#fff"/>}</span><small>{t.label}</small>
+              </button>)}</div>
+          </div>:null;
+        })}</div>}
+        <p className="wizard-small-help">Kleuren op een scherm zijn indicatief. Het atelier bevestigt de definitieve kleur met echte stalen.</p>
         {d.frame==='andere'&&<div className="measure-field"><label htmlFor="customColor">Uw RAL-code of anodic kleurnaam</label><input id="customColor" type="text" maxLength="70" placeholder="Bijv. RAL 9001 of anodic ..." value={d.customColor||''} onChange={e=>change({customColor:e.target.value})}/><small>De exacte kleur wordt door het atelier bevestigd.</small></div>}
-        <h4>Handgreep · verschillende modellen</h4>
-        <p className="field-hint">Kies een voorbeeld van de greep. De exacte afmetingen en het beslag zijn onder voorbehoud van technische bevestiging.</p>
-        <div className="hardware-grid">{HANDLES.map(t=>
+        <h4>Kies een handgreep</h4>
+        <p className="field-hint">U kunt later altijd nog een ander model bespreken.</p>
+        <div className="hardware-grid">{featuredOptions(HANDLES,FAVOURITES.handle,d.handle).map(t=>
           <button type="button" key={t.id} className={'hardware-choice '+(d.handle===t.id?'selected':'')} onClick={()=>change({handle:t.id})} aria-pressed={d.handle===t.id}>
             <span className={'hardware-illustration hardware-'+t.id} aria-hidden="true"><i/><b/></span>
             <span><strong>{t.label}</strong><small>{t.description}</small></span>
           </button>)}</div>
-        <h4>Sluiting</h4>
-        <div className="hardware-closure-grid">{CLOSURES.map(t=>
-          <button type="button" key={t.id} className={'closure-choice '+((d.closure||'magneet')===t.id?'selected':'')} onClick={()=>change({closure:t.id})} aria-pressed={(d.closure||'magneet')===t.id}>
-            <strong>{t.label}</strong><small>{t.description}</small>
-          </button>)}</div>
-        <h4>Draairichting</h4><div className="option-row">{[['links','Links'],['rechts','Rechts']].map(([id,name])=><button key={id} className={d.opening===id?'picked':''} onClick={()=>change({opening:id})}>{name}</button>)}</div>
+        <button type="button" className="show-more-options" aria-expanded={showAllHandles} onClick={()=>setShowAllHandles(v=>!v)}>
+          {showAllHandles?'Minder handgrepen':'Andere handgrepen ('+countExtra(HANDLES,FAVOURITES.handle,d.handle)+')'} <ChevronDown size={16}/>
+        </button>
+        {showAllHandles&&<div className="hardware-grid expanded-choices">{extraOptions(HANDLES,FAVOURITES.handle,d.handle).map(t=>
+          <button type="button" key={t.id} className="hardware-choice" onClick={()=>change({handle:t.id})} aria-pressed={false}>
+            <span className={'hardware-illustration hardware-'+t.id} aria-hidden="true"><i/><b/></span>
+            <span><strong>{t.label}</strong><small>{t.description}</small></span>
+          </button>)}</div>}
+        <details className="config-extra"><summary><span>Sluiting en draairichting (optioneel)</span><small>{CLOSURES.find(t=>t.id===d.closure)?.label||'Magneetsluiting'} · {d.opening==='links'?'links':'rechts'}</small></summary>
+          <h4>Sluiting</h4><div className="hardware-closure-grid">{CLOSURES.map(t=>
+            <button type="button" key={t.id} className={'closure-choice '+((d.closure||'magneet')===t.id?'selected':'')} onClick={()=>change({closure:t.id})} aria-pressed={(d.closure||'magneet')===t.id}>
+              <strong>{t.label}</strong><small>{t.description}</small>
+            </button>)}</div>
+          <h4>Draairichting</h4><div className="option-row">{[['links','Links'],['rechts','Rechts']].map(([id,name])=><button type="button" key={id} aria-pressed={d.opening===id} className={d.opening===id?'picked':''} onClick={()=>change({opening:id})}>{name}</button>)}</div>
+        </details>
       </>}
       {step===4&&<><h3>Uw deur is ontworpen.</h3><p className="field-hint">Controleer uw keuzes en vraag een vrijblijvende offerte aan.</p><ConfigSummary d={d}/><QuoteForm design={d}/></>}
     </div>
-    {step<4&&<div className="control-bottom"><button className="back-btn" onClick={()=>setStep(v=>Math.max(0,v-1))} disabled={step===0}><ChevronLeft size={16}/> Vorige</button><button className="btn btn-dark next-btn" onClick={()=>setStep(v=>Math.min(4,v+1))}>{step===3?'Naar offerte':'Volgende stap'} <ArrowRight size={17}/></button></div>}
+    <button type="button" className="mobile-preview-jump" onClick={()=>document.getElementById('mm-live-preview')?.scrollIntoView({behavior:'smooth',block:'start'})}><Eye size={16}/> Bekijk mijn deur in 3D <ArrowRight size={15}/></button>
+    {step<4&&<div className="control-bottom">
+      <button type="button" className="back-btn" onClick={()=>setStep(v=>Math.max(0,v-1))} disabled={step===0}><ChevronLeft size={16}/> Vorige</button>
+      <button type="button" className="btn btn-dark next-btn" onClick={()=>setStep(v=>Math.min(4,v+1))}>{step===3?'Naar mijn offerte':'Volgende: '+STEPS[step+1].title} <ArrowRight size={17}/></button>
+    </div>}
   </div>;
 }
 function Configurator() {
   const [d,setD]=useState(()=>{try {const saved=JSON.parse(localStorage.getItem('mm-door-design'));return {...initialDesign,...saved};}catch{return initialDesign;}});
   const [step,setStep]=useState(0),[resetToken,setResetToken]=useState(0),[notice,setNotice]=useState('');
+  const moveToStep=(next)=>{
+    setStep(oldStep=>Math.max(0,Math.min(STEPS.length-1,typeof next==='function'?next(oldStep):next)));
+    window.requestAnimationFrame(()=>document.getElementById('mm-config-controls')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  };
   const change=(patch)=>setD(old=>{
     const next={...old,...patch};
     // Keep solid steel panel sizes feasible for the currently selected height,
@@ -282,10 +341,10 @@ function Configurator() {
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">
-    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · DESIGN STUDIO</span><h1>Ontwerp uw <em>eigen deur.</em></h1><p>Ontwerp een enkele, dubbele of pivotdeur, boogdeur of glaswand met geïntegreerde deur. Ontdek onze glasvarianten, de Anodic Collection en stalen onderpanelen. De 3D-woning schaalt mee, of voeg uw eigen woningfoto toe.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
+    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · 3D DEURONTWERPER</span><h1>Uw deur in <em>5 stappen.</em></h1><p>Kies een model, geef de maten op en ontdek uw deur in 3D. U hoeft niet alles exact te weten: wij helpen met de details.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
-      <ConfigControls d={d} change={change} step={step} setStep={setStep}/>
-      <div><Suspense fallback={<div className="viewer-loading">De 3D-configurator wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>
+      <ConfigControls d={d} change={change} step={step} setStep={moveToStep}/>
+      <div id="mm-live-preview"><Suspense fallback={<div className="viewer-loading">De 3D-voorvertoning wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>
     </div>
     <div className="container config-bottom-note"><span>HANDGEMAAKT. PRECIES ZOALS U HET WILT.</span><a href="mailto:info@metaalmeesters.eu">Hulp nodig? Contacteer ons <ArrowUpRight size={16}/></a></div>
   </main>;

@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState} from 'react';
-import {Check,Download,Eye,EyeOff,House,ImagePlus,Move,RotateCcw,SlidersHorizontal,Upload, X} from 'lucide-react';
+import {ArrowRight,Check,Download,Eye,EyeOff,House,ImagePlus,Move,RotateCcw,SlidersHorizontal,Upload, X} from 'lucide-react';
 import DoorScene from './DoorScene.jsx';
 import {downloadDesign} from './data.js';
 import {capturePreviewImage} from './previewCapture.js';
@@ -20,7 +20,7 @@ function Control({label,value,min,max,onChange,unit='%'}) {
   return <label className="house-adjustment"><span>{label}<strong>{value}{unit}</strong></span><input type="range" min={min} max={max} value={value} onChange={e=>onChange(Number(e.target.value))}/></label>;
 }
 export default function HousePreview({config,resetToken,onNotice,onChange}) {
-  const [mode,setMode]=useState('woning3d');
+  const [mode,setMode]=useState('studio');
   const [finish,setFinish]=useState('warm'),[view,setView]=useState('overview');
   const [selected,setSelected]=useState(SAMPLE_HOMES[0].id);
   const [ownPhoto,setOwnPhoto]=useState(null);
@@ -79,12 +79,14 @@ export default function HousePreview({config,resetToken,onNotice,onChange}) {
     }catch(e){onNotice(e.message);}
   }
   return <section className="viewer-wrap house-viewer" aria-label="Interactieve 3D-deur met dynamische woning en echte woningfoto">
-    <div className="viewer-toolbar house-toolbar"><div><span className="live-dot"/><strong>LIVE 3D VISUALISATIE</strong></div><span>{mode==='woning3d'?'3D WONING · MEESCHALENDE MUUR':mode==='foto'?'ECHTE FOTO · 3D DEUR':'3D ATELIER'}</span></div>
+    <button type="button" className="viewer-back-to-choices" onClick={()=>document.getElementById('mm-config-controls')?.scrollIntoView({behavior:'smooth',block:'start'})}><ArrowRight size={15}/> Terug naar mijn keuzes</button>
+    <div className="viewer-toolbar house-toolbar"><div><span className="live-dot"/><strong>LIVE 3D VISUALISATIE</strong></div><span>{mode==='woning3d'?'IN EEN WONING':mode==='foto'?'OP EEN FOTO':'UW DEUR IN 3D'}</span></div>
     <div className="view-mode-tabs" role="group" aria-label="Weergave kiezen">
-      <button type="button" className={mode==='woning3d'?'current':''} onClick={()=>setMode('woning3d')} aria-pressed={mode==='woning3d'}><House size={16}/> 3D-woning</button>
-      <button type="button" className={mode==='foto'?'current':''} onClick={()=>setMode('foto')} aria-pressed={mode==='foto'}><ImagePlus size={16}/> Echte woningfoto</button>
-      <button type="button" className={mode==='studio'?'current':''} onClick={()=>setMode('studio')} aria-pressed={mode==='studio'}><SlidersHorizontal size={16}/> 3D-atelier</button>
+      <button type="button" className={mode==='studio'?'current':''} onClick={()=>setMode('studio')} aria-pressed={mode==='studio'}><SlidersHorizontal size={16}/> Mijn deur in 3D</button>
+      <button type="button" className={mode==='woning3d'?'current':''} onClick={()=>setMode('woning3d')} aria-pressed={mode==='woning3d'}><House size={16}/> In een woning</button>
+      <button type="button" className={mode==='foto'?'current':''} onClick={()=>setMode('foto')} aria-pressed={mode==='foto'}><ImagePlus size={16}/> Op een foto</button>
     </div>
+    <p className="viewer-mode-hint">{mode==='studio'?'Draai de deur met uw muis of vinger. Uw keuzes verschijnen meteen in beeld.':mode==='woning3d'?'Bekijk hoe uw ontwerp in een voorbeeldwoning past.':'Kies een woningfoto of voeg uw eigen foto toe.'}</p>
     {mode==='foto'?<>
       <div className="door-canvas house-stage" id="door-canvas" ref={stageRef}>
         <img className="house-real-photo" src={scenePhoto} alt={selected==='eigen'?'Eigen woningfoto van de klant':('Voorbeeldwoning: '+(sample?.name||'lichte inkom'))} draggable="false"/>
@@ -124,13 +126,18 @@ export default function HousePreview({config,resetToken,onNotice,onChange}) {
         <div className="house-photo-attribution">{sample?<><span>Voorbeeldfoto: {sample.by} via Pexels · niet van MetaalMeesters.</span><a href={sample.source} target="_blank" rel="noopener noreferrer">Fotobron bekijken</a></>:<><span>Uw eigen woningfoto wordt niet online opgeslagen.</span><button type="button" onClick={()=>uploadRef.current?.click()}>Andere eigen foto kiezen</button></>}</div>
         <div className="house-placement-head"><div><strong>Deur in de foto plaatsen</strong><span>Sleep de deur of pas de schuifbalken aan.</span></div><button className="house-reset" onClick={()=>setPlacement(sample?.placement||defaults)} title="Plaatsing herstellen"><RotateCcw size={15}/> Herstel</button></div>
         <div className="house-adjust-grid">
-          <Control label="Formaat" value={placement.scale} min={25} max={110} onChange={v=>update({scale:v})}/>
+          <Control label="Deurgrootte" value={placement.scale} min={25} max={110} onChange={v=>update({scale:v})}/>
           <Control label="Perspectief" value={placement.angle} min={-35} max={35} unit="°" onChange={v=>update({angle:v})}/>
-          <Control label="Horizontaal" value={placement.x} min={4} max={96} onChange={v=>update({x:v})}/>
-          <Control label="Verticaal" value={placement.y} min={5} max={97} onChange={v=>update({y:v})}/>
-          <Control label="Belichting" value={placement.light??100} min={60} max={140} onChange={v=>update({light:v})}/>
-          <Control label="Schaduw" value={placement.shadow??45} min={0} max={90} onChange={v=>update({shadow:v})}/>
         </div>
+        <details className="viewer-advanced-controls"><summary>Foto nauwkeuriger afstellen (optioneel)</summary>
+          <div className="house-adjust-grid">
+            <Control label="Links / rechts" value={placement.x} min={4} max={96} onChange={v=>update({x:v})}/>
+            <Control label="Hoger / lager" value={placement.y} min={5} max={97} onChange={v=>update({y:v})}/>
+            <Control label="Belichting" value={placement.light??100} min={60} max={140} onChange={v=>update({light:v})}/>
+            <Control label="Schaduw" value={placement.shadow??45} min={0} max={90} onChange={v=>update({shadow:v})}/>
+          </div>
+        </details>
+
         <p className="house-reality-note"><strong>Zo ziet uw ontwerp er ongeveer uit.</strong> Dit zijn echte stockfoto's van woningen, geen realisaties van MetaalMeesters. Op foto's met een bestaande deur wordt die niet automatisch verwijderd: uw 3D-ontwerp komt er visueel overheen. Versleep de deur naar de bestaande opening. Grootte, perspectief, glas en belichting zijn indicatief, niet geschikt voor technische maatopname. Een eigen foto blijft in uw browser totdat u zelf een offerte verstuurt.</p>
       </div>
     </>:<div className={'door-canvas '+(mode==='woning3d'?'architect-scene':'')} id="door-canvas">
@@ -153,7 +160,7 @@ export default function HousePreview({config,resetToken,onNotice,onChange}) {
       <p className="house-reality-note"><strong>Dynamische architectuurvisualisatie.</strong> De 3D-gevel wordt echt opnieuw opgebouwd voor de gekozen maten, inclusief de muuropening. Dit is een indicatieve, digitaal ontworpen voorbeeldwoning en geen foto of bouwkundig uitvoeringsplan. De definitieve maten worden door MetaalMeesters gecontroleerd.</p>
     </div>}
     <div className="viewer-actions">
-      <div><button className="viewer-btn" onClick={()=>onChange({open:!config.open}) }><Eye size={16}/> {config.open?'Deur sluiten':config.type==='schuif'?'Deur verschuiven':'Deur openen'}</button><button className="viewer-btn" onClick={()=>setMode(v=>v==='foto'?'woning3d':'foto')}><House size={16}/>{mode==='foto'?'3D-woning bekijken':'Op echte foto bekijken'}</button></div>
+      <div><button className="viewer-btn" onClick={()=>onChange({open:!config.open}) }><Eye size={16}/> {config.open?'Deur sluiten':config.type==='schuif'?'Deur verschuiven':'Deur openen'}</button><button className="viewer-btn" onClick={()=>setMode(v=>v==='foto'?'studio':'foto')}><House size={16}/>{mode==='foto'?'Mijn deur in 3D':'Op echte foto bekijken'}</button></div>
       <div><button className="icon-btn" title="Bewaar afbeelding" onClick={savePreview}><Download size={17}/></button><button className="viewer-btn muted" onClick={()=>downloadDesign(config)}><Download size={15}/> Ontwerpdata</button></div>
     </div>
     <div className="viewer-disclaimer"><Check size={15}/> De afmetingen en maakbaarheid worden bij een officiële offerte gecontroleerd door MetaalMeesters.</div>
