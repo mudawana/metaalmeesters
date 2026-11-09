@@ -224,3 +224,94 @@
   .size-presets button small{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.wizard-progress-track>span,.show-more-options svg{transition:none}}
+
+/* 2026: no page-length ping-pong between configuration and 3D preview. */
+#mm-config-layout{scroll-margin-top:12px}
+#mm-config-fields{scrollbar-gutter:stable;scrollbar-width:thin}
+.mobile-config-dock{display:none}
+@media(min-width:941px){
+  .config-page-heading{padding-top:28px;padding-bottom:18px}
+  .config-page-heading h1{font-size:clamp(30px,3.2vw,47px);margin:8px 0 4px}
+  .config-page-heading p{font-size:12px;max-width:660px}
+  .config-layout{grid-template-columns:minmax(355px,420px) minmax(0,1fr);gap:20px;align-items:start}
+  .config-controls{position:sticky;top:12px;height:min(830px,calc(100dvh - 24px));min-height:460px;
+    display:flex;flex-direction:column;overflow:hidden}
+  .config-controls-top,.wizard-progress-area,.steps,.wizard-guidance,.control-bottom{flex-shrink:0}
+  .config-controls-top{padding-top:15px;padding-bottom:6px}
+  .config-controls-top h2{font-size:22px;margin:5px 0 2px}
+  .config-controls-top>p{font-size:10px}
+  .wizard-progress-area{padding-bottom:9px}
+  .steps{padding-top:5px;padding-bottom:9px}
+  .step{min-height:42px;font-size:9px;gap:3px}
+  .step>span:first-child{width:24px;height:24px;font-size:9px}
+  .wizard-guidance{font-size:11px;padding:8px 16px}
+  .config-fields{flex:1 1 auto;min-height:0;max-height:none;overflow:auto;overscroll-behavior:contain;padding:20px 20px 22px}
+  .control-bottom{margin-top:auto;padding:12px 18px 15px;box-shadow:0 -8px 22px #f7f5f2b5}
+  #mm-live-preview{position:sticky;top:12px;align-self:start;max-height:calc(100dvh - 24px);
+    overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;min-width:0}
+  #mm-live-preview .viewer-wrap{position:relative;top:auto}
+  #mm-live-preview .viewer-toolbar{height:46px}
+  .config-bottom-note{margin-top:20px}
+}
+@media(max-width:940px){
+  .config-page{padding-bottom:90px}
+  .config-page-heading{padding-top:15px;padding-bottom:12px;gap:9px}
+  .config-page-heading h1{font-size:29px;letter-spacing:-.045em;margin:5px 0}
+  .config-page-heading p{font-size:11px;line-height:1.45;max-width:520px}
+  .config-page-heading .eyebrow{font-size:8px}
+  .reset-design{font-size:10px;min-height:40px;white-space:normal;max-width:85px;padding:6px}
+  .config-layout{display:block;min-height:calc(100dvh - 210px)}
+  /* Keep a measurable, offscreen 3D canvas for quote-image export. No visual scroll. */
+  .config-layout[data-mobile-pane="choices"] #mm-live-preview{
+    display:block;position:fixed;top:0;left:-200vw;z-index:-1;opacity:0;
+    pointer-events:none;width:min(700px,100vw);max-height:none;height:auto;overflow:hidden
+  }
+  .config-layout[data-mobile-pane="preview"] .config-controls{display:none}
+  .config-controls{order:0;height:calc(100dvh - 149px);max-height:850px;min-height:390px;
+    display:flex;flex-direction:column;overflow:hidden}
+  .config-controls-top,.wizard-progress-area,.steps,.wizard-guidance,.control-bottom{flex-shrink:0}
+  .config-controls-top{padding:12px 16px 5px}
+  .config-controls-top h2{font-size:21px;margin:4px 0}
+  .config-controls-top>p{font-size:10px;line-height:1.45}
+  .wizard-progress-area{padding:1px 16px 8px}
+  .steps{padding:7px 0 8px;margin:0 9px}
+  .step{min-height:38px;font-size:9px;gap:3px}
+  .step>span:first-child{width:24px;height:24px}
+  .wizard-guidance{font-size:11px;padding:8px 13px}
+  .config-fields{overflow-y:auto;overscroll-behavior:contain;min-height:0;flex:1 1 auto;padding:15px 16px 18px}
+  .config-fields h3{font-size:17px;margin-bottom:6px}
+  .config-fields .field-hint{margin-bottom:13px}
+  .config-fields h4{margin-top:16px}
+  .wizard-preview-shortcut{display:none}
+  .mobile-preview-jump{display:none}
+  .control-bottom{margin-top:auto;padding:11px 13px 13px;border-top:1px solid #e5e5df;box-shadow:0 -6px 16px #f5f5efb8}
+  .control-bottom .next-btn{min-height:45px}
+  #mm-live-preview{order:0;min-width:0;max-height:calc(100dvh - 149px);
+    overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  #mm-live-preview .viewer-wrap{position:relative;top:auto}
+  .mobile-config-dock{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:fixed;left:0;right:0;
+    bottom:0;z-index:105;background:#fff;border-top:1px solid #deded6;
+    box-shadow:0 -8px 24px #1e302224;padding:10px max(14px,env(safe-area-inset-right))
+    calc(10px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+  .mobile-config-dock button{border:1px solid #e0e2dc;background:#f4f4f0;min-height:49px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 8px;color:#3d5545;
+    font-size:12px;font-weight:800;padding:7px 10px}
+  .mobile-config-dock button.selected{background:#263a2e;border-color:#263a2e;color:#fff}
+  .mobile-config-dock small{font-size:9px;opacity:.76;font-weight:700}
+  .mobile-config-dock button:focus-visible{outline:3px solid #af955c;outline-offset:2px}
+  .config-bottom-note{display:none}
+}
+@media(max-width:420px){
+  .config-page-heading{padding-top:10px}
+  .config-page-heading h1{font-size:25px}
+  .config-page-heading p{font-size:10px}
+  .config-controls{height:calc(100dvh - 138px)}
+  #mm-live-preview{max-height:calc(100dvh - 138px)}
+  .config-controls-top{padding-top:10px}
+  .config-controls-top h2{font-size:19px}
+  .wizard-progress-area{padding-bottom:6px}
+  .step{font-size:8px;min-height:32px}
+  .step>span:first-child{width:21px;height:21px}
+  .config-fields{padding:12px 13px 14px}
+  .control-bottom{padding:8px 11px 12px}
+}

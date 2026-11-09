@@ -99,3 +99,115 @@
   .house-context-controls{padding:15px 12px}
   .viewer-advanced-controls>.house-adjust-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 }
+
+/* Simplified 3D / uploaded personal photo viewer. No example-house mode. */
+.mm-simple-viewer{overflow:visible}
+.mm-simple-viewer .view-mode-tabs{height:auto;min-height:49px;padding:6px 10px;gap:7px}
+.mm-simple-viewer .view-mode-tabs button{flex:1 1 0;width:50%;min-width:0;
+  padding:10px 7px;min-height:42px;border-radius:5px;line-height:1.3;white-space:normal;font-size:12px}
+.mm-simple-viewer .view-mode-tabs button.current{background:#27352e}
+.mm-simple-viewer .my-studio-stage{height:clamp(280px,52dvh,535px);background:#e1dfd8}
+.mm-simple-viewer .my-photo-stage{height:clamp(290px,52dvh,545px);background:#e0e1db;isolation:isolate}
+.mm-simple-viewer .house-photo-vignette{pointer-events:none}
+.mm-simple-viewer .viewer-actions{height:auto;min-height:64px;flex-wrap:wrap;padding:12px 13px;gap:8px}
+.mm-simple-viewer .viewer-actions>div{flex:1 1 auto;display:flex;flex-wrap:wrap;gap:7px}
+.mm-simple-viewer .viewer-actions .viewer-btn{min-height:42px;font-size:11px;border-radius:5px}
+.mm-simple-viewer .viewer-actions .viewer-btn:disabled{opacity:.45;cursor:not-allowed}
+.mm-simple-viewer .viewer-disclaimer{padding:12px 15px}
+.my-photo-empty{height:clamp(285px,49dvh,480px);display:flex;flex-direction:column;align-items:center;
+ justify-content:center;text-align:center;background:linear-gradient(145deg,#eaede7,#dce3d8);padding:22px 30px;color:#354b3a}
+.my-photo-empty h3{font-size:20px;line-height:1.3;margin:8px 0}
+.my-photo-empty p{font-size:12px;line-height:1.75;color:#606e60;max-width:450px;margin:0 0 22px}
+.my-photo-empty small{font-size:10px;color:#737b71;margin-top:15px}
+.my-photo-icon{border:2px dashed #a9b4a4;padding:18px;display:grid;place-items:center;border-radius:50%;color:#8b795c;margin-bottom:6px}
+.my-photo-upload-primary{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;border:0;cursor:pointer;border-radius:5px}
+.my-photo-door{outline:2px solid transparent;outline-offset:4px;touch-action:none;isolation:isolate}
+.my-photo-door:focus-visible{outline:3px solid #f3d396;border-radius:2px}
+.my-photo-door canvas{pointer-events:none}
+.my-photo-door .my-photo-resize{position:absolute;z-index:10;right:-15px;bottom:-15px;
+ width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;
+ border:2px solid #fff;background:#253a30;box-shadow:0 3px 15px #14271e8c;
+ cursor:nwse-resize;touch-action:none;user-select:none}
+.my-photo-door .my-photo-resize:focus-visible{outline:3px solid #f7cb7e;outline-offset:2px}
+.mm-simple-viewer .house-drag-hint{padding:9px 12px;max-width:94%;text-align:center;
+ font-size:10px;white-space:normal;justify-content:center;bottom:10px}
+.my-photo-editor{padding:17px 19px 15px;background:#fcfcf9}
+.my-photo-editor-top{display:flex;align-items:flex-start;justify-content:space-between;gap:13px;margin-bottom:15px}
+.my-photo-editor-top>div:first-child{display:flex;flex-direction:column;gap:5px;min-width:0}
+.my-photo-editor-top strong{font-size:13px;color:#28392e;line-height:1.45}
+.my-photo-editor-top span{font-size:11px;color:#667467;line-height:1.5}
+.my-photo-editor-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:end}
+.my-photo-editor-actions button,.my-photo-compare{border:1px solid #d8dfd5;background:#fff;color:#445a46;
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;
+ font-size:10px;line-height:1.3;font-weight:800;min-height:38px;border-radius:4px}
+.my-photo-editor-actions button:hover,.my-photo-compare:hover{background:#e9eee7}
+.my-photo-size-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;
+ margin:13px 0 12px}
+.photo-adjustment{display:flex;flex-direction:column;gap:8px;min-width:0}
+.photo-adjustment-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.photo-adjustment-head label{font-size:11px;font-weight:800;color:#34463a}
+.photo-adjustment-head output{font-size:11px;color:#897352;font-weight:800}
+.photo-adjustment-controls{display:flex;align-items:center;gap:6px}
+.photo-adjustment-controls button{flex:0 0 37px;width:37px;height:39px;border:1px solid #d8dfd5;
+ display:grid;place-items:center;background:#eef2eb;border-radius:5px;color:#304c39}
+.photo-adjustment-controls button:hover{background:#dbe5d9}
+.photo-adjustment-controls input{min-width:0;flex:1;accent-color:#927b58;cursor:pointer;min-height:38px}
+.my-photo-quick-controls{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+ padding-top:10px;border-top:1px solid #e8ebe6}
+.my-photo-nudge{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.my-photo-nudge>span{font-size:10px;font-weight:800;color:#5e6d5f}
+.my-photo-nudge-buttons{display:flex;align-items:center;gap:5px}
+.my-photo-nudge-buttons button{width:39px;height:39px;display:grid;place-items:center;
+ border:1px solid #d8dfd5;background:#f1f4ee;border-radius:5px;color:#3d5944}
+.my-photo-nudge-buttons button:hover{background:#e2ebde}
+.my-photo-advanced{margin:13px 0 0}
+.my-photo-advanced>.house-adjust-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:15px}
+.my-photo-keyboard-hint{font-size:10px;color:#6a796a;line-height:2.2;margin:12px 0 0}
+.my-photo-keyboard-hint kbd{display:inline-block;border:1px solid #d9dcd5;background:#f7f7f5;border-radius:3px;
+ padding:1px 5px;line-height:1.55;margin:0 2px;color:#3e5443;box-shadow:0 1px 0 #c6ccc3;font-size:10px}
+.mm-simple-viewer .house-reality-note{margin:12px 0 0}
+.mm-simple-viewer .viewer-actions button:focus-visible,.my-photo-editor button:focus-visible,
+.my-photo-upload-primary:focus-visible,.my-photo-door:focus-visible{
+ outline:3px solid #b89b65;outline-offset:3px
+}
+@media(max-width:1180px){
+ .mm-simple-viewer .my-studio-stage{height:clamp(260px,48dvh,480px)}
+ .mm-simple-viewer .my-photo-stage{height:clamp(270px,46dvh,480px)}
+ .my-photo-editor-top{flex-direction:column}
+ .my-photo-editor-actions{justify-content:flex-start}
+}
+@media(max-width:940px){
+ .mm-simple-viewer .viewer-toolbar{height:39px;padding:0 12px}
+ .mm-simple-viewer .view-mode-tabs{min-height:44px;padding:5px}
+ .mm-simple-viewer .view-mode-tabs button{min-height:40px;font-size:12px}
+ .mm-simple-viewer .my-studio-stage{height:clamp(250px,42dvh,380px)}
+ .mm-simple-viewer .my-photo-stage{position:sticky;top:0;z-index:5;height:clamp(235px,43dvh,360px)}
+ .my-photo-editor{padding:12px 13px 14px}
+ .my-photo-editor-top{gap:10px}
+ .my-photo-editor-top span{font-size:10px}
+ .my-photo-size-controls{gap:12px}
+ .mm-simple-viewer .house-drag-hint{font-size:9px}
+ .my-photo-keyboard-hint{font-size:9px;line-height:1.9}
+ .mm-simple-viewer .viewer-actions{padding:8px}
+ .mm-simple-viewer .viewer-actions>div{gap:6px}
+ .mm-simple-viewer .viewer-actions .viewer-btn{padding:10px 9px;font-size:10px}
+ .mm-simple-viewer .my-photo-empty{height:clamp(255px,48dvh,420px);padding:16px}
+}
+@media(max-width:520px){
+ .mm-simple-viewer .view-mode-tabs button{font-size:11px;padding:7px 5px;gap:5px}
+ .mm-simple-viewer .house-photo-label{top:9px;left:9px;padding:6px 8px;font-size:8px}
+ .my-photo-editor-top strong{font-size:12px}
+ .my-photo-size-controls{gap:9px}
+ .photo-adjustment-controls{gap:4px}
+ .photo-adjustment-controls button{width:34px;height:36px;flex-basis:34px}
+ .photo-adjustment-head label{font-size:10px}
+ .my-photo-nudge{gap:6px}
+ .my-photo-nudge-buttons{gap:4px}
+ .my-photo-nudge-buttons button{width:35px;height:38px}
+ .my-photo-quick-controls{justify-content:flex-start}
+ .my-photo-keyboard-hint{display:none}
+ .my-photo-door .my-photo-resize{width:40px;height:40px;right:-13px;bottom:-13px}
+ .my-photo-advanced>.house-adjust-grid{grid-template-columns:1fr}
+ .my-download-data{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){.my-photo-door{transition:none}}

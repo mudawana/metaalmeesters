@@ -31,7 +31,7 @@ try{
   for(const page of pages) {
     const isInteractive=page.route==='configurator';
     const markup=isInteractive
-      ? '<main class="interior-page"><section class="container page-intro"><h1>Ontwerp uw stalen deur in 3D</h1><p>Kies deurtype, afmetingen, glas, kleur en profielindeling. Bekijk hoe uw ontwerp eruitziet in een bestaande woning of op uw eigen foto.</p></section></main>'
+      ? '<main class="interior-page"><section class="container page-intro"><h1>Ontwerp uw stalen deur in 3D</h1><p>Kies deurtype, afmetingen, glas, kleur en profielindeling. Bekijk uw ingestelde deur in 3D en plaats ze desgewenst op uw eigen foto.</p></section></main>'
       :renderToString(React.createElement(App,{initialRoute:page.route}));
     if(!markup.includes('<h1'))throw Error('No SEO heading on '+page.path);
     const canonical=origin+page.path;

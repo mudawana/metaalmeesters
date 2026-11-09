@@ -129,7 +129,7 @@ function ProjectDetail({project}) {
 }
 function Offerte() {
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">VRIJBLIJVEND MAATWERK</span><h1>Een offerte<br/><em>voor uw project.</em></h1><p>Wilt u een stalen deur of een ander metaalproject laten uitvoeren? Vertel ons wat u zoekt, dan bespreken we samen de mogelijkheden.</p></div>
-    <div className="container quote-landing"><div><h2>Ontwerp uw stalen deur in 3D</h2><p>Stel het type, de afmetingen, glaskeuze en afwerking samen. Bekijk uw ontwerp op een echte woningfoto.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Op de huidige demo is automatische offerteverzending nog niet beschikbaar.</small></div>
+    <div className="container quote-landing"><div><h2>Ontwerp uw stalen deur in 3D</h2><p>Stel het type, de afmetingen, glaskeuze en afwerking samen. Bekijk uw ontwerp in 3D of plaats de deur op uw eigen woningfoto.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Op de huidige demo is automatische offerteverzending nog niet beschikbaar.</small></div>
     <div><h2>Een ander metaalproject?</h2><p>Voor trappen, balustrades, industriële constructies en horecawerken kunt u rechtstreeks contact opnemen.</p><a className="text-link" href={pageHref('contact')}>Contacteer MetaalMeesters <ArrowUpRight size={17}/></a></div></div>
   </main>;
 }
@@ -229,7 +229,7 @@ function ConfigControls({d,change,step,setStep}) {
           <div className="measure-field"><label htmlFor="doorWidth">Breedte van de bewegende deur</label><div className="input-unit"><input id="doorWidth" type="number" min="500" max={Math.max(500,d.width-300)} step="10" value={Math.min(d.doorWidth||900,Math.max(500,d.width-300))} onChange={e=>change({doorWidth:Math.max(500,Math.min(Math.max(500,d.width-300),Number(e.target.value)||500))})}/><span>mm</span></div></div>
           <label className="wall-fixed-label">Waar komen de vaste glasdelen?</label>
           <div className="option-row">{[['links','Links'],['beide','Beide kanten'],['rechts','Rechts']].map(([id,name])=><button type="button" key={id} className={d.fixedPanelSide===id?'picked':''} onClick={()=>change({fixedPanelSide:id})}>{name}</button>)}</div>
-          <p className="field-hint">De vaste panelen vullen automatisch de resterende breedte. Bekijk het resultaat in de 3D-woning.</p>
+          <p className="field-hint">De vaste panelen vullen automatisch de resterende breedte. Het resultaat verschijnt meteen in uw 3D-voorbeeld.</p>
         </div>}
         <div className="measure-tip"><Ruler size={19}/><div><strong>Alle maten op aanvraag</strong><p>De grenzen hierboven zijn alleen voor deze 3D-visualisatie, geen productiebeperking. Ongewone of grotere afmetingen kunt u in de offerteaanvraag vermelden. Definitieve productie- en montagematen worden door MetaalMeesters bevestigd.</p></div></div>
       </>}

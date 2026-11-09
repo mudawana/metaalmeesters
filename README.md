@@ -104,3 +104,6 @@ De acht klantfoto's zijn afzonderlijk ontvangen. Ze tonen werkelijk maatwerk maa
 
 ### Boogdeuren in de eerste fase
 De configurator ondersteunt nu **enkele boogdeuren, dubbele boogdeuren met één of twee bogen, pivotboogdeuren en glaswanden met geïntegreerde boogdeur**. Zowel de boogvormige profielen en het glas als de uitsparing in de 3D-woning zijn dynamisch. De booghoogte en boogindeling worden bewaard voor offertes. Meer informatie in [docs/BOOGDEUREN_3D.md](docs/BOOGDEUREN_3D.md). Balustrades blijven een aparte fase.
+
+## Huidige configurator: eigen foto, zonder 3D-woning
+De bezoeker kan de ingestelde deur **in 3D bekijken of op de eigen JPG/PNG/WebP-foto plaatsen**. De huisweergave en voorbeeldwoningselectie zijn uit de interface verwijderd. Grootte, breedte, positie, perspectief en licht zijn met touch, toetsenbord en knoppen instelbaar. De laptop heeft twee eigen scrollpanelen; op gsm wisselt de klant met een vaste knop tussen de instellingen en de 3D-preview. Zie [docs/EIGEN_FOTO_EN_BEDIENING.md](docs/EIGEN_FOTO_EN_BEDIENING.md). Eerdere README-secties over een 3D-woning beschrijven oude versies.
