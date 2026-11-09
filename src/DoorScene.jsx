@@ -91,7 +91,7 @@ function Showroom({room,width,height,topShape,archHeight,lobes}) {
 }
 
 function AdaptiveCamera({photoMode,width,height}) {
-  const {camera}=useThree();
+  const {camera,size}=useThree();
   useEffect(()=>{
     if(photoMode){
       // Fit the entire selected door even for very tall arches or broad glass walls.
@@ -105,7 +105,7 @@ function AdaptiveCamera({photoMode,width,height}) {
       camera.lookAt(0,height*.52,-.2);
     }
     camera.updateProjectionMatrix();
-  },[camera,photoMode,width,height]);
+  },[camera,photoMode,width,height,size.width,size.height]);
   return null;
 }
 

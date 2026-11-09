@@ -101,7 +101,7 @@ export const pages = [
     "route": "configurator",
     "path": "/configurator/",
     "title": "3D stalen deur configurator | MetaalMeesters",
-    "description": "Ontwerp uw stalen deur in 3D. Kies afmetingen, glas, profielverdeling en kleur en bekijk uw deur op een echte woningfoto. Vrijblijvende aanvraag op maat."
+    "description": "Ontwerp uw stalen deur in 3D. Kies afmetingen, glas, profielverdeling en kleur en bekijk uw deur op uw eigen woningfoto. Vrijblijvende aanvraag op maat."
   },
   {
     "route": "portfolio/project-hulst",
