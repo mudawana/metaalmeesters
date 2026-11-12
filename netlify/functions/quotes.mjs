@@ -3,6 +3,7 @@ import {authorized,safeOrigin,apiJSON} from '../lib/session.mjs';
 import {putQuote,getQuote,listQuotes,deleteQuote,STAGES} from '../lib/quotes-data.mjs';
 import {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from '../../src/product-options.mjs';
 import {cmLabel,onsiteMeasureNote} from '../../src/measurement-units.mjs';
+import {safeBalustradeDesign,balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_HANDRAILS,BAL_MOUNT,BAL_GLASS} from '../../src/balustrade-options.mjs';
 
 const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const permitted={
@@ -49,7 +50,29 @@ async function mailNotification(quote,req) {
   const {RESEND_API_KEY,QUOTE_FROM_EMAIL,QUOTE_TO_EMAIL}=process.env;
   if(!RESEND_API_KEY||!QUOTE_FROM_EMAIL||!QUOTE_TO_EMAIL)return 'niet ingesteld';
   const d=quote.design;
-  const text=[
+  const text=(quote.product==='balustrade' ? [
+    'Nieuwe BALUSTRADE-offerteaanvraag bij MetaalMeesters',
+    '',
+    'Klant: '+quote.name,
+    'E-mail: '+quote.email,
+    'Telefoon: '+(quote.phone||'-'),
+    'Locatie: '+(quote.city||'-'),
+    'Type: '+balustradeTypeLabel(d.type),
+    'Toepassing: '+(d.placement==='buiten'?'Buiten':'Binnen'),
+    'Lengte (schatting): '+cmLabel(d.length),
+    'Hoogte (schatting): '+cmLabel(d.height),
+    'Invulling: '+balustradeInfillLabel(d.infill),
+    ...(d.infill==='glas'?['Glasuitstraling: '+(BAL_GLASS.find(x=>x.id===d.glass)?.label||d.glass)]:[]),
+    'Kleur: '+balustradeColorLabel(d.color)+(d.color==='andere'?' · '+(d.customColor||'Nog te bepalen'):''),
+    'Handregel: '+(BAL_HANDRAILS.find(x=>x.id===d.handrail)?.label||d.handrail),
+    'Bevestiging: '+(BAL_MOUNT.find(x=>x.id===d.mount)?.label||d.mount),
+    '',
+    'Opmeting, veiligheidsvereisten, draagkracht en definitieve prijs worden door MetaalMeesters beoordeeld.',
+    '',
+    'Bekijk het 3D-voorbeeld in het privébeheerportaal:',
+    new URL('/#/beheer',req.url).href,
+    'Referentie: '+quote.id
+  ] : [
     'Er is een nieuwe offerteaanvraag binnengekomen op MetaalMeesters.',
     '',
     'Klant: '+quote.name,
@@ -74,12 +97,12 @@ async function mailNotification(quote,req) {
     new URL('/#/beheer',req.url).href,
     '',
     'Referentie: '+quote.id
-  ].join('\n');
+  ]).join('\n');
   try {
     const res=await fetch('https://api.resend.com/emails',{
       method:'POST',
       headers:{'Authorization':'Bearer '+RESEND_API_KEY,'Content-Type':'application/json'},
-      body:JSON.stringify({from:QUOTE_FROM_EMAIL,to:[QUOTE_TO_EMAIL],reply_to:quote.email,subject:'Nieuwe offerteaanvraag · '+quote.name+' · '+quote.id.slice(-8),text})
+      body:JSON.stringify({from:QUOTE_FROM_EMAIL,to:[QUOTE_TO_EMAIL],reply_to:quote.email,subject:'Nieuwe '+(quote.product==='balustrade'?'balustrade-':'deur-')+'offerte · '+quote.name+' · '+quote.id.slice(-8),text})
     });
     if(!res.ok)throw new Error('E-mailprovider status '+res.status);
     return 'verstuurd';
@@ -93,9 +116,12 @@ async function processSubmission(req) {
   try{input=await req.json();}catch{return error('Ongeldige gegevens.');}
   if(!input || typeof input!=='object')return error('Ongeldige aanvraag.');
   if(input.website) return error('Aanvraag kon niet worden verwerkt.',400);
-  const {name,email,phone,city,notes,design,image,consent}=input;
+  const {name,email,phone,city,notes,product,design,image,consent}=input;
+  if(product!=null&&!['deur','balustrade'].includes(product))return error('Onbekende productsoort.');
+  const kind=product==='balustrade'?'balustrade':'deur';
+  const balustrade=kind==='balustrade'?safeBalustradeDesign(design):null;
   if(!consent || !clean(name,151) || clean(name,151).length>150 || !emailPattern.test(clean(email,260)) ||
-     !validDesign(design))return error('Controleer uw contactgegevens en ontwerp.');
+    (kind==='balustrade'?!balustrade:!validDesign(design)))return error('Controleer uw contactgegevens en ontwerp.');
   const photo=safeImage(image);
   if(!photo)return error('De foto van uw 3D-deur ontbreekt. Probeer opnieuw, bij voorkeur in een moderne browser.');
   // Rudimentary abuse limit. Use managed CAPTCHA or a transactional store for production at scale.
@@ -107,10 +133,10 @@ async function processSubmission(req) {
   if(limiter && Date.now()-limiter.time<45000)return error('Er werd zojuist al een aanvraag verstuurd. Probeer het later opnieuw.',429);
   const id=new Date().toISOString().replace(/[:.]/g,'-')+'-'+randomUUID();
   const quote={
-    id,createdAt:new Date().toISOString(),status:'nieuw',
+    id,createdAt:new Date().toISOString(),status:'nieuw',product:kind,
     name:clean(name,150),email:clean(email,260),phone:clean(phone,100),
     city:clean(city,150),notes:clean(notes,1800),
-    design:{
+    design:kind==='balustrade'?balustrade:{
       ...Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening','topShape','panelLayout','lowerPanelHeight','closure'].includes(k)).map(k=>[k,design[k]])),
       ...(design.type==='wand'?{doorWidth:design.doorWidth,fixedPanelSide:design.fixedPanelSide}:{}),
       ...(design.frame==='andere'?{customColor:clean(design.customColor,70)}:{})

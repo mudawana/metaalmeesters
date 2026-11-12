@@ -1,6 +1,7 @@
 import React, {useCallback,useEffect,useRef,useState} from 'react';
 import {GLASSES,FRAMES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
 import {cmLabel} from './measurement-units.mjs';
+import {balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_GLASS,BAL_HANDRAILS,BAL_MOUNT} from './balustrade-options.mjs';
 import {ArrowLeft,ArrowRight,Archive,CheckCircle2,Clock3,Download,Eye,Inbox,LockKeyhole,LogOut,Mail,Phone,RefreshCcw,Search,ShieldCheck,Trash2, X} from 'lucide-react';
 
 const API='/.netlify/functions/';
@@ -14,9 +15,12 @@ async function jsonRequest(path,options={}) {
 }
 const readableDate=date=>{try{return new Intl.DateTimeFormat('nl-BE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(date));}catch{return date;}};
 const typeLabel={enkel:'Enkele deur',dubbel:'Dubbele deur',schuif:'Schuifdeur',pivot:'Pivotdeur',wand:'Glaswand met deur'};
+const isBalustrade=q=>q.product==='balustrade'||q.design?.category==='balustrade';
+const requestLabel=q=>isBalustrade(q)?balustradeTypeLabel(q.design?.type):typeLabel[q.design?.type]||'Stalen deur';
 
 function Detail({quote,onBack,onChanged}) {
   const [status,setStatus]=useState(quote.status),[saving,setSaving]=useState(false),[message,setMessage]=useState('');
+  const balustrade=isBalustrade(quote);
   async function updateStatus(next) {
     setSaving(true);setMessage('');
     try{
@@ -34,10 +38,24 @@ function Detail({quote,onBack,onChanged}) {
     <div className="admin-detail-bar"><button onClick={onBack} className="admin-back"><ArrowLeft size={18}/> Alle aanvragen</button><button onClick={exportQuote} className="admin-secondary"><Download size={15}/> Download gegevens</button></div>
     <div className="admin-detail-heading"><div><span className="eyebrow">OFFERTEAANVRAAG</span><h2>{quote.name}</h2><p>Ontvangen op {readableDate(quote.createdAt)} · Referentie: {quote.id.slice(-12)}</p></div><span className={'admin-status status-'+status.replaceAll(' ','-')}>{status}</span></div>
     <div className="admin-detail-grid">
-      <section className="admin-white-card"><h3>Afbeelding van de ontworpen deur</h3>{quote.image?<img className="admin-door-image" src={quote.image} alt={'3D-deurontwerp van '+quote.name}/>:<p>Voor deze aanvraag is geen afbeelding beschikbaar.</p>}<div className="admin-image-caption"><ShieldCheck size={15}/> Alleen zichtbaar na aanmelden in het beheerportaal.</div></section>
+      <section className="admin-white-card"><h3>{balustrade?'3D-voorbeeld van de balustrade':'Afbeelding van de ontworpen deur'}</h3>{quote.image?<img className="admin-door-image" src={quote.image} alt={'3D-'+(balustrade?'balustradeontwerp':'deurontwerp')+' van '+quote.name}/>:<p>Voor deze aanvraag is geen afbeelding beschikbaar.</p>}<div className="admin-image-caption"><ShieldCheck size={15}/> Alleen zichtbaar na aanmelden in het beheerportaal.</div></section>
       <div className="admin-detail-stack">
         <section className="admin-white-card"><h3>Klantgegevens</h3><div className="admin-data-row"><span>Naam</span><strong>{quote.name}</strong></div><div className="admin-data-row"><span>E-mail</span><a href={'mailto:'+quote.email}>{quote.email}</a></div><div className="admin-data-row"><span>Telefoon</span>{quote.phone?<a href={'tel:'+quote.phone}>{quote.phone}</a>:<strong>—</strong>}</div><div className="admin-data-row"><span>Gemeente</span><strong>{quote.city||'—'}</strong></div><div className="admin-data-row"><span>Opmerkingen</span><strong className="admin-notes">{quote.notes||'—'}</strong></div></section>
-        <section className="admin-white-card"><h3>Deurspecificaties</h3><p className="admin-mini">Indicatieve maten in cm · MetaalMeesters komt zelf opmeten vóór productie.</p>{[
+        {balustrade?<section className="admin-white-card"><h3>Balustradespecificaties</h3>
+          <p className="admin-mini">Indicatieve afmetingen in cm · opmeting, veiligheid en definitieve prijs ter plaatse te bepalen.</p>
+          {[
+            ['Type',balustradeTypeLabel(quote.design?.type)],
+            ['Toepassing',quote.design?.placement==='buiten'?'Buiten':'Binnen'],
+            ['Totale lengte (indicatie)',cmLabel(quote.design?.length)],
+            ['Gewenste hoogte (indicatie)',cmLabel(quote.design?.height)],
+            ['Invulling',balustradeInfillLabel(quote.design?.infill)],
+            ...(quote.design?.infill==='glas'?[['Glasuitstraling',BAL_GLASS.find(x=>x.id===quote.design?.glass)?.label||'Nader te bepalen']]:[]),
+            ['Kleur',balustradeColorLabel(quote.design?.color)],
+            ...(quote.design?.color==='andere'?[['Gewenste kleur',quote.design?.customColor||'Nog te bepalen']]:[]),
+            ['Handregel',BAL_HANDRAILS.find(x=>x.id===quote.design?.handrail)?.label||'Nader te bepalen'],
+            ['Bevestiging',BAL_MOUNT.find(x=>x.id===quote.design?.mount)?.label||'Nader te bepalen']
+          ].map(([key,value])=><div className="admin-data-row" key={key}><span>{key}</span><strong>{value}</strong></div>)}
+        </section>:<section className="admin-white-card"><h3>Deurspecificaties</h3><p className="admin-mini">Indicatieve maten in cm · MetaalMeesters komt zelf opmeten vóór productie.</p>{[
           ['Type',typeLabel[quote.design?.type]||'—'],
           ['Breedte (indicatie)',cmLabel(quote.design?.width)],['Hoogte (indicatie)',cmLabel(quote.design?.height)],
           ['Bovenvorm',quote.design?.topShape==='boog'?'Boog':'Recht'],
@@ -53,7 +71,7 @@ function Detail({quote,onBack,onChanged}) {
           ['Handgreep',HANDLES.find(x=>x.id===quote.design?.handle)?.label||quote.design?.handle],
           ['Sluiting',CLOSURES.find(x=>x.id===quote.design?.closure)?.label||'Nog niet opgegeven'],
           ['Draairichting',quote.design?.opening]
-        ].map(([key,value])=><div className="admin-data-row" key={key}><span>{key}</span><strong>{value}</strong></div>)}</section>
+        ].map(([key,value])=><div className="admin-data-row" key={key}><span>{key}</span><strong>{value}</strong></div>)}</section>}
         <section className="admin-white-card"><h3>Verwerking</h3><label className="admin-label">Status van deze offerte<select value={status} disabled={saving} onChange={e=>updateStatus(e.target.value)}>{STAGES.map(x=><option key={x}>{x}</option>)}</select></label><p className="admin-mini">E-mailmelding: {quote.notification||'onbekend'}.</p><a className="admin-email-link" href={'mailto:'+quote.email+'?subject='+encodeURIComponent('Uw offerteaanvraag bij MetaalMeesters')}>Beantwoord deze klant <Mail size={16}/></a>{message&&<p className="admin-error">{message}</p>}</section>
       </div>
     </div>
@@ -91,7 +109,7 @@ function Dashboard({onLogout}) {
     try{await jsonRequest('quotes?id='+encodeURIComponent(id),{method:'DELETE'});setSelected(null);refresh();}
     catch(e){setError(e.message);}
   }
-  const filtered=items.filter(x=>(filter==='alle'||x.status===filter)&&[x.name,x.email,x.city,x.id,x.design?.type].join(' ').toLowerCase().includes(query.toLowerCase()));
+  const filtered=items.filter(x=>(filter==='alle'||x.status===filter)&&[x.name,x.email,x.city,x.id,x.product,x.design?.type,x.design?.infill].join(' ').toLowerCase().includes(query.toLowerCase()));
   const newCount=items.filter(x=>x.status==='nieuw').length;
   return <div className="admin-shell container">
     <div className="admin-top"><div><span className="eyebrow">PRIVÉ · METAALMEESTERS</span><h1>Offerte<em>portaal.</em></h1><p>Uw aanvragen, afmetingen en 3D-ontwerpen op één plek.</p></div><div className="admin-top-actions"><button className="admin-secondary" onClick={refresh}><RefreshCcw size={16}/> Vernieuwen</button><button className="admin-secondary" onClick={onLogout}><LogOut size={16}/> Uitloggen</button></div></div>
@@ -102,8 +120,8 @@ function Dashboard({onLogout}) {
       <section className="admin-list-card">
         <div className="admin-list-tools"><div className="admin-search"><Search size={18}/><input aria-label="Zoek aanvragen" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Zoek op naam, e-mail of referentie..."/></div><select aria-label="Filter op status" value={filter} onChange={e=>setFilter(e.target.value)}><option value="alle">Alle statussen</option>{STAGES.map(x=><option key={x}>{x}</option>)}</select></div>
         {loading?<div className="admin-empty">Aanvragen ophalen...</div>:filtered.length===0?<div className="admin-empty"><Inbox size={36}/><h3>Geen aanvragen gevonden</h3><p>Zodra een klant een ontwerp verstuurt, verschijnt het hier automatisch.</p></div>:
-          <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Klant</th><th>Deur</th><th>Afmetingen</th><th>Datum</th><th>Status</th><th/></tr></thead><tbody>{filtered.map(item=><tr key={item.id} onClick={()=>openQuote(item.id)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter')openQuote(item.id);}}>
-            <td><strong>{item.name}</strong><small>{item.email}</small></td><td>{typeLabel[item.design?.type]||item.design?.type}</td><td>{cmLabel(item.design?.width)} × {cmLabel(item.design?.height)}</td><td>{readableDate(item.createdAt)}</td><td><span className={'admin-status status-'+item.status.replaceAll(' ','-')}>{item.status}</span></td><td><Eye size={18}/></td>
+          <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Klant</th><th>Product</th><th>Afmetingen</th><th>Datum</th><th>Status</th><th/></tr></thead><tbody>{filtered.map(item=><tr key={item.id} onClick={()=>openQuote(item.id)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter')openQuote(item.id);}}>
+            <td><strong>{item.name}</strong><small>{item.email}</small></td><td><strong>{isBalustrade(item)?'Balustrade':'Stalen deur'}</strong><small>{requestLabel(item)}</small></td><td>{isBalustrade(item)?cmLabel(item.design?.length)+' × '+cmLabel(item.design?.height):cmLabel(item.design?.width)+' × '+cmLabel(item.design?.height)}</td><td>{readableDate(item.createdAt)}</td><td><span className={'admin-status status-'+item.status.replaceAll(' ','-')}>{item.status}</span></td><td><Eye size={18}/></td>
           </tr>)}</tbody></table></div>}
       </section>}
     <div className="admin-bottom-hint"><ShieldCheck size={16}/> De inhoud van dit portaal is enkel via een beveiligde sessie toegankelijk. <span>De lijst toont maximaal 250 recentste aanvragen.</span></div>
