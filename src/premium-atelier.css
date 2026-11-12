@@ -323,3 +323,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible { 
   .bal-choices-layout {grid-template-columns:1fr;}
   .product-choice-card {min-height:410px;}
 }
+
+/* Preserve the whole architectural scene instead of cropping the U railing
+   into a narrow, unrecognizable vertical slice. */
+.product-choice-card img {height:70%;min-height:0;object-position:center center;}
+.product-choice-card::after {background:linear-gradient(180deg,#10181306 0%,#1018130b 30%,#121c17ab 57%,#121c17ed 72%,#121c17 100%);}
+.product-choice-card-content {padding-bottom:31px;}
+@media(max-width:640px){
+  .product-choice-card img {height:67%;min-height:0;}
+  .product-choice-card::after {background:linear-gradient(180deg,#10181308 0%,#10181306 30%,#121c17ae 54%,#121c17ed 72%,#121c17 100%);}
+}
