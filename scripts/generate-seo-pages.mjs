@@ -9,7 +9,13 @@ import {LEGAL_APPROVED,isLegalPage} from '../src/legal-profile.mjs';
 
 const target='dist';
 const template=await fs.readFile(path.join(target,'index.html'),'utf8');
-const isPreview=process.env.GITHUB_PAGES==='true';
+const isGitHubPreview=process.env.GITHUB_PAGES==='true';
+// Until the business explicitly launches metaalmeesters.eu, Netlify is a test
+// environment. Do not index .netlify.app or the temporary .be domain.
+const netlifyUrl=(process.env.URL||'').replace(/\/$/,'');
+const isNetlifyPreview=process.env.NETLIFY==='true' &&
+  !/^https:\/\/(?:www\.)?metaalmeesters\.eu$/i.test(netlifyUrl);
+const isPreview=isGitHubPreview||isNetlifyPreview;
 const origin='https://metaalmeesters.eu';
 const htmlEscape=(s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 
@@ -109,9 +115,11 @@ const sitemap='<?xml version="1.0" encoding="UTF-8"?>\n'+
 pages.filter(p=>LEGAL_APPROVED||!isLegalPage(p.route)).map(p=>'  <url><loc>'+origin+p.path+'</loc></url>').join('\n')+
 '\n</urlset>\n';
 await fs.writeFile(path.join(target,'sitemap.xml'),sitemap);
-await fs.writeFile(path.join(target,'robots.txt'),isPreview
+await fs.writeFile(path.join(target,'robots.txt'),isGitHubPreview
   ?'User-agent: *\nDisallow: /metaalmeesters/\n'
-  :'User-agent: *\nAllow: /\nSitemap: '+origin+'/sitemap.xml\n');
+  :isNetlifyPreview
+    ?'User-agent: *\nAllow: /\n'
+    :'User-agent: *\nAllow: /\nSitemap: '+origin+'/sitemap.xml\n');
 const expected=['/','/diensten/','/projecten/','/contact/','/offerte/','/configurator/','/portfolio/project-kontich/','/over-ons/',...Array.from(servicePagesByRoute.values(),p=>p.path)];
 for(const slug of expected){
   const p=path.join(target,slug.replace(/^\/|\/$/g,''),'index.html');

@@ -52,3 +52,10 @@ test('3D model preserves the WebGL buffer for an actual quote image',async()=>{
  assert.match(config,/id="balustrade-canvas"/);
  assert.match(config,/QuoteForm design=\{design\} product="balustrade"/);
 });
+
+test('temporary Netlify domain is noindex until the official .eu migration',async()=>{
+ const generator=await fs.readFile('scripts/generate-seo-pages.mjs','utf8');
+ assert.match(generator,/isNetlifyPreview/);
+ assert.match(generator,/process\.env\.NETLIFY/);
+ assert.match(generator,/isGitHubPreview\|\|isNetlifyPreview/);
+});
