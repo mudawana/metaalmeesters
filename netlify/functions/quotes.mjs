@@ -3,6 +3,7 @@ import {authorized,safeOrigin,apiJSON} from '../lib/session.mjs';
 import {putQuote,getQuote,listQuotes,deleteQuote,STAGES} from '../lib/quotes-data.mjs';
 import {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from '../../src/product-options.mjs';
 import {cmLabel,onsiteMeasureNote} from '../../src/measurement-units.mjs';
+import {hasLeftReturn,hasRightReturn,totalRailingLengthMm} from '../../src/balustrade-geometry.mjs';
 import {safeBalustradeDesign,balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_LAYOUTS,BAL_HANDRAILS,BAL_MOUNT,BAL_GLASS} from '../../src/balustrade-options.mjs';
 
 const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,7 +61,10 @@ async function mailNotification(quote,req) {
     'Type: '+balustradeTypeLabel(d.type),
     'Toepassing: '+(d.placement==='buiten'?'Buiten':'Binnen'),
     'Verloop: '+(d.type==='trap'?'Rechte trapbalustrade':BAL_LAYOUTS.find(x=>x.id===(d.layout||'recht'))?.label||'Rechte opstelling'),
-    'Lengte (schatting): '+cmLabel(d.length),
+    'Lengte voorzijde (schatting): '+cmLabel(d.length),
+    ...(hasLeftReturn(d.layout)?['Lengte linkerzijde (schatting): '+cmLabel(d.sideLeft)]:[]),
+    ...(hasRightReturn(d.layout)?['Lengte rechterzijde (schatting): '+cmLabel(d.sideRight)]:[]),
+    'Totale lengte (schatting): '+cmLabel(totalRailingLengthMm(d)),
     'Hoogte (schatting): '+cmLabel(d.height),
     'Invulling: '+balustradeInfillLabel(d.infill),
     ...(d.infill==='glas'?['Glasuitstraling: '+(BAL_GLASS.find(x=>x.id===d.glass)?.label||d.glass)]:[]),
