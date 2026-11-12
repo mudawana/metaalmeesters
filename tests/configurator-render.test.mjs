@@ -4,20 +4,19 @@ import React from 'react';
 import {renderToString} from 'react-dom/server';
 import {createServer} from 'vite';
 
-// The SEO build deliberately skips server rendering the interactive route.
-// This test renders it so missing JSX imports (which cause blank screens)
-// fail in CI before the site is published.
-test('interactive configurator renders the first step without runtime errors',async()=>{
+// The interactive configurator is mounted by the browser.
+// Render the chooser in CI so a broken import does not result in a blank screen.
+test('configurator starts with two real product choices',async()=>{
  const vite=await createServer({
    server:{middlewareMode:true,hmr:false},appType:'custom',logLevel:'error'
  });
  try {
    const {default:App}=await vite.ssrLoadModule('/src/App.jsx');
    const html=renderToString(React.createElement(App,{initialRoute:'configurator'}));
-   assert.match(html,/aria-valuenow="1"/); // React SSR inserts comment nodes between numeric text
-   assert.match(html,/Uw deur in/);
-   assert.match(html,/Volgende: Afmetingen/);
-   assert.match(html,/Bekijk uw 3D-voorbeeld/);
-   assert.match(html,/Enkele deur/);
+   assert.match(html,/Wat wilt u/);
+   assert.match(html,/Stalen deur/);
+   assert.match(html,/Balustrade/);
+   assert.match(html,/Ontwerp uw balustrade/);
+   assert.match(html,/product-choice-card/);
  }finally{await vite.close();}
 });

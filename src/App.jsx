@@ -45,7 +45,7 @@ function Header({route}) {
         {nav.map(([url,label])=><a key={url} href={pageHref(url)} className={route===url?'active':''}>{label}</a>)}
         <a className="mobile-config" href={pageHref('configurator')}>3D-configurator <ArrowUpRight size={16}/></a>
       </nav>
-      <a className="header-cta" href={pageHref('configurator')}>Ontwerp uw deur <ArrowUpRight size={16}/></a>
+      <a className="header-cta" href={pageHref('configurator')}>Ontwerp in 3D <ArrowUpRight size={16}/></a>
       <button className="menu-toggle" onClick={()=>setOpen(v=>!v)} aria-label="Menu openen of sluiten">{open?<X/>:<Menu/>}</button>
     </div>
   </header>;
