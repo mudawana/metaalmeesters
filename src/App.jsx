@@ -384,7 +384,7 @@ function ProductConfigurator(){
   if(product==='balustrade')return <Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Balustradeconfigurator laden...</h1></div></main>}><BalustradeConfigurator onBack={()=>choose(null)}/></Suspense>;
   return <main className="product-choice-page"><div className="container">
     <span className="eyebrow product-choice-eyebrow">DE METAALMEESTERS ONTWERPSTUDIO · 01 / 02</span>
-    <h1>Uw idee.<br/><em>Onze expertise.</em></h1>
+    <h1>Wat wilt u<br/><em>ontwerpen?</em></h1>
     <p className="product-choice-intro">Kies waarmee uw ontwerp begint. Ontdek materialen, lijnen en afmetingen in 3D en ontvang daarna een vrijblijvende offerte op maat. Onze vakmensen verzorgen de definitieve opmeting en technische beoordeling.</p>
     <div className="product-choice-grid">
       <button type="button" className="product-choice-card" onClick={()=>choose('deur')}>
