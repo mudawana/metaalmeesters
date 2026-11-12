@@ -2,6 +2,7 @@ import React,{useEffect,useState,Suspense} from 'react';
 import {ArrowLeft,ArrowRight,Check,Eye,RotateCcw,Ruler,ShieldCheck} from 'lucide-react';
 import QuoteForm from './QuoteForm.jsx';
 import {cmAsMm,mmAsCm,cmLabel} from './measurement-units.mjs';
+import {hasLeftReturn,hasRightReturn,totalRailingLengthMm} from './balustrade-geometry.mjs';
 import {initialBalustrade,BAL_TYPES,BAL_LAYOUTS,BAL_INFILL,BAL_COLORS,BAL_GLASS,BAL_MOUNT,BAL_HANDRAILS,
   balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,safeBalustradeDesign} from './balustrade-options.mjs';
 import './balustrade.css';
@@ -14,6 +15,20 @@ function Choice({active,onClick,title,desc,visual}) {
     {visual||null}
     <span><strong>{title}</strong>{desc&&<small>{desc}</small>}</span>
   </button>;
+}
+const LAYOUT_PATHS={
+  recht:'M 9 43 H 91',
+  'hoek-links':'M 16 12 V 43 H 91',
+  'hoek-rechts':'M 9 43 H 84 V 12',
+  u:'M 16 12 V 43 H 84 V 12'
+};
+function LayoutPreview({kind}) {
+  return <span className="bal-layout-preview" aria-hidden="true">
+    <svg viewBox="0 0 100 58" role="presentation">
+      <path d={LAYOUT_PATHS[kind]||LAYOUT_PATHS.recht} fill="none" stroke="currentColor" strokeWidth="5.5" strokeLinecap="square" strokeLinejoin="round"/>
+      <path d="M 16 49 H 84" stroke="currentColor" strokeOpacity=".13" strokeWidth="1" strokeDasharray="2 4"/>
+    </svg>
+  </span>;
 }
 function InfillPreview({kind}) {
   const count=kind==='verticaal'?6:kind==='horizontaal'?3:1;
@@ -40,6 +55,7 @@ export default function BalustradeConfigurator({onBack}) {
   const [step,setStep]=useState(0);
   useEffect(()=>{try{localStorage.setItem('mm-balustrade-design',JSON.stringify(design));}catch{}},[design]);
   const change=patch=>setDesign(d=>({...d,...patch}));
+  const actualLayout=design.type==='trap'?'recht':design.layout;
   const reset=()=>{setDesign({...initialBalustrade});setStep(0);};
   const next=()=>{setStep(s=>Math.min(s+1,3));document.querySelector('.bal-config-card')?.scrollIntoView({behavior:'smooth',block:'start'});};
   const prev=()=>{setStep(s=>Math.max(s-1,0));document.querySelector('.bal-config-card')?.scrollIntoView({behavior:'smooth',block:'start'});};
@@ -68,14 +84,17 @@ export default function BalustradeConfigurator({onBack}) {
           {step===1&&<>
             <h3>Welke afmetingen heeft u in gedachten?</h3><p className="bal-hint">Vul een schatting in. U mag ook 0 cm invullen wanneer u een maat nog niet kent.</p>
             {design.type==='trap'?<p className="bal-hint">Voor een trap tonen we een recht, hellend voorbeeld. Bochten en bordessen worden bij de opmeting uitgewerkt.</p>:<>
-              <h3>Hoe loopt de balustrade?</h3>
-              <div className="bal-choices bal-choices-compact">{BAL_LAYOUTS.map(l=><Choice key={l.id} title={l.label} desc={l.hint} active={design.layout===l.id} onClick={()=>change({layout:l.id})}/>)}</div>
-              <p className="bal-hint">Bij een hoekopstelling is dit de totale indicatieve lengte van beide zijden samen. Het 3D-model toont een voorbeeldverdeling.</p>
+              <h3>Wat is de vorm van uw balustrade?</h3>
+              <div className="bal-choices bal-choices-layout">{BAL_LAYOUTS.map(l=><Choice key={l.id} title={l.label} desc={l.hint} visual={<LayoutPreview kind={l.id}/>} active={design.layout===l.id} onClick={()=>change({layout:l.id})}/>)}</div>
+              <p className="bal-hint">Kies recht, een hoek links of rechts, of een echte U-vorm met drie zijden. De vorm verschijnt meteen in 3D.</p>
             </>}
-            <Measure name="length" label="Totale lengte" value={design.length} onChange={length=>change({length})}/>
+            <Measure name="length" label={actualLayout==='recht'?'Totale lengte':'Lengte voorzijde'} value={design.length} onChange={length=>change({length})}/>
+            {hasLeftReturn(actualLayout)&&<Measure name="sideLeft" label="Lengte linkerzijde" value={design.sideLeft} onChange={sideLeft=>change({sideLeft})}/>}
+            {hasRightReturn(actualLayout)&&<Measure name="sideRight" label="Lengte rechterzijde" value={design.sideRight} onChange={sideRight=>change({sideRight})}/>}
+            {actualLayout!=='recht'&&<div className="bal-total-measure"><span>Totale indicatieve lengte</span><strong>{cmLabel(totalRailingLengthMm(design))}</strong><small>Som van alle zichtbare zijden. De exacte aansluiting wordt opgemeten.</small></div>}
             <Measure name="height" label="Gewenste hoogte" value={design.height} onChange={height=>change({height})}/>
             <div className="bal-callout"><Ruler size={22}/><p><strong>Geen exacte maten nodig.</strong> Ahmed controleert ter plaatse de opening, de hoogte, de ondergrond en de bevestigingsmogelijkheden. De 3D-weergave is een indicatie.</p></div>
-            <p className="bal-hint">Voor een trap of een hoekopstelling bespreken we het exacte verloop tijdens de opmeting. De 3D-preview toont één voorbeelddeel.</p>
+            <p className="bal-hint">Ook bij een U-vorm blijven de afmetingen indicatief. Hoeken, aansluitingen, profielen en constructieve veiligheid worden ter plaatse beoordeeld.</p>
           </>}
           {step===2&&<>
             <h3>Wat vindt u mooi?</h3><p className="bal-hint">Pas de invulling en kleur aan. De definitieve technische uitvoering wordt later beoordeeld.</p>
@@ -97,7 +116,10 @@ export default function BalustradeConfigurator({onBack}) {
             <h3>Uw balustradeontwerp is klaar.</h3><p className="bal-hint">Vraag vrijblijvend een offerte aan. Ahmed kan op basis van uw wensen een inschatting maken; de definitieve prijs volgt na opmeting en technische beoordeling.</p>
             <div className="summary">
               <div><span>Toepassing</span><strong>{balustradeTypeLabel(design.type)} · {design.placement==='buiten'?'buiten':'binnen'}</strong></div>
-              <div><span>Afmetingen (schatting)</span><strong>{cmLabel(design.length)} lang × {cmLabel(design.height)} hoog</strong></div>
+              <div><span>Afmetingen (schatting)</span><strong>{cmLabel(design.length)} voorzijde × {cmLabel(design.height)} hoog</strong></div>
+              {hasLeftReturn(actualLayout)&&<div><span>Linkerzijde</span><strong>{cmLabel(design.sideLeft)}</strong></div>}
+              {hasRightReturn(actualLayout)&&<div><span>Rechterzijde</span><strong>{cmLabel(design.sideRight)}</strong></div>}
+              {actualLayout!=='recht'&&<div><span>Lengte alle zijden samen</span><strong>{cmLabel(totalRailingLengthMm(design))}</strong></div>}
               <div><span>Verloop</span><strong>{design.type==='trap'?'Helling · technisch na te meten':BAL_LAYOUTS.find(l=>l.id===design.layout)?.label}</strong></div>
               <div><span>Invulling</span><strong>{balustradeInfillLabel(design.infill)}{design.infill==='glas'?' · '+BAL_GLASS.find(x=>x.id===design.glass)?.label:''}</strong></div>
               <div><span>Staalkleur</span><strong>{balustradeColorLabel(design.color)}{design.color==='andere'&&design.customColor?' · '+design.customColor:''}</strong></div>
@@ -120,7 +142,7 @@ export default function BalustradeConfigurator({onBack}) {
           <span className="bal-preview-caption">3D-visualisatie · indicatief</span>
         </div>
         <div className="bal-view-help"><Eye size={16}/><span>Sleep om te draaien. Scroll of knijp om in te zoomen. Elke wijziging verschijnt meteen in het model.</span></div>
-        <div className="bal-preview-meta"><strong>{balustradeTypeLabel(design.type)}</strong><span>{cmLabel(design.length)} lang · {cmLabel(design.height)} hoog</span></div>
+        <div className="bal-preview-meta"><strong>{balustradeTypeLabel(design.type)}</strong><span>{actualLayout==='recht'?cmLabel(design.length):cmLabel(totalRailingLengthMm(design))+' totaal'} · {cmLabel(design.height)} hoog</span></div>
         <p className="bal-preview-disclaimer">3D-inspiratie, niet op schaal voor productie of een goedgekeurde veiligheidsconstructie. Werkelijke profielen en bevestiging na advies.</p>
       </aside>
     </div>
