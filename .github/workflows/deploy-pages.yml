@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://mudawana.github.io/metaalmeesters/
     steps:
       - uses: actions/checkout@v4
         with:
@@ -81,11 +81,6 @@ jobs:
             git commit -m "Publish compiled MetaalMeesters website [skip ci]"
             git push
           fi
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: ./dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      # GitHub Pages is already configured to publish from the main branch.
+      # The branch publisher deploys the compiled files from the sync commit.
+      # A second deploy-pages action races it and gets cancelled, so omit it.
