@@ -49,7 +49,7 @@ function Measure({name,label,value,onChange}) {
 }
 export default function BalustradeConfigurator({onBack}) {
   const [design,setDesign]=useState(()=>{
-    try {const stored=JSON.parse(localStorage.getItem('mm-balustrade-design'));return safeBalustradeDesign({...initialBalustrade,...stored})||initialBalustrade;}
+    try {const stored=JSON.parse(localStorage.getItem('mm-balustrade-design'));return safeBalustradeDesign(stored)||initialBalustrade;}
     catch{return initialBalustrade;}
   });
   const [step,setStep]=useState(0);
