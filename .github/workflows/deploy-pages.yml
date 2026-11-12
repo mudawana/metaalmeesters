@@ -78,7 +78,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html 404.html assets images homes over-ons diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren robots.txt sitemap.xml .nojekyll
           if ! git diff --cached --quiet; then
-            git commit -m "Publish compiled MetaalMeesters website [skip ci]"
+            git commit -m "Publish compiled MetaalMeesters website [skip ci] [skip netlify]"
             git push
           fi
       # GitHub Pages is already configured to publish from the main branch.
