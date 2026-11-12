@@ -7,7 +7,7 @@ import './admin.css';
 const HousePreview=React.lazy(()=>import('./HousePreview.jsx'));
 const Admin=React.lazy(()=>import('./Admin.jsx'));
 import {assets,imageUrl,initialDesign,TYPES,FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS,formatDesign,downloadDesign} from './data.js';
-import {VISUAL_RANGE} from './door-dimensions.mjs';
+import {mmAsCm,cmAsMm,cmLabel,onsiteMeasureNote} from './measurement-units.mjs';
 import {STEPS,FAVOURITES,featuredOptions,extraOptions,countExtra,sizesForType} from './configurator-ux.mjs';
 
 const routeFromLocation=()=>{
@@ -144,6 +144,35 @@ function Contact() {
 const steps=STEPS.map((s,i)=>[String(i+1).padStart(2,'0'),s.title]);
 function OptionCard({active,onClick,title,sub}){return <button type="button" className={'option-card '+(active?'selected':'')} onClick={onClick} aria-pressed={active}><span className="option-radio">{active&&<Check size={12}/>}</span><strong>{title}</strong>{sub&&<small>{sub}</small>}</button>;}
 function RangeControl({title,value,min,max,onChange}){return <div className="range-control"><div className="range-head"><strong>{title}</strong><span>{value}</span></div><input type="range" min={min} max={max} step="1" value={value} onChange={e=>onChange(Number(e.target.value))}/><div className="range-labels"><span>Geen</span><span>{max} verdelingen</span></div></div>;}
+function DimensionCmField({id,label,value,onChange,description}) {
+  // Preserve the customer's unmodified text throughout the editing gesture.
+  // In particular, deleting everything and typing 5000 must never snap to a min.
+  const [text,setText]=useState(()=>mmAsCm(value));
+  const [focused,setFocused]=useState(false);
+  useEffect(()=>{if(!focused)setText(mmAsCm(value));},[value,focused]);
+  const parsed=cmAsMm(text);
+  return <div className="measure-field measure-field-cm">
+    <label htmlFor={id}>{label}</label>
+    <div className="input-unit">
+      <input id={id} type="text" inputMode="decimal" autoComplete="off"
+        value={text} aria-describedby={id+'-help'}
+        onFocus={()=>setFocused(true)}
+        onChange={e=>{
+          const raw=e.target.value;
+          setText(raw);
+          const mm=cmAsMm(raw);
+          if(mm!==null)onChange(mm);
+        }}
+        onBlur={()=>{
+          setFocused(false);
+          if(cmAsMm(text)===null)setText(mmAsCm(value));
+        }}
+        placeholder="Bijv. 250" />
+      <span>cm</span>
+    </div>
+    <small id={id+'-help'}>{parsed===0?'0 cm = nog niet opgemeten. MetaalMeesters meet later zelf op.':description||'Typ zelf een maat, bijvoorbeeld 250 of 225,5 cm.'}</small>
+  </div>;
+}
 function GlassChoice({glass,selected,onClick}) {
   return <button type="button" className={'glass-choice '+(selected?'selected':'')} aria-pressed={selected} onClick={onClick}>
     <span className={'glass-example glass-example-'+glass.visual} style={{'--glass-color':glass.color}} aria-hidden="true"><i/></span>
@@ -154,13 +183,13 @@ function GlassChoice({glass,selected,onClick}) {
 function ConfigSummary({d}) {
   return <div className="summary">
     <div><span>Deurtype</span><strong>{TYPES.find(x=>x.id===d.type)?.label}</strong></div>
-    <div><span>{d.type==='wand'?'Totale glaswand':'Afmetingen'}</span><strong>{d.width} × {d.height} mm</strong></div>
-    {d.type==='wand'&&<div><span>Geïntegreerde deur</span><strong>{d.doorWidth} mm breed · vaste panelen {d.fixedPanelSide}</strong></div>}
-    <div><span>Bovenvorm</span><strong>{d.topShape==='boog'?'Boog · '+d.archHeight+' mm'+(d.type==='dubbel'?(d.archPattern==='apart'?' · twee bogen':' · één boog'):''):'Recht'}</strong></div>
+    <div><span>{d.type==='wand'?'Totale glaswand':'Afmetingen (geschat)'}</span><strong>{cmLabel(d.width)} × {cmLabel(d.height)}</strong></div>
+    {d.type==='wand'&&<div><span>Geïntegreerde deur</span><strong>{cmLabel(d.doorWidth)} breed · vaste panelen {d.fixedPanelSide}</strong></div>}
+    <div><span>Bovenvorm</span><strong>{d.topShape==='boog'?'Boogdeur · vorm door atelier te bepalen':'Rechte deur'}</strong></div>
     <div><span>Glassoort</span><strong>{GLASSES.find(x=>x.id===d.glass)?.label}</strong></div>
     <div><span>Glasopbouw</span><strong>{GLASSES.find(x=>x.id===d.glass)?.safety||'Te bevestigen'}</strong></div>
     <div><span>Kleur staal</span><strong>{FRAMES.find(x=>x.id===d.frame)?.label}{d.frame==='andere'&&d.customColor?' · '+d.customColor:''}</strong></div>
-    <div><span>Deurvulling</span><strong>{PANEL_LAYOUTS.find(x=>x.id===(d.panelLayout||'glas'))?.label}{d.panelLayout==='staal-onder'?' · '+d.lowerPanelHeight+' mm staal':''}</strong></div>
+    <div><span>Deurvulling</span><strong>{PANEL_LAYOUTS.find(x=>x.id===(d.panelLayout||'glas'))?.label}{d.panelLayout==='staal-onder'?' · '+cmLabel(d.lowerPanelHeight)+' staal':''}</strong></div>
     <div><span>Indeling</span><strong>{d.vertical} verticaal · {d.panelLayout==='staal-onder'?'drie horizontale vakken':d.horizontal+' horizontaal'}</strong></div>
     <div><span>Handgreep</span><strong>{HANDLES.find(x=>x.id===d.handle)?.label||d.handle}</strong></div>
     <div><span>Sluiting</span><strong>{CLOSURES.find(x=>x.id===d.closure)?.label||'Nog te bepalen'}</strong></div>
@@ -186,52 +215,39 @@ function ConfigControls({d,change,step,setStep}) {
         <h3>Welk type deur wenst u?</h3><p className="field-hint">Kies het model dat bij uw ruimte past.</p><div className="options-two">{TYPES.filter(t=>t.id!=='schuif'||showExtraTypes||d.type==='schuif').map(t=><OptionCard key={t.id} title={t.label} sub={t.caption} active={d.type===t.id} onClick={()=>change({type:t.id,topShape:t.id==='schuif'?'recht':d.topShape,width:t.id==='wand'&&d.width<1400?2600:t.id==='dubbel'&&d.width<1200?1600:d.width,doorWidth:t.id==='wand'?Math.min(d.doorWidth||900,Math.max(500,(t.id==='wand'&&d.width<1400?2600:d.width)-300)):d.doorWidth})}/>)}</div>
         <button type="button" className="show-more-options" aria-expanded={showExtraTypes} onClick={()=>setShowExtraTypes(v=>!v)}>{showExtraTypes?'Minder deurtypes':'Ook een schuifdeur bekijken'} <ChevronDown size={16}/></button>
         <h3 className="subsection-title">Welke bovenvorm?</h3>
-        <p className="field-hint">Een echte gebogen stalen deur, ook in de 3D-muuropening.</p>
+        <p className="field-hint">Een boogdeur? Dan hoeft u enkel de breedte en hoogte op te geven. De exacte boog wordt door ons opgemeten.</p>
         {d.type!=='schuif'?<div className="options-two">
           <OptionCard title="Rechte bovenkant" sub="Klassieke rechte deur" active={d.topShape!=='boog'} onClick={()=>change({topShape:'recht'})}/>
-          <OptionCard title="Boogdeur" sub="Gebogen glas, profiel en opening" active={d.topShape==='boog'} onClick={()=>change({topShape:'boog'})}/>
+          <OptionCard title="Boogdeur" sub="Breedte en hoogte zijn voldoende" active={d.topShape==='boog'} onClick={()=>change({topShape:'boog'})}/>
         </div>:<p className="field-hint">Schuifdeuren worden voorlopig enkel met rechte bovenkant getoond.</p>}
         <details className="config-extra"><summary><span>Roedenstijl aanpassen (optioneel)</span><small>{d.style==='eigen'?'Eigen verdeling':d.style==='minimal'?'Zonder roeden':d.style==='atelier'?'Atelier':d.style==='industrieel'?'Industrieel':'Klassiek'}</small></summary>
           <div className="options-two">{[['minimal','Minimal','Zonder onderverdeling'],['atelier','Atelier','Een verfijnd raster'],['industrieel','Industrieel','Een strak lijnenspel'],['klassiek','Klassiek','Één horizontale lijn']].map(([id,title,sub])=><OptionCard key={id} title={title} sub={sub} active={d.style===id} onClick={()=>applyStyle(id)}/>)}</div>
         </details>
       </>}
       {step===1&&<>
-        <h3>Hoe groot wordt uw deur?</h3><p className="field-hint">Een schatting is voldoende om te beginnen. Exact opmeten gebeurt later.</p>
-        <div className="size-presets">
-          <span>Of kies snel een voorbeeldmaat</span>
-          <div>{sizesForType(d.type).map(size=><button type="button" key={size.label} aria-pressed={d.width===size.width&&d.height===size.height} className={d.width===size.width&&d.height===size.height?'selected':''}
-            onClick={()=>change({width:size.width,height:size.height,doorWidth:Math.min(d.doorWidth||900,Math.max(500,size.width-300))})}>
-            <strong>{size.label}</strong><small>{size.width} × {size.height} mm</small></button>)}</div>
-        </div>
-        <div className="measure-field"><label htmlFor="width">{d.type==='wand'?'Totale breedte van de glaswand':'Breedte van de deuropening'}</label><div className="input-unit"><input id="width" type="number" min={VISUAL_RANGE.widthMin} max={VISUAL_RANGE.widthMax} step="10" value={d.width} onChange={e=>change({width:Math.max(VISUAL_RANGE.widthMin,Math.min(VISUAL_RANGE.widthMax,Number(e.target.value)||VISUAL_RANGE.widthMin))})}/><span>mm</span></div><small>Visualisatie: {VISUAL_RANGE.widthMin}–{VISUAL_RANGE.widthMax} mm</small></div>
-        <div className="measure-field"><label htmlFor="height">Hoogte van de opening</label><div className="input-unit"><input id="height" type="number" min={VISUAL_RANGE.heightMin} max={VISUAL_RANGE.heightMax} step="10" value={d.height} onChange={e=>change({height:Math.max(VISUAL_RANGE.heightMin,Math.min(VISUAL_RANGE.heightMax,Number(e.target.value)||VISUAL_RANGE.heightMin))})}/><span>mm</span></div><small>Visualisatie: {VISUAL_RANGE.heightMin}–{VISUAL_RANGE.heightMax} mm</small></div>
-        {d.topShape==='boog'&&d.type!=='schuif'&&<details className="config-extra"><summary><span>Booghoogte instellen</span><small>Standaard {d.archHeight} mm · aanpassen mag</small></summary><section className="arch-config-options">
-          <h4>Booghoogte</h4>
-          <p className="field-hint">Stel in hoe sterk de deur bovenaan gebogen is. De hoogte hierboven is de totale hoogte inclusief de boog.</p>
-          <div className="arch-height-readout"><span>Hoogte van de boog</span><strong>{Math.min(d.archHeight||300,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))} mm</strong></div>
-          <input className="arch-height-slider" aria-label="Booghoogte in millimeters" type="range" min="80" step="10"
-            max={Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45)))}
-            value={Math.min(d.archHeight||300,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))}
-            onChange={e=>change({archHeight:Number(e.target.value)})}/>
-          <div className="arch-presets">{[['Laag',160],['Standaard',300],['Hoog',550]].map(([label,rise])=>
-            <button type="button" key={label} onClick={()=>change({archHeight:Math.min(rise,Math.max(80,Math.min(1000,Math.floor(d.width/(d.type==='dubbel'&&d.archPattern==='apart'?4:2)),Math.floor(d.height*.45))))})}>{label}</button>)}</div>
-          {d.type==='dubbel'&&<>
-            <h4>Boogverdeling bij dubbele deuren</h4>
-            <div className="options-two">
-              <OptionCard title="Eén doorlopende boog" sub="Grote gezamenlijke boog boven beide vleugels" active={d.archPattern!=='apart'} onClick={()=>change({archPattern:'doorlopend'})}/>
-              <OptionCard title="Twee afzonderlijke bogen" sub="Elke vleugel zijn eigen boog" active={d.archPattern==='apart'} onClick={()=>change({archPattern:'apart'})}/>
-            </div>
-          </>}
-          <p className="field-hint">Boogvorm en kromming zijn een indicatie. Het atelier controleert de technische uitvoerbaarheid.</p>
-        </section></details>}
-        {d.type==='wand'&&<div className="wall-options">
-          <h4>Deur geïntegreerd in de vaste glaswand</h4>
-          <div className="measure-field"><label htmlFor="doorWidth">Breedte van de bewegende deur</label><div className="input-unit"><input id="doorWidth" type="number" min="500" max={Math.max(500,d.width-300)} step="10" value={Math.min(d.doorWidth||900,Math.max(500,d.width-300))} onChange={e=>change({doorWidth:Math.max(500,Math.min(Math.max(500,d.width-300),Number(e.target.value)||500))})}/><span>mm</span></div></div>
-          <label className="wall-fixed-label">Waar komen de vaste glasdelen?</label>
-          <div className="option-row">{[['links','Links'],['beide','Beide kanten'],['rechts','Rechts']].map(([id,name])=><button type="button" key={id} className={d.fixedPanelSide===id?'picked':''} onClick={()=>change({fixedPanelSide:id})}>{name}</button>)}</div>
-          <p className="field-hint">De vaste panelen vullen automatisch de resterende breedte. Het resultaat verschijnt meteen in uw 3D-voorbeeld.</p>
-        </div>}
-        <div className="measure-tip"><Ruler size={19}/><div><strong>Alle maten op aanvraag</strong><p>De grenzen hierboven zijn alleen voor deze 3D-visualisatie, geen productiebeperking. Ongewone of grotere afmetingen kunt u in de offerteaanvraag vermelden. Definitieve productie- en montagematen worden door MetaalMeesters bevestigd.</p></div></div>
+        <h3>{d.topShape==='boog'?'Breedte en hoogte van uw boogdeur':'Welke afmetingen heeft u ongeveer nodig?'}</h3>
+        <p className="field-hint">Vul zelf uw maten in <strong>centimeter</strong> in. U mag een getal helemaal wissen en opnieuw typen. We werken op maat en komen altijd zelf opmeten.</p>
+        <DimensionCmField id="width" label={d.type==='wand'?'Totale breedte glaswand':'Breedte'} value={d.width} onChange={width=>change({width})}/>
+        <DimensionCmField id="height" label="Hoogte (inclusief eventuele boog)" value={d.height} onChange={height=>change({height})}/>
+        {d.topShape==='boog'&&<p className="wizard-small-help">De boog in 3D is een voorbeeld. U hoeft geen booghoogte, radius of verdeling op te geven; die leggen we bij de opmeting vast.</p>}
+        {d.type==='wand'&&<details className="config-extra"><summary><span>Geïntegreerde deur in de glaswand (optioneel)</span><small>Breedte deur en vaste glasdelen</small></summary>
+          <div className="wall-options">
+            <DimensionCmField id="doorWidth" label="Breedte van de geïntegreerde deur" value={d.doorWidth} onChange={doorWidth=>change({doorWidth})}/>
+            <label className="wall-fixed-label">Waar komen de vaste glasdelen?</label>
+            <div className="option-row">{[['links','Links'],['beide','Beide kanten'],['rechts','Rechts']].map(([id,name])=><button type="button" key={id} className={d.fixedPanelSide===id?'picked':''} onClick={()=>change({fixedPanelSide:id})}>{name}</button>)}</div>
+          </div>
+        </details>}
+        <details className="config-extra"><summary><span>Of kies een voorbeeldmaat</span><small>Compact, standaard of ruim</small></summary>
+          <div className="size-presets"><div>{sizesForType(d.type).map(size=><button type="button" key={size.label} aria-pressed={d.width===size.width&&d.height===size.height} className={d.width===size.width&&d.height===size.height?'selected':''}
+            onClick={()=>change({width:size.width,height:size.height})}>
+            <strong>{size.label}</strong><small>{mmAsCm(size.width)} × {mmAsCm(size.height)} cm</small></button>)}</div>
+          </div>
+        </details>
+        <div className="measure-tip measure-guarantee" role="note"><Ruler size={22}/><div>
+          <strong>Wij komen altijd zelf opmeten</strong>
+          <p>{onsiteMeasureNote()}</p>
+          <p className="measure-guarantee-secondary">U mag voorlopig 0 cm invullen als u een maat nog niet kent. Bij heel kleine of grote maten is de 3D-weergave alleen een indicatie, niet de definitieve productieafmeting.</p>
+        </div></div>
       </>}
       {step===2&&<>
         <h3>Glas & verdeling</h3><p className="field-hint">Creëer het perfecte samenspel van licht en lijnen.</p>
@@ -255,9 +271,8 @@ function ConfigControls({d,change,step,setStep}) {
         <p className="field-hint">Kies volledig glas of een deur in drie delen: twee glasvakken bovenaan en een gesloten paneel van staal onderaan.</p>
         <div className="options-two">{PANEL_LAYOUTS.map(t=><OptionCard key={t.id} title={t.label} sub={t.description} active={(d.panelLayout||'glas')===t.id} onClick={()=>change({panelLayout:t.id})}/>)}</div>
         {d.panelLayout==='staal-onder'&&<div className="panel-height-option">
-          <label htmlFor="lowerPanelHeight">Hoogte stalen onderpaneel</label>
-          <div className="input-unit"><input id="lowerPanelHeight" type="number" step="10" min="250" max={Math.floor(d.height*.60)} value={Math.min(d.lowerPanelHeight||650,Math.floor(d.height*.60))}
-            onChange={e=>change({lowerPanelHeight:Math.max(250,Math.min(Math.floor(d.height*.60),Number(e.target.value)||650))})}/><span>mm</span></div>
+          <p className="field-hint">De hoogte van het onderste dichte paneel is ook een indicatie.</p>
+          <DimensionCmField id="lowerPanelHeight" label="Hoogte van het stalen deel" value={d.lowerPanelHeight} onChange={lowerPanelHeight=>change({lowerPanelHeight})}/>
           <small>Het stalen paneel vervangt echt het onderste glasvak in de 3D-weergave. De drie horizontale vakken zijn automatisch verdeeld.</small>
         </div>}
         <details className="config-extra"><summary><span>Roeden precies instellen (optioneel)</span><small>{d.vertical} verticaal · {d.panelLayout==='staal-onder'?'vaste drie vakken':d.horizontal+' horizontaal'}</small></summary>
@@ -312,7 +327,7 @@ function ConfigControls({d,change,step,setStep}) {
           <h4>Draairichting</h4><div className="option-row">{[['links','Links'],['rechts','Rechts']].map(([id,name])=><button type="button" key={id} aria-pressed={d.opening===id} className={d.opening===id?'picked':''} onClick={()=>change({opening:id})}>{name}</button>)}</div>
         </details>
       </>}
-      {step===4&&<><h3>Uw deur is ontworpen.</h3><p className="field-hint">Controleer uw keuzes en vraag een vrijblijvende offerte aan.</p><ConfigSummary d={d}/><QuoteForm design={d}/></>}
+      {step===4&&<><h3>Uw ontwerp is klaar.</h3><p className="field-hint">Dit zijn uw voorlopige keuzes. <strong>MetaalMeesters meet uw deur altijd zelf exact op vóór de productie.</strong> Vraag vrijblijvend een offerte.</p><ConfigSummary d={d}/><div className="measure-tip measure-guarantee" role="note"><Ruler size={22}/><div><strong>Exacte afmetingen? Die meten wij zelf.</strong><p>{onsiteMeasureNote()}</p></div></div><QuoteForm design={d}/></>}
     </div>
     <button type="button" className="mobile-preview-jump" onClick={()=>document.getElementById('mm-live-preview')?.scrollIntoView({behavior:'smooth',block:'start'})}><Eye size={16}/> Bekijk mijn deur in 3D <ArrowRight size={15}/></button>
     {step<4&&<div className="control-bottom">
@@ -328,16 +343,7 @@ function Configurator() {
     setStep(oldStep=>Math.max(0,Math.min(STEPS.length-1,typeof next==='function'?next(oldStep):next)));
     window.requestAnimationFrame(()=>document.getElementById('mm-config-controls')?.scrollIntoView({behavior:'smooth',block:'start'}));
   };
-  const change=(patch)=>setD(old=>{
-    const next={...old,...patch};
-    // Keep solid steel panel sizes feasible for the currently selected height,
-    // including when the user reduces overall dimensions after choosing a panel.
-    if(next.panelLayout==='staal-onder'){
-      const limit=Math.max(250,Math.floor((Number(next.height)||2200)*.60));
-      next.lowerPanelHeight=Math.max(250,Math.min(limit,Number(next.lowerPanelHeight)||650));
-    }
-    return next;
-  });
+  const change=(patch)=>setD(old=>({...old,...patch}));
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">

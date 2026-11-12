@@ -9,12 +9,11 @@ import {ArchedDoorLeaf,ArchedFixedPanel} from './ArchedElements.jsx';
 import {GlassSurface} from './GlassVisual.jsx';
 import {DoorHardware,DoorHinge} from './DoorHardware.jsx';
 import {SteelInfill} from './SteelInfill.jsx';
+import {CoatedSteelMaterial} from './CoatedSteel.jsx';
 import {StudioReflections,InstalledStudio} from './StudioWorld.jsx';
 import {lowerSteelMeters} from './product-options.mjs';
 
-function Metal({ color, roughness=0.38 }) {
-  return <meshPhysicalMaterial color={color} metalness={.87} roughness={roughness} envMapIntensity={1.65} clearcoat={.19} clearcoatRoughness={.15}/>;
-}
+function Metal({color}) {return <CoatedSteelMaterial color={color}/>;}
 const FRAME_COLORS = Object.fromEntries(FRAMES.map(c=>[c.id,c.color]));
 
 function Bar({pos,size,color,radius=0.004}) {
@@ -170,8 +169,9 @@ export default function DoorScene({config,resetToken,photoMode=false,photoAngle=
     gl={{alpha:photoMode,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}}
     onCreated={({gl})=>{
       gl.outputColorSpace=THREE.SRGBColorSpace;
-      gl.toneMapping=THREE.ACESFilmicToneMapping;
-      gl.toneMappingExposure=photoMode?1.10:1.18;
+      gl.toneMapping=THREE.AgXToneMapping;
+      gl.toneMappingExposure=photoMode?1.10:1.22;
+      gl.transmissionResolutionScale=photoMode?.75:1;
       if(photoMode)gl.setClearColor('#ffffff',0);
     }}
     fallback={<div className="webgl-fallback">Uw browser ondersteunt geen WebGL. Probeer een recentere browser.</div>}>

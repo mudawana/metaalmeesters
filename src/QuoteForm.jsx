@@ -1,6 +1,7 @@
 import React,{useState} from 'react';
 import {Send,ShieldCheck} from 'lucide-react';
 import {capturePreviewImage} from './previewCapture.js';
+import {onsiteMeasureNote} from './measurement-units.mjs';
 
 export default function QuoteForm({design}) {
   const [name,setName]=useState(''),[email,setEmail]=useState(''),[phone,setPhone]=useState(''),[city,setCity]=useState(''),[notes,setNotes]=useState(''),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[success,setSuccess]=useState(false),[website,setWebsite]=useState('');
@@ -27,7 +28,7 @@ export default function QuoteForm({design}) {
   const isStaticDemo=typeof window!=='undefined' && window.location.hostname.endsWith('github.io');
   return <form className="quote-form" onSubmit={submit}>
     {isStaticDemo&&<p className="form-status form-status-error" role="status">Voorbeeldwebsite: echte offerteaanvragen zijn hier nog niet actief. Zodra de site met het privéportaal op Netlify staat, kunt u veilig verzenden.</p>}
-    <div className="quote-note"><ShieldCheck size={20}/><div><strong>Vrijblijvende offerte op maat</strong><span>Uw aanvraag wordt samen met een privéfoto van de 3D-deur opgeslagen bij MetaalMeesters. Er worden geen automatische prijzen berekend.</span></div></div>
+    <div className="quote-note"><ShieldCheck size={20}/><div><strong>Vrijblijvende offerte op maat · exacte opmeting door ons</strong><span>{onsiteMeasureNote()} Er worden geen automatische prijzen berekend.</span></div></div>
     <div className="field-grid"><label>Naam *<input required autoComplete="name" maxLength={150} value={name} onChange={e=>setName(e.target.value)} placeholder="Uw volledige naam"/></label><label>E-mailadres *<input required type="email" autoComplete="email" maxLength={260} value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label></div>
     <div className="field-grid"><label>Telefoonnummer<input type="tel" autoComplete="tel" maxLength={100} value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+32 ..."/></label><label>Gemeente<input maxLength={150} value={city} onChange={e=>setCity(e.target.value)} placeholder="Waar komt de deur?"/></label></div>
     <label>Extra informatie<textarea value={notes} maxLength={1800} onChange={e=>setNotes(e.target.value)} rows="3" placeholder="Vertel gerust wat meer over uw project..."/></label>

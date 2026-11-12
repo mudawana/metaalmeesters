@@ -1,4 +1,5 @@
 import {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
+import {cmLabel,onsiteMeasureNote} from './measurement-units.mjs';
 export {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
 export const basePath = import.meta.env.BASE_URL || '/';
 
@@ -58,16 +59,16 @@ export function formatDesign(d) {
     'METAALMEESTERS — DEURCONFIGURATIE',
     '',
     'Deurtype: ' + type,
-    'Breedte totale opening: ' + d.width + ' mm',
-    ...(d.type==='wand' ? ['Breedte geïntegreerde deur: '+d.doorWidth+' mm','Vaste glasdelen: '+d.fixedPanelSide] : []),
-    'Hoogte opening: ' + d.height + ' mm',
+    'Breedte totale opening: ' + cmLabel(d.width),
+    ...(d.type==='wand' ? ['Breedte geïntegreerde deur: '+cmLabel(d.doorWidth),'Vaste glasdelen: '+d.fixedPanelSide] : []),
+    'Hoogte opening: ' + cmLabel(d.height),
     'Bovenvorm: ' + (d.topShape==='boog'?'Boog':'Recht'),
-    ...(d.topShape==='boog' ? ['Booghoogte: '+d.archHeight+' mm',...(d.type==='dubbel'?['Boogverdeling: '+(d.archPattern==='apart'?'Twee aparte bogen':'Eén doorlopende boog')]:[])] : []),
+    ...(d.topShape==='boog' ? ['Boogvorm: door MetaalMeesters zelf op te meten en technisch te bepalen'] : []),
     'Afwerking: ' + frame+(d.frame==='andere' ? (' ('+(d.customColor||'te bepalen')+')') : ''),
     'Glas: ' + glass,
     'Glasopbouw: ' + (GLASSES.find(t=>t.id===d.glass)?.safety||'Nog te bevestigen'),
     'Deurvulling: ' + (PANEL_LAYOUTS.find(t=>t.id===d.panelLayout)?.label||'Volledig glas'),
-    ...(d.panelLayout==='staal-onder'?['Hoogte stalen onderpaneel: '+d.lowerPanelHeight+' mm']:[]),
+    ...(d.panelLayout==='staal-onder'?['Hoogte stalen onderpaneel: '+cmLabel(d.lowerPanelHeight)]:[]),
     'Verticale verdelingen: ' + d.vertical,
     'Horizontale verdelingen: ' + d.horizontal,
     'Handgreep: ' + (HANDLES.find(t=>t.id===d.handle)?.label||d.handle),
@@ -76,6 +77,7 @@ export function formatDesign(d) {
     'Stijl: ' + d.style,
     'Opmerkingen: ' + (d.notes || 'Geen'),
     '',
+    onsiteMeasureNote(),
     'Alle productiematen, kleurcodes en technische haalbaarheid worden gevalideerd door MetaalMeesters.',
     'Dit document is geen productieplan en bevat geen prijs.'
   ].join('\n');

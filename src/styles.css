@@ -315,3 +315,28 @@
   .config-fields{padding:12px 13px 14px}
   .control-bottom{padding:8px 11px 12px}
 }
+
+/* Customer-facing centimetres, freely editable instead of clamped numeric spinners. */
+.measure-field-cm{margin:17px 0 21px}
+.measure-field-cm>label{display:block;margin-bottom:9px;font-size:13px;font-weight:800;color:#304237}
+.measure-field-cm .input-unit{display:flex;align-items:stretch;overflow:hidden;border-radius:6px;
+ border:2px solid #d5dfd2;background:white;transition:border-color .15s,box-shadow .15s}
+.measure-field-cm .input-unit:focus-within{border-color:#9f8968;box-shadow:0 0 0 3px #9f896820}
+.measure-field-cm input{width:100%;min-width:0;flex:1;min-height:54px;padding:10px 15px;
+ border:0!important;outline:none!important;box-shadow:none!important;
+ font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;color:#283b30;
+ font-family:Manrope,sans-serif;background:transparent;appearance:none}
+.measure-field-cm .input-unit>span{display:grid;place-items:center;min-width:61px;padding:0 14px;
+ font-size:16px;font-weight:800;color:#516354;background:#edf1ea;border-left:1px solid #dbe2d7}
+.measure-field-cm>small{display:block;margin-top:9px;font-size:11px;line-height:1.6;color:#6a786b}
+.measure-field-cm input::placeholder{font-weight:500;color:#adb6a8}
+.measure-guarantee{margin-top:20px;background:#ecf2ec;border-left:3px solid #7d9c80;padding:16px 14px;align-items:flex-start}
+.measure-guarantee strong{font-size:12px;color:#2f5940}
+.measure-guarantee p{font-size:11px;line-height:1.7;color:#526a57;margin:6px 0 0}
+.measure-guarantee .measure-guarantee-secondary{color:#657568}
+.config-extra .size-presets{margin:14px;padding:5px 0 14px}
+.panel-height-option .measure-field-cm{margin:6px 0 4px}
+.panel-height-option>.field-hint{margin:0}
+@media(max-width:600px){.measure-field-cm input{min-height:49px;font-size:19px;padding:9px 13px}
+ .measure-field-cm>label{font-size:12px}.measure-guarantee{padding:12px}
+ .measure-field-cm .input-unit>span{min-width:52px}}

@@ -1,5 +1,6 @@
 import React, {useCallback,useEffect,useRef,useState} from 'react';
 import {GLASSES,FRAMES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
+import {cmLabel} from './measurement-units.mjs';
 import {ArrowLeft,ArrowRight,Archive,CheckCircle2,Clock3,Download,Eye,Inbox,LockKeyhole,LogOut,Mail,Phone,RefreshCcw,Search,ShieldCheck,Trash2, X} from 'lucide-react';
 
 const API='/.netlify/functions/';
@@ -36,17 +37,17 @@ function Detail({quote,onBack,onChanged}) {
       <section className="admin-white-card"><h3>Afbeelding van de ontworpen deur</h3>{quote.image?<img className="admin-door-image" src={quote.image} alt={'3D-deurontwerp van '+quote.name}/>:<p>Voor deze aanvraag is geen afbeelding beschikbaar.</p>}<div className="admin-image-caption"><ShieldCheck size={15}/> Alleen zichtbaar na aanmelden in het beheerportaal.</div></section>
       <div className="admin-detail-stack">
         <section className="admin-white-card"><h3>Klantgegevens</h3><div className="admin-data-row"><span>Naam</span><strong>{quote.name}</strong></div><div className="admin-data-row"><span>E-mail</span><a href={'mailto:'+quote.email}>{quote.email}</a></div><div className="admin-data-row"><span>Telefoon</span>{quote.phone?<a href={'tel:'+quote.phone}>{quote.phone}</a>:<strong>—</strong>}</div><div className="admin-data-row"><span>Gemeente</span><strong>{quote.city||'—'}</strong></div><div className="admin-data-row"><span>Opmerkingen</span><strong className="admin-notes">{quote.notes||'—'}</strong></div></section>
-        <section className="admin-white-card"><h3>Deurspecificaties</h3>{[
+        <section className="admin-white-card"><h3>Deurspecificaties</h3><p className="admin-mini">Indicatieve maten in cm · MetaalMeesters komt zelf opmeten vóór productie.</p>{[
           ['Type',typeLabel[quote.design?.type]||'—'],
-          ['Breedte',quote.design?.width+' mm'],['Hoogte',quote.design?.height+' mm'],
+          ['Breedte (indicatie)',cmLabel(quote.design?.width)],['Hoogte (indicatie)',cmLabel(quote.design?.height)],
           ['Bovenvorm',quote.design?.topShape==='boog'?'Boog':'Recht'],
-          ...(quote.design?.topShape==='boog'?[['Booghoogte',(quote.design.archHeight||'—')+' mm'],...(quote.design.type==='dubbel'?[['Boogindeling',quote.design.archPattern==='apart'?'Twee aparte bogen':'Eén doorlopende boog']]:[])]:[]),
-          ...(quote.design?.type==='wand'?[['Geïntegreerde deur',(quote.design.doorWidth||'—')+' mm']]:[]),
+          ...(quote.design?.topShape==='boog'?[['Boogvorm','Exact op te meten door MetaalMeesters']]:[]),
+          ...(quote.design?.type==='wand'?[['Geïntegreerde deur',cmLabel(quote.design.doorWidth)]]:[]),
           ['Glas',GLASSES.find(x=>x.id===quote.design?.glass)?.label||quote.design?.glass],
           ['Glasopbouw',GLASSES.find(x=>x.id===quote.design?.glass)?.safety||'Te bevestigen'],
           ['Kader',FRAMES.find(x=>x.id===quote.design?.frame)?.label||quote.design?.frame],
           ['Deurvulling',PANEL_LAYOUTS.find(x=>x.id===quote.design?.panelLayout)?.label||'Volledig glas'],
-          ...(quote.design?.panelLayout==='staal-onder'?[['Stalen onderpaneel',quote.design.lowerPanelHeight+' mm']]:[]),
+          ...(quote.design?.panelLayout==='staal-onder'?[['Stalen onderpaneel',cmLabel(quote.design.lowerPanelHeight)]]:[]),
           ['Verticaal',quote.design?.vertical+' verdelingen'],
           ['Horizontaal',quote.design?.horizontal+' verdelingen'],
           ['Handgreep',HANDLES.find(x=>x.id===quote.design?.handle)?.label||quote.design?.handle],
@@ -102,7 +103,7 @@ function Dashboard({onLogout}) {
         <div className="admin-list-tools"><div className="admin-search"><Search size={18}/><input aria-label="Zoek aanvragen" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Zoek op naam, e-mail of referentie..."/></div><select aria-label="Filter op status" value={filter} onChange={e=>setFilter(e.target.value)}><option value="alle">Alle statussen</option>{STAGES.map(x=><option key={x}>{x}</option>)}</select></div>
         {loading?<div className="admin-empty">Aanvragen ophalen...</div>:filtered.length===0?<div className="admin-empty"><Inbox size={36}/><h3>Geen aanvragen gevonden</h3><p>Zodra een klant een ontwerp verstuurt, verschijnt het hier automatisch.</p></div>:
           <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Klant</th><th>Deur</th><th>Afmetingen</th><th>Datum</th><th>Status</th><th/></tr></thead><tbody>{filtered.map(item=><tr key={item.id} onClick={()=>openQuote(item.id)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter')openQuote(item.id);}}>
-            <td><strong>{item.name}</strong><small>{item.email}</small></td><td>{typeLabel[item.design?.type]||item.design?.type}</td><td>{item.design?.width} × {item.design?.height} mm</td><td>{readableDate(item.createdAt)}</td><td><span className={'admin-status status-'+item.status.replaceAll(' ','-')}>{item.status}</span></td><td><Eye size={18}/></td>
+            <td><strong>{item.name}</strong><small>{item.email}</small></td><td>{typeLabel[item.design?.type]||item.design?.type}</td><td>{cmLabel(item.design?.width)} × {cmLabel(item.design?.height)}</td><td>{readableDate(item.createdAt)}</td><td><span className={'admin-status status-'+item.status.replaceAll(' ','-')}>{item.status}</span></td><td><Eye size={18}/></td>
           </tr>)}</tbody></table></div>}
       </section>}
     <div className="admin-bottom-hint"><ShieldCheck size={16}/> De inhoud van dit portaal is enkel via een beveiligde sessie toegankelijk. <span>De lijst toont maximaal 250 recentste aanvragen.</span></div>

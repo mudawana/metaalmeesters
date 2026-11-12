@@ -38,9 +38,13 @@ export function GlassMaterial({kind,photoMode=false,width=1,height=2,uvMeters=fa
   const map=useMemo(()=>physicalGlassTexture(glass.visual,width,height,uvMeters),[glass.visual,width,height,uvMeters]);
   useEffect(()=>()=>map?.dispose(),[map]);
   const normalScale=reliefSettings[glass.visual]?.normalScale||0;
+  // Untinted clear glass should remain optically near-neutral: colour belongs in
+  // absorption through tinted glass, not an opaque surface coating.
+  const isClear=glass.visual==='clear';
+  const surfaceColor=isClear?'#f7fbfc':glass.color;
   return photoMode
     ?<meshPhysicalMaterial
-      color={glass.color} metalness={0} roughness={profile.roughness}
+      color={surfaceColor} metalness={0} roughness={profile.roughness}
       normalMap={map||null} normalScale={[normalScale,normalScale]}
       transparent opacity={profile.opacity} depthWrite={false}
       side={THREE.DoubleSide} clearcoat={.68} clearcoatRoughness={.13}
@@ -49,10 +53,10 @@ export function GlassMaterial({kind,photoMode=false,width=1,height=2,uvMeters=fa
       color={glass.color} metalness={0} roughness={profile.roughness}
       transmission={profile.transmission} thickness={.014} ior={1.52}
       attenuationDistance={glass.visual==='dark'?.24:2.4}
-      attenuationColor={glass.color}
+      attenuationColor={isClear?'#f7fbfc':glass.color}
       normalMap={map||null} normalScale={[normalScale,normalScale]}
       clearcoat={.90} clearcoatRoughness={.06}
-      envMapIntensity={1.18} side={THREE.DoubleSide}/>;
+      envMapIntensity={1.35} side={THREE.DoubleSide}/>;
 }
 
 // Draadglas has actual embedded-looking narrow wires; the other reliefs use

@@ -2,6 +2,7 @@ import {randomUUID,createHash} from 'node:crypto';
 import {authorized,safeOrigin,apiJSON} from '../lib/session.mjs';
 import {putQuote,getQuote,listQuotes,deleteQuote,STAGES} from '../lib/quotes-data.mjs';
 import {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from '../../src/product-options.mjs';
+import {cmLabel,onsiteMeasureNote} from '../../src/measurement-units.mjs';
 
 const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const permitted={
@@ -15,21 +16,22 @@ const clean=(value,max=300)=>String(value||'').trim().slice(0,max);
 const error=(msg,code=400)=>apiJSON({error:msg},code);
 export function validDesign(d) {
   if(!d || typeof d!=='object')return false;
-  if(!Number.isInteger(d.width)||d.width<500||d.width>8000 ||
-     !Number.isInteger(d.height)||d.height<1400||d.height>4500)return false;
-  if(d.type==='wand' && (!Number.isInteger(d.doorWidth) || d.doorWidth<500 || d.doorWidth>d.width-300 || !['links','rechts','beide'].includes(d.fixedPanelSide))) return false;
+  // 0 cm is allowed as 'nog op te meten'. The request is not a production plan.
+  // Do not confuse 3D viewport limits with the sizes an atelier can discuss.
+  if(!Number.isSafeInteger(d.width)||d.width<0||d.width>1e9 ||
+     !Number.isSafeInteger(d.height)||d.height<0||d.height>1e9)return false;
+  if(d.type==='wand' && (!Number.isSafeInteger(d.doorWidth) || d.doorWidth<0 || d.doorWidth>1e9 ||
+     (d.width>0&&d.doorWidth>0&&d.doorWidth>d.width) ||
+     !['links','rechts','beide'].includes(d.fixedPanelSide)))return false;
   if(d.frame==='andere' && (d.customColor!=null && typeof d.customColor!=='string'))return false;
   if(d.closure!=null&&!CLOSURES.some(x=>x.id===d.closure))return false;
   const layout=d.panelLayout||'glas';
   if(!PANEL_LAYOUTS.some(x=>x.id===layout))return false;
-  if(layout==='staal-onder'&&(!Number.isInteger(d.lowerPanelHeight)||d.lowerPanelHeight<250||d.lowerPanelHeight>Math.floor(d.height*.60)))return false;
+  if(layout==='staal-onder'&&(!Number.isSafeInteger(d.lowerPanelHeight)||d.lowerPanelHeight<0||d.lowerPanelHeight>1e9||
+    (d.height>0&&d.lowerPanelHeight>d.height*.60)))return false;
   const topShape=d.topShape||'recht';
   if(!['recht','boog'].includes(topShape))return false;
-  if(topShape==='boog') {
-    if(d.type==='schuif')return false; // No misleading curved sliding rail.
-    if(!Number.isInteger(d.archHeight)||d.archHeight<80||d.archHeight>1000)return false;
-    if(d.type==='dubbel'&&!['doorlopend','apart'].includes(d.archPattern))return false;
-  }
+  if(topShape==='boog'&&d.type==='schuif')return false;
   return Object.entries(permitted).every(([key,values])=>values.includes(d[key])) &&
     Number.isInteger(d.vertical)&&d.vertical>=0&&d.vertical<=4 &&
     Number.isInteger(d.horizontal)&&d.horizontal>=0&&d.horizontal<=5;
@@ -55,16 +57,16 @@ async function mailNotification(quote,req) {
     'Telefoon: '+(quote.phone||'-'),
     'Locatie: '+(quote.city||'-'),
     'Deurtype: '+d.type,
-    ...(d.type==='wand'?['Geïntegreerde deur: '+d.doorWidth+' mm','Vaste panelen: '+d.fixedPanelSide]:[]),
-    'Breedte: '+d.width+' mm',
-    'Hoogte: '+d.height+' mm',
-    'Bovenvorm: '+(d.topShape==='boog'?'Boog':'Recht'),
-    ...(d.topShape==='boog'?['Booghoogte: '+d.archHeight+' mm',...(d.type==='dubbel'?['Bogen: '+(d.archPattern==='apart'?'twee apart':'doorlopend')]:[])]:[]),
+    ...(d.type==='wand'?['Geïntegreerde deur: '+cmLabel(d.doorWidth),'Vaste panelen: '+d.fixedPanelSide]:[]),
+    'Breedte (voorlopig): '+cmLabel(d.width),
+    'Hoogte (voorlopig): '+cmLabel(d.height),
+    'Bovenvorm: '+(d.topShape==='boog'?'Boog, exacte radius volgt na inmeten':'Recht'),
+    onsiteMeasureNote(),
     'Glassoort: '+(GLASSES.find(x=>x.id===d.glass)?.label||d.glass),
     'Glasopbouw: '+(GLASSES.find(x=>x.id===d.glass)?.safety||'Nog te bevestigen'),
     'Kader: '+(FRAMES.find(x=>x.id===d.frame)?.label||d.frame)+(d.customColor?' · '+d.customColor:''),
     'Deurvulling: '+(PANEL_LAYOUTS.find(x=>x.id===d.panelLayout)?.label||'Volledig glas'),
-    ...(d.panelLayout==='staal-onder'?['Stalen onderpaneel: '+d.lowerPanelHeight+' mm']:[]),
+    ...(d.panelLayout==='staal-onder'?['Stalen onderpaneel: '+cmLabel(d.lowerPanelHeight)]:[]),
     'Handgreep: '+(HANDLES.find(x=>x.id===d.handle)?.label||d.handle),
     'Sluiting: '+(CLOSURES.find(x=>x.id===d.closure)?.label||'Nog te bepalen'),
     '',
@@ -109,7 +111,7 @@ async function processSubmission(req) {
     name:clean(name,150),email:clean(email,260),phone:clean(phone,100),
     city:clean(city,150),notes:clean(notes,1800),
     design:{
-      ...Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening','topShape','archHeight','archPattern','panelLayout','lowerPanelHeight','closure'].includes(k)).map(k=>[k,design[k]])),
+      ...Object.fromEntries(Object.keys(design).filter(k=>['type','width','height','style','frame','glass','vertical','horizontal','handle','opening','topShape','panelLayout','lowerPanelHeight','closure'].includes(k)).map(k=>[k,design[k]])),
       ...(design.type==='wand'?{doorWidth:design.doorWidth,fixedPanelSide:design.fixedPanelSide}:{}),
       ...(design.frame==='andere'?{customColor:clean(design.customColor,70)}:{})
     },

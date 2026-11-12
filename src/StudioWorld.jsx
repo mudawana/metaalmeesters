@@ -30,12 +30,14 @@ function ArchWallInfill({width,height,rise=300,lobes=1,color}) {
 // Entirely local, high-key showroom environment map. Lightformers are visible
 // in steel and glass reflections without a downloaded HDR image or API key.
 export function StudioReflections() {
- return <Environment resolution={128} frames={1}>
+ return <Environment resolution={256} frames={1}>
    <Lightformer form="rect" position={[0,6,8]} rotation={[Math.PI/2,0,0]} scale={[9,4,1]} intensity={2.8} color="#fff3e3"/>
    <Lightformer form="rect" position={[-6,2,4]} rotation={[0,Math.PI/3,0]} scale={[3,7,1]} intensity={3.1} color="#f8ffff"/>
    <Lightformer form="rect" position={[6,2,2]} rotation={[0,-Math.PI/3,0]} scale={[2.8,6,1]} intensity={2.0} color="#d7e5ee"/>
    <Lightformer form="rect" position={[0,2,-6]} scale={[8,5,1]} intensity={1.6} color="#f0dbc4"/>
    <Lightformer form="ring" position={[0,6,-1]} rotation={[Math.PI/2,0,0]} scale={[5,5,1]} intensity={.7} color="#ffffff"/>
+   <Lightformer form="rect" position={[-.5,3,7]} scale={[.28,5,1]} intensity={.9} color="#f5fff7"/>
+   <Lightformer form="rect" position={[2,5,0]} rotation={[Math.PI/2,0,0]} scale={[5,.7,1]} intensity={.85} color="#ffffff"/>
  </Environment>;
 }
 

@@ -5,6 +5,7 @@ import {archSpec} from './arch-geometry.mjs';
 import {GlassMaterial,GlassPattern} from './GlassVisual.jsx';
 import {DoorHardware,DoorHinge} from './DoorHardware.jsx';
 import {SteelInfill} from './SteelInfill.jsx';
+import {CoatedSteelMaterial} from './CoatedSteel.jsx';
 import {lowerSteelMeters} from './product-options.mjs';
 
 // An arched panel is genuine cut-to-shape geometry. No rectangular glass
@@ -12,7 +13,7 @@ import {lowerSteelMeters} from './product-options.mjs';
 function MetalBar({x,y,w,h,z=.065,color}) {
   if(w<=0||h<=0)return null;
   return <RoundedBox args={[w,h,.042]} position={[x,y,z]} radius={Math.min(.006,w*.15,h*.15)} smoothness={2} castShadow>
-    <meshPhysicalMaterial color={color} metalness={.86} roughness={.35} envMapIntensity={1.6} clearcoat={.18} clearcoatRoughness={.14}/>
+    <CoatedSteelMaterial color={color}/>
   </RoundedBox>;
 }
 
@@ -76,7 +77,7 @@ export function ArchedPanel({width,height,archHeight=300,totalWidth=width,center
     <GlassPattern kind={config.glass} width={profile.innerHalf*2} height={height} bottom={profile.glassBottom}
       topAt={profile.topAt} frame={profile.frame}/>
     <mesh geometry={profile.outline} position={[0,0,-.026]} castShadow receiveShadow>
-      <meshPhysicalMaterial color={frameColor} metalness={.88} roughness={.34} envMapIntensity={1.60} clearcoat={.20} clearcoatRoughness={.14}/>
+      <CoatedSteelMaterial color={frameColor}/>
     </mesh>
     {steel>0&&<SteelInfill width={profile.innerHalf*2} height={steel} centerY={profile.frame+steel/2} color={frameColor} photoMode={photoMode}/>}
     {Array.from({length:vert},(_,i)=>{

@@ -47,6 +47,16 @@ test('quote refuses invalid catalogue items and excessive solid panel dimensions
  assert.equal(validDesign({...base,handle:'onbekend'}),false);
  assert.equal(validDesign({...base,closure:'onbekend'}),false);
  assert.equal(validDesign({...base,panelLayout:'staal-onder',lowerPanelHeight:5000}),false);
- assert.equal(validDesign({...base,panelLayout:'staal-onder',lowerPanelHeight:0}),false);
+ // Zero means 'still to be measured' and is allowed in an enquiry.
+ assert.equal(validDesign({...base,panelLayout:'staal-onder',lowerPanelHeight:0}),true);
  assert.equal(validDesign({...base,panelLayout:'raar'}),false);
+});
+
+test('quote accepts free centimetre measurements, including unknown 0 cm',()=>{
+ assert.ok(validDesign({...base,width:50000,height:2300}));
+ assert.ok(validDesign({...base,width:0,height:0}));
+ assert.ok(validDesign({...base,width:5000,height:50000,topShape:'boog',archHeight:undefined,archPattern:undefined}));
+ assert.equal(validDesign({...base,width:-1}),false);
+ assert.equal(validDesign({...base,height:-2}),false);
+ assert.equal(validDesign({...base,width:1e12}),false);
 });
