@@ -1,7 +1,7 @@
 import React, {useCallback,useEffect,useRef,useState} from 'react';
 import {GLASSES,FRAMES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
 import {cmLabel} from './measurement-units.mjs';
-import {balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_GLASS,BAL_HANDRAILS,BAL_MOUNT} from './balustrade-options.mjs';
+import {balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_LAYOUTS,BAL_GLASS,BAL_HANDRAILS,BAL_MOUNT} from './balustrade-options.mjs';
 import {ArrowLeft,ArrowRight,Archive,CheckCircle2,Clock3,Download,Eye,Inbox,LockKeyhole,LogOut,Mail,Phone,RefreshCcw,Search,ShieldCheck,Trash2, X} from 'lucide-react';
 
 const API='/.netlify/functions/';
@@ -46,6 +46,7 @@ function Detail({quote,onBack,onChanged}) {
           {[
             ['Type',balustradeTypeLabel(quote.design?.type)],
             ['Toepassing',quote.design?.placement==='buiten'?'Buiten':'Binnen'],
+            ['Verloop',quote.design?.type==='trap'?'Rechte trapbalustrade':BAL_LAYOUTS.find(x=>x.id===(quote.design?.layout||'recht'))?.label||'Rechte opstelling'],
             ['Totale lengte (indicatie)',cmLabel(quote.design?.length)],
             ['Gewenste hoogte (indicatie)',cmLabel(quote.design?.height)],
             ['Invulling',balustradeInfillLabel(quote.design?.infill)],
@@ -78,7 +79,7 @@ function Detail({quote,onBack,onChanged}) {
   </div>;
 }
 function Dashboard({onLogout}) {
-  const [items,setItems]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[selected,setSelected]=useState(null),[filter,setFilter]=useState('alle'),[query,setQuery]=useState(''),[newNotice,setNewNotice]=useState(0);
+  const [items,setItems]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[selected,setSelected]=useState(null),[filter,setFilter]=useState('alle'),[productFilter,setProductFilter]=useState('alle'),[query,setQuery]=useState(''),[newNotice,setNewNotice]=useState(0);
   const loadedOnce=useRef(false),idsRef=useRef(new Set());
   const refresh=useCallback(async()=>{
     try{
@@ -109,7 +110,7 @@ function Dashboard({onLogout}) {
     try{await jsonRequest('quotes?id='+encodeURIComponent(id),{method:'DELETE'});setSelected(null);refresh();}
     catch(e){setError(e.message);}
   }
-  const filtered=items.filter(x=>(filter==='alle'||x.status===filter)&&[x.name,x.email,x.city,x.id,x.product,x.design?.type,x.design?.infill].join(' ').toLowerCase().includes(query.toLowerCase()));
+  const filtered=items.filter(x=>(filter==='alle'||x.status===filter)&&(productFilter==='alle'||(productFilter==='balustrade'?isBalustrade(x):!isBalustrade(x)))&&[x.name,x.email,x.city,x.id,x.product,x.design?.type,x.design?.infill].join(' ').toLowerCase().includes(query.toLowerCase()));
   const newCount=items.filter(x=>x.status==='nieuw').length;
   return <div className="admin-shell container">
     <div className="admin-top"><div><span className="eyebrow">PRIVÉ · METAALMEESTERS</span><h1>Offerte<em>portaal.</em></h1><p>Uw aanvragen, afmetingen en 3D-ontwerpen op één plek.</p></div><div className="admin-top-actions"><button className="admin-secondary" onClick={refresh}><RefreshCcw size={16}/> Vernieuwen</button><button className="admin-secondary" onClick={onLogout}><LogOut size={16}/> Uitloggen</button></div></div>
@@ -118,7 +119,7 @@ function Dashboard({onLogout}) {
     {error&&<p className="admin-error" role="alert">{error}</p>}
     {selected?<><Detail quote={selected} onBack={()=>{setSelected(null);refresh();}} onChanged={status=>{setSelected(s=>({...s,status}));setItems(a=>a.map(q=>q.id===selected.id?{...q,status}:q));}}/><button className="admin-danger" onClick={()=>removeQuote(selected.id)}><Trash2 size={16}/> Aanvraag definitief verwijderen</button></>:
       <section className="admin-list-card">
-        <div className="admin-list-tools"><div className="admin-search"><Search size={18}/><input aria-label="Zoek aanvragen" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Zoek op naam, e-mail of referentie..."/></div><select aria-label="Filter op status" value={filter} onChange={e=>setFilter(e.target.value)}><option value="alle">Alle statussen</option>{STAGES.map(x=><option key={x}>{x}</option>)}</select></div>
+        <div className="admin-list-tools"><div className="admin-search"><Search size={18}/><input aria-label="Zoek aanvragen" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Zoek op naam, e-mail of referentie..."/></div><select aria-label="Filter op product" value={productFilter} onChange={e=>setProductFilter(e.target.value)}><option value="alle">Alle producten</option><option value="deur">Stalen deuren</option><option value="balustrade">Balustrades</option></select><select aria-label="Filter op status" value={filter} onChange={e=>setFilter(e.target.value)}><option value="alle">Alle statussen</option>{STAGES.map(x=><option key={x}>{x}</option>)}</select></div>
         {loading?<div className="admin-empty">Aanvragen ophalen...</div>:filtered.length===0?<div className="admin-empty"><Inbox size={36}/><h3>Geen aanvragen gevonden</h3><p>Zodra een klant een ontwerp verstuurt, verschijnt het hier automatisch.</p></div>:
           <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Klant</th><th>Product</th><th>Afmetingen</th><th>Datum</th><th>Status</th><th/></tr></thead><tbody>{filtered.map(item=><tr key={item.id} onClick={()=>openQuote(item.id)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter')openQuote(item.id);}}>
             <td><strong>{item.name}</strong><small>{item.email}</small></td><td><strong>{isBalustrade(item)?'Balustrade':'Stalen deur'}</strong><small>{requestLabel(item)}</small></td><td>{isBalustrade(item)?cmLabel(item.design?.length)+' × '+cmLabel(item.design?.height):cmLabel(item.design?.width)+' × '+cmLabel(item.design?.height)}</td><td>{readableDate(item.createdAt)}</td><td><span className={'admin-status status-'+item.status.replaceAll(' ','-')}>{item.status}</span></td><td><Eye size={18}/></td>

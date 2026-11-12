@@ -2,6 +2,7 @@ import React from 'react';
 import {createRoot,hydrateRoot} from 'react-dom/client';
 import App from './App.jsx';
 import './styles.css';
+import './premium-atelier.css';
 
 const root=document.getElementById('root');
 const view=<React.StrictMode><App/></React.StrictMode>;

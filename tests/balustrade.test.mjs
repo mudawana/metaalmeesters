@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {safeBalustradeDesign,initialBalustrade,BAL_TYPES,BAL_INFILL,BAL_MOUNT,BAL_COLORS} from '../src/balustrade-options.mjs';
+import {safeBalustradeDesign,initialBalustrade,BAL_TYPES,BAL_LAYOUTS,BAL_INFILL,BAL_MOUNT,BAL_COLORS} from '../src/balustrade-options.mjs';
 import {validDesign} from '../netlify/functions/quotes.mjs';
 
 test('balustrade catalogue has the requested models and options',()=>{
@@ -9,6 +9,7 @@ test('balustrade catalogue has the requested models and options',()=>{
  assert.ok(BAL_INFILL.some(x=>x.id==='glas'));
  assert.ok(BAL_INFILL.some(x=>x.id==='verticaal'));
  assert.ok(BAL_INFILL.some(x=>x.id==='horizontaal'));
+ assert.deepEqual(BAL_LAYOUTS.map(x=>x.id),['recht','hoek-links','hoek-rechts']);
  assert.ok(BAL_MOUNT.length>=3);
  assert.ok(BAL_COLORS.length>=5);
 });
@@ -16,12 +17,17 @@ test('safe balustrade quote accepts unknown or arbitrarily entered measurements'
  assert.deepEqual(safeBalustradeDesign(initialBalustrade),initialBalustrade);
  assert.equal(safeBalustradeDesign({...initialBalustrade,length:0,height:0}).height,0);
  assert.equal(safeBalustradeDesign({...initialBalustrade,length:9375,height:1175}).length,9375);
+ const {layout,...legacy}=initialBalustrade;
+ assert.equal(safeBalustradeDesign(legacy).layout,'recht','existing saved designs remain readable');
+ assert.equal(safeBalustradeDesign({...initialBalustrade,layout:'hoek-links'}).layout,'hoek-links');
+ assert.equal(safeBalustradeDesign({...initialBalustrade,layout:'hoek-rechts'}).layout,'hoek-rechts');
 });
 test('invalid or poisoned balustrade designs are rejected',()=>{
  assert.equal(safeBalustradeDesign({...initialBalustrade,category:'deur'}),null);
  assert.equal(safeBalustradeDesign({...initialBalustrade,length:-10}),null);
  assert.equal(safeBalustradeDesign({...initialBalustrade,length:2.5}),null);
  assert.equal(safeBalustradeDesign({...initialBalustrade,infill:'onveilig'}),null);
+ assert.equal(safeBalustradeDesign({...initialBalustrade,layout:'onbekend'}),null);
  assert.equal(safeBalustradeDesign({...initialBalustrade,type:'onbekend'}),null);
  assert.equal(safeBalustradeDesign({...initialBalustrade,customColor:'a'.repeat(71)}),null);
  assert.ok(!Object.hasOwn(safeBalustradeDesign({...initialBalustrade,admin:true}),'admin'));
@@ -49,6 +55,10 @@ test('3D model preserves the WebGL buffer for an actual quote image',async()=>{
  assert.match(scene,/preserveDrawingBuffer:true/);
  assert.match(scene,/OrbitControls/);
  assert.match(scene,/Railing design/);
+ assert.match(scene,/Architecture/);
+ assert.match(scene,/Glass/);
+ assert.match(scene,/CylindricalHandrail/);
+ assert.match(scene,/corner/);
  assert.match(config,/id="balustrade-canvas"/);
  assert.match(config,/QuoteForm design=\{design\} product="balustrade"/);
 });
@@ -58,4 +68,22 @@ test('temporary Netlify domain is noindex until the official .eu migration',asyn
  assert.match(generator,/isNetlifyPreview/);
  assert.match(generator,/process\.env\.NETLIFY/);
  assert.match(generator,/isGitHubPreview\|\|isNetlifyPreview/);
+});
+
+
+test('premium design studio preserves the shared door quote journey',async()=>{
+ const app=await fs.readFile('src/App.jsx','utf8');
+ const config=await fs.readFile('src/BalustradeConfigurator.jsx','utf8');
+ const admin=await fs.readFile('src/Admin.jsx','utf8');
+ const style=await fs.readFile('src/premium-atelier.css','utf8');
+ const main=await fs.readFile('src/main.jsx','utf8');
+ assert.match(app,/Stalen deuren\./);
+ assert.match(app,/Balustrades\./);
+ assert.match(app,/function ProductConfigurator/);
+ assert.match(config,/BAL_LAYOUTS/);
+ assert.match(config,/InfillPreview/);
+ assert.match(config,/bal-mobile-jump/);
+ assert.match(admin,/Filter op product/);
+ assert.match(main,/premium-atelier\.css/);
+ assert.match(style,/\.bal-preview-wrap/);
 });
