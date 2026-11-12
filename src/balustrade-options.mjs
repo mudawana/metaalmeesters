@@ -54,6 +54,16 @@ export const safeBalustradeDesign=design=>{
   if(!design||typeof design!=='object'||Array.isArray(design))return null;
   if(design.category!=='balustrade')return null;
   const safe={...initialBalustrade,...design};
+  // Earlier L-shaped designs stored one total length. Preserve that total
+  // when loading an old saved design which lacks explicit return lengths.
+  if(['hoek-links','hoek-rechts'].includes(design.layout) &&
+     !Object.hasOwn(design,'sideLeft')&&!Object.hasOwn(design,'sideRight') &&
+     Number.isSafeInteger(design.length)&&design.length>0) {
+    const front=Math.round(design.length*.63);
+    safe.length=front;
+    if(design.layout==='hoek-links')safe.sideLeft=design.length-front;
+    else safe.sideRight=design.length-front;
+  }
   const picks={type:BAL_TYPES,layout:BAL_LAYOUTS,placement:[{id:'binnen'},{id:'buiten'}],
     infill:BAL_INFILL,color:BAL_COLORS,glass:BAL_GLASS,
     mount:BAL_MOUNT,handrail:BAL_HANDRAILS};
