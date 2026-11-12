@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - design/luxe-metaalmeesters-configurator
+      - feature/u-vorm-balustrade-premium
     paths:
       - .github/workflows/luxe-studio-check.yml
       - src/**
