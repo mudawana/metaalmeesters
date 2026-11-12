@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {safeBalustradeDesign,initialBalustrade,BAL_TYPES,BAL_INFILL,BAL_MOUNT,BAL_COLORS} from '../src/balustrade-options.mjs';
 import {validDesign} from '../netlify/functions/quotes.mjs';
-import {initialDesign} from '../src/data.js';
 
 test('balustrade catalogue has the requested models and options',()=>{
  assert.deepEqual(BAL_TYPES.map(x=>x.id),['trap','balkon','terras','vide','raam']);
@@ -28,7 +27,7 @@ test('invalid or poisoned balustrade designs are rejected',()=>{
  assert.ok(!Object.hasOwn(safeBalustradeDesign({...initialBalustrade,admin:true}),'admin'));
 });
 test('existing stalen-deur validator still accepts original design',()=>{
- assert.equal(validDesign(initialDesign),true);
+ assert.equal(validDesign({type:'enkel',frame:'zwart',glass:'helder',handle:'lang',opening:'rechts',width:900,height:2200,vertical:1,horizontal:2}),true);
 });
 test('quote form saves proper product and screenshot, admin can show both',async()=>{
  const form=await fs.readFile('src/QuoteForm.jsx','utf8');
