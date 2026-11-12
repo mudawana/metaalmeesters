@@ -44,6 +44,19 @@ test('unknown sizes and old saved layouts preserve quote lengths',()=>{
  assert.equal(previewRailingRuns(safe)[0].lengthM,1.8);
 });
 
+test('legacy L quotes keep exactly their original combined length',()=>{
+ const previous={...initialBalustrade,type:'balkon',layout:'hoek-links',length:3000};
+ delete previous.sideLeft;delete previous.sideRight;
+ const migrated=safeBalustradeDesign(previous);
+ assert.equal(migrated.length,1890);
+ assert.equal(migrated.sideLeft,1110);
+ assert.equal(totalRailingLengthMm(migrated),3000);
+ const mirrored=safeBalustradeDesign({...previous,layout:'hoek-rechts'});
+ assert.equal(mirrored.length,1890);
+ assert.equal(mirrored.sideRight,1110);
+ assert.equal(totalRailingLengthMm(mirrored),3000);
+});
+
 test('premium selection contains optimized new asset and saves side measurements',async()=>{
  const [app,data,asset,config,admin,api,scene]=await Promise.all([
   fs.readFile('src/App.jsx','utf8'),fs.readFile('src/data.js','utf8'),
