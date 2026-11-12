@@ -4,6 +4,7 @@ import {projects as portfolioProjects,pages as seoPages,pageHref,indexableRoutes
 import QuoteForm from './QuoteForm.jsx';
 import {PrivacyPage,CookiePage,CompanyPage} from './LegalPages.jsx';
 import SeoServicePage from './SeoServicePage.jsx';
+import OverOnsPage from './OverOnsPage.jsx';
 import {servicePages,servicePagesByRoute} from './seo-services.mjs';
 import './admin.css';
 // The heavy Three.js preview and private admin app are loaded only when needed.
@@ -24,7 +25,7 @@ const routeFromLocation=()=>{
 };
 const nav=[['home','Home'],['stalen-deuren-op-maat','Stalen deuren'],['diensten','Diensten'],['projecten','Realisaties'],['contact','Contact'],['offerte','Offerte']];
 function Img({name,alt='',...props}) {
-  return <img src={imageUrl(name)} alt={alt} onError={e=>{const fallback=imageUrl('hero');if(!e.currentTarget.src.endsWith(fallback))e.currentTarget.src=fallback;}} {...props}/>;
+  return <img src={imageUrl(name)} alt={alt} loading="lazy" decoding="async" onError={e=>{const fallback=imageUrl('hero');if(!e.currentTarget.src.endsWith(fallback))e.currentTarget.src=fallback;}} {...props}/>;
 }
 function Logo({light=false}) {
   return <a className={'brand '+(light?'brand-light':'')} href={pageHref('home')} aria-label="MetaalMeesters - home">
@@ -56,7 +57,7 @@ function Footer() {
       </div>
       <div className="footer-grid">
         <div><Logo light/><p>Hoogwaardig metaalwerk op maat.<br/>Ontworpen met oog voor detail, gemaakt om lang mee te gaan.</p></div>
-        <div><strong>Ontdek</strong><a href={pageHref('stalen-deuren-op-maat')}>Stalen deuren op maat</a><a href={pageHref('pivotdeuren')}>Pivotdeuren</a><a href={pageHref('boogdeuren')}>Boogdeuren</a><a href={pageHref('stalen-glaswanden')}>Glaswanden</a><a href={pageHref('glas-voor-stalen-deuren')}>Glassoorten</a><a href={pageHref('diensten')}>Alle diensten</a><a href={pageHref('projecten')}>Realisaties</a><a href={pageHref('configurator')}>3D-configurator</a></div>
+        <div><strong>Ontdek</strong><a href={pageHref('stalen-deuren-op-maat')}>Stalen deuren op maat</a><a href={pageHref('pivotdeuren')}>Pivotdeuren</a><a href={pageHref('boogdeuren')}>Boogdeuren</a><a href={pageHref('stalen-glaswanden')}>Glaswanden</a><a href={pageHref('glas-voor-stalen-deuren')}>Glassoorten</a><a href={pageHref('diensten')}>Alle diensten</a><a href={pageHref('projecten')}>Realisaties</a><a href={pageHref('over-ons')}>Over ons</a><a href={pageHref('configurator')}>3D-configurator</a></div>
         <div><strong>Contact</strong><a href="mailto:info@metaalmeesters.eu">info@metaalmeesters.eu</a><a href="tel:+32472864888">+32 472 86 48 88</a><span>Maatschappelijke zetel: Lange Lobroekstraat 58, 2060 Antwerpen</span></div>
         <div className="footer-legal-links"><strong>Wettelijke informatie</strong><a href={pageHref('privacy')}>Privacyverklaring</a><a href={pageHref('cookies')}>Cookies en opslag</a><a href={pageHref('bedrijfsgegevens')}>Bedrijfsgegevens</a></div>
       </div>
@@ -70,7 +71,7 @@ function SectionHeading({label,title,description,action}) {
 function Home() {
   return <main>
     <section className="hero">
-      <Img name="hero" className="hero-img" alt="Stalen en glazen constructie door MetaalMeesters"/>
+      <Img name="hero" className="hero-img" alt="Stalen en glazen constructie door MetaalMeesters" loading="eager" fetchPriority="high"/>
       <div className="hero-shade"/>
       <div className="container hero-content">
         <div className="hero-eyebrow"><span className="line"/> METAALMEESTERS · ANTWERPEN</div>
@@ -82,7 +83,7 @@ function Home() {
     </section>
     <section className="intro section-space container">
       <div className="intro-visual"><Img name="details" alt="Detail van een metalen constructie door MetaalMeesters"/><span className="visual-index">01 — VAKMANSCHAP</span></div>
-      <div className="intro-copy"><span className="eyebrow">OVER METAALMEESTERS</span><h2>Geen standaard werk.<br/><em>Wel karakter.</em></h2><p>Bij MetaalMeesters staat maatwerk centraal. Met liefde voor het materiaal en aandacht voor elk detail creëren we duurzame metalen constructies die ruimtes sterker en mooier maken.</p><p>Van het eerste idee tot de laatste afwerking denken onze vakmensen met u mee.</p><a className="text-link" href={pageHref('diensten')}>Ontdek ons vakmanschap <ArrowUpRight size={18}/></a></div>
+      <div className="intro-copy"><span className="eyebrow">OVER METAALMEESTERS</span><h2>Geen standaard werk.<br/><em>Wel karakter.</em></h2><p>Bij MetaalMeesters staat maatwerk centraal. Met liefde voor het materiaal en aandacht voor elk detail creëren we duurzame metalen constructies die ruimtes sterker en mooier maken.</p><p>Van het eerste idee tot de laatste afwerking denken onze vakmensen met u mee.</p><a className="text-link" href={pageHref('over-ons')}>Ontdek ons vakmanschap <ArrowUpRight size={18}/></a></div>
     </section>
     <section className="services-section section-space">
       <div className="container">
@@ -381,5 +382,5 @@ export default function App({initialRoute}) {
   const portfolio=portfolioProjects.find(p=>'portfolio/'+p.slug===current);
   const seoService=servicePagesByRoute.get(current);
   const activeNav=portfolio?'projecten':current;
-  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:seoService?<SeoServicePage page={seoService}/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='privacy'?<PrivacyPage/>:current==='cookies'?<CookiePage/>:current==='bedrijfsgegevens'?<CompanyPage/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<Configurator/>}<Footer/></>;
+  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:seoService?<SeoServicePage page={seoService}/>:current==='over-ons'?<OverOnsPage/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='privacy'?<PrivacyPage/>:current==='cookies'?<CookiePage/>:current==='bedrijfsgegevens'?<CompanyPage/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<Configurator/>}<Footer/></>;
 }

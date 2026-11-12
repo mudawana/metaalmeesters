@@ -178,6 +178,12 @@ export const pages = [
     "title": "Bedrijfsgegevens en contact | MetaalMeesters",
     "description": "Bedrijfs- en contactgegevens van MetaalMeesters."
   },
+  {
+    route:'over-ons',
+    path:'/over-ons/',
+    title:'Over MetaalMeesters BV | Stalen deuren op maat in Antwerpen',
+    description:'Maak kennis met MetaalMeesters BV in Antwerpen. Ontdek onze werkwijze voor stalen deuren en glaswanden op maat, van 3D-ontwerp tot eigen opmeting.'
+  },
   ...servicePages.map(p=>({route:p.route,path:p.path,title:p.title,description:p.description}))
 ];
 

@@ -71,3 +71,9 @@ Bronnen:
 
 ## E-mail en hosting NA de SEO-fase
 Netlify Free: $0, 300 credits per maand, hard plafond. Er is geen regel voor 100 bezoekers per dag. Publicaties, bandbreedte en serverfuncties gebruiken credits; bij overschrijden kan de site tijdelijk pauzeren. Voor zakelijk betrouwbaar verkeer mogelijk later Personal ($9/maand). Een **website hosten is niet hetzelfde als e-mail ontvangen**. Voor `info@metaalmeesters.eu` is een mailboxprovider nodig; voor de website-offertealerts kan Resend als transactionele e-maildienst worden ingesteld met correcte SPF/DKIM/DMARC en zonder de huidige MX-records te veranderen. Het domein blijft vooralsnog bij WordPress.
+
+## Extra vertrouwenspagina
+De pagina `/over-ons/` verduidelijkt de officiële bedrijfsidentiteit, de werkwijze met eigen opmeting, de stappen van het ontwerp en hoe klanten contact opnemen. Er worden geen niet-geverifieerde jaren ervaring, awards, teamfoto's of showroomclaims toegevoegd. Na Ahmeds goedkeuring kunnen er echte atelierfoto's en een kort verhaal over het bedrijf aan worden toegevoegd.
+
+## Performance-maatregel
+Homepage-afbeelding krijgt eager/high priority; de overige informatieve sitefoto's worden lazy geladen. Dit verlaagt onnodige concurrentie met de LCP-afbeelding. De belangrijkste JPEGs zijn momenteel circa 0,8–1,1 MB; conversie naar WebP/AVIF met correcte mobiele afmetingen kan na het verkrijgen/controleren van de originele foto-assets extra winst geven.

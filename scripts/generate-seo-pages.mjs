@@ -44,7 +44,7 @@ try{
     const canonical=origin+page.path;
     const service=servicePagesByRoute.get(page.route);
     const schema=[];
-    if(page.route==='home'||page.route==='contact'){
+    if(page.route==='home'||page.route==='contact'||page.route==='over-ons'){
       schema.push(localBusiness);
       if(page.route==='home')schema.push({
         '@context':'https://schema.org','@type':'WebSite',
@@ -52,6 +52,13 @@ try{
         inLanguage:'nl-BE',publisher:{'@id':origin+'/#company'}
       });
     }
+    if(page.route==='over-ons')schema.push({
+      '@context':'https://schema.org','@type':'BreadcrumbList',
+      itemListElement:[
+        {'@type':'ListItem',position:1,name:'Home',item:origin+'/'},
+        {'@type':'ListItem',position:2,name:'Over ons',item:canonical}
+      ]
+    });
     if(service){
       schema.push({
         '@context':'https://schema.org','@type':'Service',
@@ -105,7 +112,7 @@ await fs.writeFile(path.join(target,'sitemap.xml'),sitemap);
 await fs.writeFile(path.join(target,'robots.txt'),isPreview
   ?'User-agent: *\nDisallow: /metaalmeesters/\n'
   :'User-agent: *\nAllow: /\nSitemap: '+origin+'/sitemap.xml\n');
-const expected=['/','/diensten/','/projecten/','/contact/','/offerte/','/configurator/','/portfolio/project-kontich/',...Array.from(servicePagesByRoute.values(),p=>p.path)];
+const expected=['/','/diensten/','/projecten/','/contact/','/offerte/','/configurator/','/portfolio/project-kontich/','/over-ons/',...Array.from(servicePagesByRoute.values(),p=>p.path)];
 for(const slug of expected){
   const p=path.join(target,slug.replace(/^\/|\/$/g,''),'index.html');
   const html=await fs.readFile(p,'utf8');

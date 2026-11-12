@@ -34,6 +34,7 @@ test('published preview synchronizes every landing route',()=>{
   assert.ok(y.includes(' '+segment+' '),segment);
  }
  assert.match(y,/noindex,follow/);
+ assert.match(y,/over-ons/);
 });
 test('SEO landing pages really SSR with unique headings and customer answers',async()=>{
  const React=await import('react');
@@ -42,6 +43,10 @@ test('SEO landing pages really SSR with unique headings and customer answers',as
  const vite=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom',logLevel:'error'});
  try{
   const {default:App}=await vite.ssrLoadModule('/src/App.jsx');
+  const about=renderToString(React.createElement(App,{initialRoute:'over-ons'}));
+  assert.ok(about.includes('Over MetaalMeesters in Antwerpen'));
+  assert.ok(about.includes('1035.390.965'));
+  assert.ok(about.includes('metaalmeesters.eu'));
   for(const p of servicePages){
     const html=renderToString(React.createElement(App,{initialRoute:p.route}));
     assert.ok(html.includes(p.h1),p.route);
