@@ -62,7 +62,7 @@ test('3D model preserves the WebGL buffer for an actual quote image',async()=>{
  assert.match(scene,/Architecture/);
  assert.match(scene,/Glass/);
  assert.match(scene,/CylindricalHandrail/);
- assert.match(scene,/corner/);
+ assert.match(scene,/omitCornerPost/);
  assert.match(config,/id="balustrade-canvas"/);
  assert.match(config,/QuoteForm design=\{design\} product="balustrade"/);
 });
