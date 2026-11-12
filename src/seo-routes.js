@@ -72,8 +72,8 @@ export const pages = [
   {
     "route": "home",
     "path": "/",
-    "title": "Stalen deuren op maat Antwerpen | MetaalMeesters",
-    "description": "Stalen deuren en glaswanden op maat in Antwerpen. Ontdek enkele deuren, pivotdeuren, boogdeuren, glasopties en de 3D-configurator van MetaalMeesters."
+    "title": "Stalen deuren & balustrades op maat Antwerpen | MetaalMeesters",
+    "description": "Stalen deuren, glaswanden en balustrades op maat in Antwerpen. Ontwerp uw maatwerk in de 3D-configurator van MetaalMeesters en vraag vrijblijvend een offerte aan."
   },
   {
     "route": "diensten",
