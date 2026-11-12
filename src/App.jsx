@@ -394,7 +394,8 @@ function ProductConfigurator(){
         </div>
       </button>
       <button type="button" className="product-choice-card" onClick={()=>choose('balustrade')}>
-        <Img name="railing" alt="Balustrade uitgevoerd in staal" loading="eager"/>
+        <Img name="balustradeConcept" alt="Digitaal sfeerbeeld van een glazen U-vormige balustrade met zwarte stalen profielen op een luxe terras" loading="eager"/>
+        <span className="product-choice-visual-note">Digitaal sfeerbeeld</span>
         <div className="product-choice-card-content"><span>02 · BALUSTRADES</span><h2>Balustrades</h2><p>Trap, balkon, terras, vide of raam. Bepaal indicatieve maten, spijlen, glas, kleur en handregel.</p>
           <div className="product-choice-card-footer">Ontwerp uw balustrade <ArrowUpRight size={19}/></div>
         </div>
