@@ -7,6 +7,7 @@ export const assets = {
   hero: 'Metaalmeesters_Home_04.jpg',
   balcony: 'Metaalmeesters_Home_02.jpg',
   railing: 'Metaalmeesters_Home_03.jpg',
+  balustradeConcept: 'balustrade-studio.avif',
   hospitality: 'Metaalmeesters_Home_01.jpg',
   details: 'Metaalmeesters_Home_2_450x338.jpg',
   door1: 'deuren.jpg',
