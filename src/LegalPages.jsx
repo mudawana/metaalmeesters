@@ -18,7 +18,7 @@ function DraftWarning(){
   if(LEGAL_APPROVED)return null;
   return <div className="legal-draft" role="note"><Info size={21} aria-hidden="true"/>
     <div><strong>Deze informatie wordt voorbereid voor de officiële lancering.</strong>
-      <p>De wettelijke naam, het volledige vestigingsadres, het ondernemings- en btw-nummer en de definitieve afspraken over gegevensbewaring worden nog door MetaalMeesters bevestigd. Deze pagina is nog geen definitief goedgekeurde juridische tekst.</p>
+      <p>De officiële onderneming en haar maatschappelijke zetel zijn ingevuld op basis van openbare Belgische bedrijfsgegevens. De afspraken over gegevensbewaring, gebruikte dienstverleners en de definitieve privacytekst moeten nog door MetaalMeesters worden goedgekeurd. Deze pagina is dus nog een ontwerp.</p>
     </div>
   </div>;
 }
@@ -45,9 +45,9 @@ export function PrivacyPage(){
   return <LegalLayout tag="UW GEGEVENS" title="Privacyverklaring"
     subtitle="Hoe wij omgaan met contactgegevens, vrijblijvende offerteaanvragen en foto's van uw eigen woning.">
     <section><h2>1. Wie verwerkt uw gegevens?</h2>
-      <p>MetaalMeesters is het aanspreekpunt voor de persoonsgegevens die via deze website worden verwerkt. De precieze identiteit van de verwerkingsverantwoordelijke moet vóór de officiële lancering overeenkomen met de inschrijving in de Kruispuntbank van Ondernemingen.</p>
+      <p>MetaalMeesters is het aanspreekpunt voor de persoonsgegevens die via deze website worden verwerkt. Volgens de openbare Belgische bedrijfsregisters is dit Metaalmeesters BV, ondernemingsnummer 1035.390.965, met maatschappelijke zetel te Lange Lobroekstraat 58, 2060 Antwerpen.</p>
       <p><strong>Handelsnaam:</strong> {biz.tradingName}. <strong>Officiële ondernemingsnaam:</strong> {biz.officialName||<Missing/>}. <strong>Contact:</strong> <Email/>.</p>
-      <p>Het officiële vestigingsadres vindt u op de <a href={pageHref('bedrijfsgegevens')}>pagina met bedrijfsgegevens</a> zodra het door MetaalMeesters is gecontroleerd.</p>
+      <p>De officiële maatschappelijke zetel en de overige wettelijke identificatiegegevens vindt u op de <a href={pageHref('bedrijfsgegevens')}>pagina met bedrijfsgegevens</a>. Het adres van de maatschappelijke zetel is niet noodzakelijk een bezoekadres.</p>
     </section>
     <section><h2>2. Welke gegevens verwerken wij?</h2>
       <ul>
@@ -122,8 +122,8 @@ export function CompanyPage(){
     <section><h2>Identiteit van de onderneming</h2>
       <dl className="legal-company-details">
         <div><dt>Handelsnaam</dt><dd>{biz.tradingName}</dd></div>
-        <div><dt>Officiële naam</dt><dd>{biz.officialName||<Missing>Wordt door MetaalMeesters bevestigd</Missing>}</dd></div>
-        <div><dt>Vestigingsadres</dt><dd>{biz.streetAndNumber&&biz.postalCode?biz.streetAndNumber+', '+biz.postalCode+' '+biz.municipality:<Missing>Volledig adres en huisnummer nog te bevestigen (omgeving Zwijndrecht)</Missing>}</dd></div>
+        <div><dt>Officiële naam</dt><dd>{biz.officialName||<Missing>Wordt nog gecontroleerd</Missing>}</dd></div>
+        <div><dt>Maatschappelijke zetel</dt><dd>{biz.streetAndNumber&&biz.postalCode?biz.streetAndNumber+', '+biz.postalCode+' '+biz.municipality:<Missing>Volledig zeteladres wordt nog gecontroleerd</Missing>}</dd></div>
         <div><dt>Ondernemingsnummer (KBO)</dt><dd>{biz.enterpriseNumber||<Missing>Wordt vóór livegang aangevuld</Missing>}</dd></div>
         <div><dt>Btw-identificatienummer</dt><dd>{biz.vatNumber||<Missing>Wordt vóór livegang gecontroleerd en, indien van toepassing, aangevuld</Missing>}</dd></div>
         <div><dt>E-mailadres</dt><dd><Email/></dd></div>

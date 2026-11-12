@@ -16,10 +16,12 @@ const localBusiness={
   '@context':'https://schema.org',
   '@type':'LocalBusiness',
   name:'MetaalMeesters',
+  legalName:'Metaalmeesters BV',
+  vatID:'BE1035390965',
   url:origin+'/',
   telephone:'+32472864888',
   email:'info@metaalmeesters.eu',
-  address:{'@type':'PostalAddress',addressLocality:'Zwijndrecht',addressRegion:'Antwerpen',addressCountry:'BE'},
+  address:{'@type':'PostalAddress',streetAddress:'Lange Lobroekstraat 58',postalCode:'2060',addressLocality:'Antwerpen',addressRegion:'Antwerpen',addressCountry:'BE'},
   areaServed:{'@type':'AdministrativeArea',name:'Antwerpen'}
 };
 const vite=await createServer({

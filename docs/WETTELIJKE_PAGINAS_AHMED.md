@@ -1,6 +1,6 @@
 # MetaalMeesters – wettelijke pagina's: controlelijst vóór livegang
 
-**Status: ontwerp, NIET goedgekeurd.** Toegevoegd op 12 november 2026.
+**Status: ontwerp, NIET goedgekeurd.** Toegevoegd op 12 november 2026. De onderneming is op 12 november 2026 geïdentificeerd via Companyweb en aanvullende openbare registerdata. De formele juridische en privacygoedkeuring blijft nodig.
 
 ## Wat is in code toegevoegd?
 - `/privacy/`: privacyverklaring over contact, offertes, 3D-ontwerpen, eventuele woningfoto's, hosting, rechten en verwerking.
@@ -33,3 +33,16 @@
 - Belgische FOD Economie, verplichte ondernemingsgegevens: https://news.economie.fgov.be/203683-deze-info-moet-u-zeker-vermelden-op-uw-bedrijfswebsite/
 - Belgische GBA, cookies en strikt noodzakelijke uitzonderingen: https://www.gegevensbeschermingsautoriteit.be/professioneel/thema-s/cookies
 - AVG, art. 13 (te verschaffen informatie): https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=celex:32016R0679
+
+## Officiële bedrijfsidentiteit (gecontroleerde openbare bronnen)
+- Officiële onderneming: **Metaalmeesters BV**
+- Ondernemingsnummer: **1035.390.965**
+- Btw-nummer: **BE 1035.390.965**
+- Maatschappelijke zetel: **Lange Lobroekstraat 58, 2060 Antwerpen, België**
+- Rechtsvorm: besloten vennootschap
+- Bron: https://www.companyweb.be/nl/1035390965/metaalmeesters en https://www.goudengids.be/bedrijf/Antwerpen/L623868931/Metaalmeesters/
+- Dit is het *statutair adres*; geen bevestiging van showroom of bezoekadres.
+- Het telefoonnummer en e-mailadres op de website zijn bestaande codegegevens en zijn **niet** bevestigd door de openbare registerbron.
+
+## Technische correctie publicatie
+De GitHub Pages-workflow synchroniseerde eerder alleen de root en bepaalde bestaande pagina's naar de legacy Pages-bronmap. Daardoor kwamen de nieuwe wettelijke pagina's wel in `dist` maar **niet** in de gepubliceerde repositorymap. De lijst is uitgebreid met `privacy`, `cookies` en `bedrijfsgegevens`, inclusief een buildcontrole op de drie bestanden.
