@@ -45,7 +45,7 @@ function Header({route}) {
         {nav.map(([url,label])=><a key={url} href={pageHref(url)} className={route===url?'active':''}>{label}</a>)}
         <a className="mobile-config" href={pageHref('configurator')}>3D-configurator <ArrowUpRight size={16}/></a>
       </nav>
-      <a className="header-cta" href={pageHref('configurator')}>Ontwerp in 3D <ArrowUpRight size={16}/></a>
+      <a className="header-cta" href={pageHref('configurator')}>Ontdek de 3D-ontwerpstudio <ArrowUpRight size={16}/></a>
       <button className="menu-toggle" onClick={()=>setOpen(v=>!v)} aria-label="Menu openen of sluiten">{open?<X/>:<Menu/>}</button>
     </div>
   </header>;
@@ -76,24 +76,24 @@ function Home() {
       <Img name="hero" className="hero-img" alt="Stalen en glazen constructie door MetaalMeesters" loading="eager" fetchPriority="high"/>
       <div className="hero-shade"/>
       <div className="container hero-content">
-        <div className="hero-eyebrow"><span className="line"/> METAALMEESTERS · ANTWERPEN</div>
-        <h1>Stalen deuren<br/><em>met karakter.</em></h1>
-        <p>Stalen deuren en glaswanden op maat in Antwerpen. Van een enkele binnendeur tot een pivot- of boogdeur: ontdek onze afwerkingen en ontwerp uw eigen deur in 3D.</p>
-        <div className="hero-actions"><a href={pageHref('configurator')} className="btn btn-cream">Ontwerp uw eigen deur <ArrowUpRight size={18}/></a><a className="hero-link" href={pageHref('projecten')}>Ontdek onze realisaties <ArrowRight size={18}/></a></div>
+        <div className="hero-eyebrow"><span className="line"/> METAALMEESTERS · ATELIER VOOR STAAL & GLAS</div>
+        <h1>Stalen deuren.<br/><em>Balustrades.</em></h1>
+        <p>Architecturaal metaalwerk op maat in Antwerpen. Van verfijnde stalen deuren en glaswanden tot karaktervolle balustrades. Ontworpen voor uw ruimte, afgewerkt met oog voor elk detail.</p>
+        <div className="hero-actions"><a href={pageHref('configurator')} className="btn btn-cream">Ontwerp in 3D <ArrowUpRight size={18}/></a><a className="hero-link" href={pageHref('projecten')}>Ontdek onze realisaties <ArrowRight size={18}/></a></div>
       </div>
-      <div className="hero-bottom container"><span>01 / UNIEK METAALWERK OP MAAT</span><span>SCROLL OM TE ONTDEKKEN <span className="scroll-line"/></span></div>
+      <div className="hero-bottom container"><span>MAATWERK IN STAAL · DEUREN & BALUSTRADES</span><span>SCROLL OM TE ONTDEKKEN <span className="scroll-line"/></span></div>
     </section>
     <section className="intro section-space container">
       <div className="intro-visual"><Img name="details" alt="Detail van een metalen constructie door MetaalMeesters"/><span className="visual-index">01 — VAKMANSCHAP</span></div>
-      <div className="intro-copy"><span className="eyebrow">OVER METAALMEESTERS</span><h2>Geen standaard werk.<br/><em>Wel karakter.</em></h2><p>Bij MetaalMeesters staat maatwerk centraal. Met liefde voor het materiaal en aandacht voor elk detail creëren we duurzame metalen constructies die ruimtes sterker en mooier maken.</p><p>Van het eerste idee tot de laatste afwerking denken onze vakmensen met u mee.</p><a className="text-link" href={pageHref('over-ons')}>Ontdek ons vakmanschap <ArrowUpRight size={18}/></a></div>
+      <div className="intro-copy"><span className="eyebrow">OVER METAALMEESTERS</span><h2>Gemaakt om te blijven.<br/><em>Ontworpen om te raken.</em></h2><p>Een stalen deur die licht binnenlaat. Een balustrade die architectuur versterkt. Wij geloven dat echt maatwerk zich toont in de lijnen, de materialen en de zorgvuldige afwerking.</p><p>Van het eerste idee tot de laatste afwerking denken onze vakmensen met u mee.</p><a className="text-link" href={pageHref('over-ons')}>Ontdek ons vakmanschap <ArrowUpRight size={18}/></a></div>
     </section>
     <section className="services-section section-space">
       <div className="container">
-        <SectionHeading label="WAT WE DOEN" title={<>Sterk in metaal.<br/><em>Fijn in detail.</em></>} description="Een selectie uit onze mogelijkheden. Elke realisatie begint met uw verhaal." action={['Alle diensten',pageHref('diensten')]}/>
+        <SectionHeading label="WAT WE DOEN" title={<>Architectuur in staal.<br/><em>Tot in detail.</em></>} description="Een selectie uit onze mogelijkheden. Elke realisatie begint met uw verhaal." action={['Alle diensten',pageHref('diensten')]}/>
         <div className="service-grid">
           <a href={pageHref('stalen-deuren-op-maat')} className="service-card"><div className="service-photo"><Img name="door4" alt="Ontwerp voor stalen deuren"/><span className="service-count">01 / DEUREN</span></div><div className="service-card-bottom"><div><h3>Stalen deuren</h3><p>Op maat, tot in de kleinste details.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
-          <a href={pageHref('diensten')} className="service-card"><div className="service-photo"><Img name="railing" alt="Metalen balustrades in maatwerk"/><span className="service-count">02 / CONSTRUCTIES</span></div><div className="service-card-bottom"><div><h3>Constructies</h3><p>Van balustrades tot unieke projecten.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
-          <a href={pageHref('diensten')} className="service-card"><div className="service-photo"><Img name="hospitality" alt="Stalen glasconstructie voor horeca"/><span className="service-count">03 / INTERIEUR & HORECA</span></div><div className="service-card-bottom"><div><h3>Interieur & horeca</h3><p>Functioneel, verfijnd en duurzaam.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
+          <a href={pageHref('diensten')} className="service-card"><div className="service-photo"><Img name="railing" alt="Metalen balustrades in maatwerk"/><span className="service-count">02 / BALUSTRADES</span></div><div className="service-card-bottom"><div><h3>Balustrades</h3><p>Een verfijnde lijn door uw interieur of buitenruimte.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
+          <a href={pageHref('diensten')} className="service-card"><div className="service-photo"><Img name="hospitality" alt="Stalen glasconstructie voor horeca"/><span className="service-count">03 / METAALWERK</span></div><div className="service-card-bottom"><div><h3>Overig maatwerk</h3><p>Unieke constructies met dezelfde aandacht voor detail.</p></div><span className="small-round"><ArrowUpRight size={18}/></span></div></a>
         </div>
       </div>
     </section>
@@ -108,12 +108,12 @@ function Home() {
     </section>
     <section className="config-banner">
       <div className="config-banner-image"><Img name="balcony" alt="Metaalwerk voor residentieel project"/></div>
-      <div className="config-banner-content"><span className="eyebrow light">NIEUW · INTERACTIEVE 3D-CONFIGURATOR</span><h2>Uw deur.<br/><em>Uw ontwerp.</em></h2><p>Kies het model, bepaal de afmetingen en combineer glas, indeling en afwerking. Bekijk uw eigen stalen deur van alle kanten in 3D.</p><a className="btn btn-cream" href={pageHref('configurator')}>Start met ontwerpen <ArrowUpRight size={18}/></a><small>Vrijblijvend ontwerpen · Offerte op maat</small></div>
+      <div className="config-banner-content"><span className="eyebrow light">UW PERSOONLIJKE 3D-ONTWERPSTUDIO</span><h2>Een idee.<br/><em>Uw ontwerp.</em></h2><p>Ontwerp uw eigen stalen deur of balustrade. Kies het model, de afmetingen, kleuren en details en ontdek het resultaat in een interactieve 3D-weergave.</p><a className="btn btn-cream" href={pageHref('configurator')}>Open de 3D-ontwerpstudio <ArrowUpRight size={18}/></a><small>STALEN DEUREN&nbsp; / &nbsp;BALUSTRADES&nbsp; · &nbsp;VRIJBLIJVENDE OFFERTE</small></div>
     </section>
     <section className="process-section section-space container">
       <SectionHeading label="ONZE AANPAK" title={<>Van eerste idee<br/><em>tot perfect resultaat.</em></>}/>
       <div className="process-grid">
-        {[['01','Uw idee','Vertel ons over uw project of ontwerp uw stalen deur zelf in 3D.'],['02','Persoonlijke offerte','We bekijken uw wensen, controleren de maten en bezorgen een offerte op maat.'],['03','Met zorg gemaakt','Na uw akkoord realiseren we uw project met ambachtelijk vakmanschap.']].map(([num,title,description])=><div className="process-card" key={num}><span>{num}</span><h3>{title}</h3><p>{description}</p></div>)}
+        {[['01','Uw idee','Vertel ons over uw project of ontwerp uw stalen deur of balustrade in 3D.'],['02','Persoonlijke offerte','We bekijken uw wensen, controleren de maten en bezorgen een offerte op maat.'],['03','Met zorg gemaakt','Na uw akkoord realiseren we uw project met ambachtelijk vakmanschap.']].map(([num,title,description])=><div className="process-card" key={num}><span>{num}</span><h3>{title}</h3><p>{description}</p></div>)}
       </div>
     </section>
   </main>;
@@ -151,7 +151,7 @@ function ProjectDetail({project}) {
 }
 function Offerte() {
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">VRIJBLIJVEND MAATWERK</span><h1>Een offerte<br/><em>voor uw project.</em></h1><p>Wilt u een stalen deur of een ander metaalproject laten uitvoeren? Vertel ons wat u zoekt, dan bespreken we samen de mogelijkheden.</p></div>
-    <div className="container quote-landing"><div><h2>Ontwerp een deur of balustrade in 3D</h2><p>Kies stalen deur of balustrade en stel de afmetingen, kleur en afwerking samen. Vraag daarna vrijblijvend een offerte aan.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Op de huidige demo is automatische offerteverzending nog niet beschikbaar.</small></div>
+    <div className="container quote-landing"><div><h2>Ontwerp een deur of balustrade in 3D</h2><p>Kies stalen deur of balustrade en stel de afmetingen, kleur en afwerking samen. Vraag daarna vrijblijvend een offerte aan.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Indicatieve afmetingen · Definitieve beoordeling en opmeting door MetaalMeesters.</small></div>
     <div><h2>Een ander metaalproject?</h2><p>Voor losse trappen, industriële constructies en horecawerken kunt u rechtstreeks contact opnemen.</p><a className="text-link" href={pageHref('contact')}>Contacteer MetaalMeesters <ArrowUpRight size={17}/></a></div></div>
   </main>;
 }
@@ -159,7 +159,7 @@ function Contact() {
   const [name,setName]=useState(''),[email,setEmail]=useState(''),[message,setMessage]=useState('');
   const contact=e=>{e.preventDefault();location.href='mailto:info@metaalmeesters.eu?subject='+encodeURIComponent('Contactaanvraag MetaalMeesters - '+name)+'&body='+encodeURIComponent('Naam: '+name+'\nE-mail: '+email+'\n\n'+message);};
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">LATEN WE PRATEN</span><h1>Een goed project<br/><em>begint met een gesprek.</em></h1><p>Heeft u een vraag of een bijzonder idee? We helpen u graag verder.</p></div>
-    <div className="container contact-layout"><div className="contact-details"><h3>Contactgegevens</h3><a href="mailto:info@metaalmeesters.eu"><Mail/> info@metaalmeesters.eu</a><a href="tel:+32472864888"><Phone/> +32 472 86 48 88</a><p><MapPin/> Maatschappelijke zetel: Lange Lobroekstraat 58, 2060 Antwerpen</p><div className="contact-aside"><span className="eyebrow">LIEVER EEN DEUR ONTWERPEN?</span><h3>Bekijk het eerst in 3D.</h3><a className="text-link" href={pageHref('configurator')}>Open de deurconfigurator <ArrowUpRight size={16}/></a></div></div>
+    <div className="container contact-layout"><div className="contact-details"><h3>Contactgegevens</h3><a href="mailto:info@metaalmeesters.eu"><Mail/> info@metaalmeesters.eu</a><a href="tel:+32472864888"><Phone/> +32 472 86 48 88</a><p><MapPin/> Maatschappelijke zetel: Lange Lobroekstraat 58, 2060 Antwerpen</p><div className="contact-aside"><span className="eyebrow">ZELF UW MAATWERK ONTWERPEN?</span><h3>Bekijk het eerst in 3D.</h3><a className="text-link" href={pageHref('configurator')}>Open de 3D-ontwerpstudio <ArrowUpRight size={16}/></a></div></div>
     <form className="contact-form" onSubmit={contact}><h3>Stuur ons een bericht</h3><label>Uw naam<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Voor- en achternaam"/></label><label>E-mailadres<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label><label>Uw bericht<textarea required rows="6" value={message} onChange={e=>setMessage(e.target.value)} placeholder="Waarmee kunnen wij u helpen?"/></label><button className="btn btn-dark" type="submit">Open e-mailprogramma <ArrowUpRight size={17}/></button><small>Uw e-mailprogramma wordt geopend. Controleer en verstuur het bericht zelf. Lees onze <a href={pageHref('privacy')}>privacyverklaring</a>.</small></form></div>
   </main>;
 }
@@ -383,20 +383,20 @@ function ProductConfigurator(){
   if(product==='deur')return <Configurator onBack={()=>choose(null)}/>;
   if(product==='balustrade')return <Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Balustradeconfigurator laden...</h1></div></main>}><BalustradeConfigurator onBack={()=>choose(null)}/></Suspense>;
   return <main className="product-choice-page"><div className="container">
-    <span className="eyebrow product-choice-eyebrow">METAALMEESTERS · 3D CONFIGURATOR</span>
-    <h1>Wat wilt u <em>ontwerpen?</em></h1>
-    <p className="product-choice-intro">Ontwerp uw stalen deur of balustrade in 3D. Kies een product, pas het ontwerp aan en vraag vrijblijvend een offerte. De werkelijke maten en definitieve prijs worden door ons bevestigd.</p>
+    <span className="eyebrow product-choice-eyebrow">DE METAALMEESTERS ONTWERPSTUDIO · 01 / 02</span>
+    <h1>Uw idee.<br/><em>Onze expertise.</em></h1>
+    <p className="product-choice-intro">Kies waarmee uw ontwerp begint. Ontdek materialen, lijnen en afmetingen in 3D en ontvang daarna een vrijblijvende offerte op maat. Onze vakmensen verzorgen de definitieve opmeting en technische beoordeling.</p>
     <div className="product-choice-grid">
       <button type="button" className="product-choice-card" onClick={()=>choose('deur')}>
         <Img name="door4" alt="Stalen deur met glas" loading="eager"/>
-        <div className="product-choice-card-content"><span>01 · STALEN DEUREN</span><h2>Stalen deur</h2><p>Enkele deur, dubbele deur, pivotdeur, boogdeur of glaswand. Onze vertrouwde volledige deurconfigurator.</p>
-          <div className="product-choice-card-footer">Ontwerp uw deur <ArrowUpRight size={19}/></div>
+        <div className="product-choice-card-content"><span>01 · STALEN DEUREN</span><h2>Stalen deuren</h2><p>Enkele deur, dubbele deur, pivotdeur, boogdeur of glaswand. Onze vertrouwde volledige deurconfigurator.</p>
+          <div className="product-choice-card-footer">Ontdek de deurenstudio <ArrowUpRight size={19}/></div>
         </div>
       </button>
       <button type="button" className="product-choice-card" onClick={()=>choose('balustrade')}>
         <Img name="railing" alt="Balustrade uitgevoerd in staal" loading="eager"/>
-        <div className="product-choice-card-content"><span>02 · BALUSTRADES</span><h2>Balustrade</h2><p>Trap, balkon, terras, vide of raam. Bepaal indicatieve maten, spijlen, glas, kleur en handregel.</p>
-          <div className="product-choice-card-footer">Ontwerp uw balustrade <ArrowUpRight size={19}/></div>
+        <div className="product-choice-card-content"><span>02 · BALUSTRADES</span><h2>Balustrades</h2><p>Trap, balkon, terras, vide of raam. Bepaal indicatieve maten, spijlen, glas, kleur en handregel.</p>
+          <div className="product-choice-card-footer">Ontdek de balustradestudio <ArrowUpRight size={19}/></div>
         </div>
       </button>
     </div>
