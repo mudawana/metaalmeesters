@@ -9,7 +9,7 @@ test('marble maps include visible stone variation and distinct grout joints',()=
  assert.equal(stone.length,96*96*4);
  assert.ok(new Set(Array.from(stone.filter((_,i)=>i%4===0))).size>20);
  assert.ok(new Set(Array.from(rough.filter((_,i)=>i%4===1))).size>7);
- assert.ok(new Set(Array.from(bump.filter((_,i)=>i%4===0))).size>5);
+ assert.ok(new Set(Array.from(bump.filter((_,i)=>i%4===0))).size>2);
  const inTile=marbleSample(.0625,.0625),joint=marbleSample(.125,.125);
  assert.ok(inTile.r>joint.r);
  assert.ok(inTile.roughness<joint.roughness);

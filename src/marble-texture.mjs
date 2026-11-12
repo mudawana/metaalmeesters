@@ -76,7 +76,7 @@ export function makeMarbleTexturePixels(size=512,channel='color'){
     }else{
       const gx=(marbleSample(u+epsilon,v).height-marbleSample(u-epsilon,v).height)/(2*epsilon);
       const gy=(marbleSample(u,v+epsilon).height-marbleSample(u,v-epsilon).height)/(2*epsilon);
-      const strength=.027,dx=-gx*strength,dy=-gy*strength,length=Math.hypot(dx,dy,1);
+      const strength=.24,dx=-gx*strength,dy=-gy*strength,length=Math.hypot(dx,dy,1);
       output[idx]=Math.round(clamp((dx/length+1)*127.5,0,255));
       output[idx+1]=Math.round(clamp((dy/length+1)*127.5,0,255));
       output[idx+2]=Math.round(clamp((1/length+1)*127.5,0,255));
