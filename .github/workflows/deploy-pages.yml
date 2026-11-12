@@ -43,6 +43,7 @@ jobs:
         run: |
           test -f dist/index.html
           test -d dist/assets
+          test -f dist/404.html
           for legal in privacy cookies bedrijfsgegevens; do
             test -f "dist/$legal/index.html" || { echo "Missing built legal page: $legal"; exit 1; }
           done
@@ -69,12 +70,13 @@ jobs:
           for page in over-ons diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren; do
             if [ -d "dist/$page" ]; then mkdir -p "$page"; cp -R "dist/$page/." "$page/"; fi
           done
+          cp dist/404.html 404.html
           cp dist/robots.txt robots.txt
           cp dist/sitemap.xml sitemap.xml
           touch .nojekyll
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html assets images homes over-ons diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren robots.txt sitemap.xml .nojekyll
+          git add index.html 404.html assets images homes over-ons diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren robots.txt sitemap.xml .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "Publish compiled MetaalMeesters website [skip ci]"
             git push

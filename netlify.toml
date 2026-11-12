@@ -3,7 +3,7 @@
   publish = "dist"
   functions = "netlify/functions"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Each public page has a real SSR-generated dist/<slug>/index.html.
+# A wildcard 200 rewrite makes unknown URLs look like real pages (soft 404).
+# Netlify serves /404.html with a true 404 status for non-existent paths.
+# Add exact 301 redirects after auditing the current WordPress URL inventory.

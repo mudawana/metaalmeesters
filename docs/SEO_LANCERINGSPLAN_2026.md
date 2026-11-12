@@ -77,3 +77,8 @@ De pagina `/over-ons/` verduidelijkt de officiële bedrijfsidentiteit, de werkwi
 
 ## Performance-maatregel
 Homepage-afbeelding krijgt eager/high priority; de overige informatieve sitefoto's worden lazy geladen. Dit verlaagt onnodige concurrentie met de LCP-afbeelding. De belangrijkste JPEGs zijn momenteel circa 0,8–1,1 MB; conversie naar WebP/AVIF met correcte mobiele afmetingen kan na het verkrijgen/controleren van de originele foto-assets extra winst geven.
+
+## Correcte HTTP 404-status op de uiteindelijke hosting
+In de vroegere `netlify.toml` stuurde een globale `/* -> /index.html 200`-rewrite ook onbestaande URL's door naar de homepage. Omdat elk geldig pad nu via een echte `dist/<slug>/index.html` wordt opgebouwd, is deze rewrite verwijderd. `public/404.html` wordt een eigen foutpagina die Netlify bij niet-bestaande URL's met een **HTTP 404**-status serveert. Dit voorkomt generieke soft 404s. Exacte permanente 301-redirects voor de oude WordPress URLs moeten **pas na het ophalen van een echte URL-inventaris** worden toegevoegd, zodat bestaande ranking-signalen niet verloren gaan.
+
+Referentie: https://docs.netlify.com/manage/routing/redirects/redirect-options/ en https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes
