@@ -2,6 +2,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Download, Eye, Mail, MapPin, Menu, Minus, Move3D, Phone, Plus, RotateCcw, Ruler, Send, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import {projects as portfolioProjects,pages as seoPages,pageHref,indexableRoutes} from './seo-routes.js';
 import QuoteForm from './QuoteForm.jsx';
+import {PrivacyPage,CookiePage,CompanyPage} from './LegalPages.jsx';
 import './admin.css';
 // The heavy Three.js preview and private admin app are loaded only when needed.
 const HousePreview=React.lazy(()=>import('./HousePreview.jsx'));
@@ -54,7 +55,8 @@ function Footer() {
       <div className="footer-grid">
         <div><Logo light/><p>Hoogwaardig metaalwerk op maat.<br/>Ontworpen met oog voor detail, gemaakt om lang mee te gaan.</p></div>
         <div><strong>Ontdek</strong><a href={pageHref('diensten')}>Onze diensten</a><a href={pageHref('projecten')}>Realisaties</a><a href={pageHref('configurator')}>3D-deurconfigurator</a></div>
-        <div><strong>Contact</strong><a href="mailto:info@metaalmeesters.eu">info@metaalmeesters.eu</a><a href="tel:+32472864888">+32 472 86 48 88</a><span>Smoutpot, Zwijndrecht</span></div>
+        <div><strong>Contact</strong><a href="mailto:info@metaalmeesters.eu">info@metaalmeesters.eu</a><a href="tel:+32472864888">+32 472 86 48 88</a><span>Zwijndrecht, regio Antwerpen</span></div>
+        <div className="footer-legal-links"><strong>Wettelijke informatie</strong><a href={pageHref('privacy')}>Privacyverklaring</a><a href={pageHref('cookies')}>Cookies en opslag</a><a href={pageHref('bedrijfsgegevens')}>Bedrijfsgegevens</a></div>
       </div>
       <div className="footer-bottom"><span>© {new Date().getFullYear()} MetaalMeesters. Alle rechten voorbehouden.</span><span>Met passie vervaardigd in Antwerpen. <a href={pageHref('home')+'#/beheer'} className="footer-admin-link">Beheerportaal</a></span></div>
     </div>
@@ -138,7 +140,7 @@ function Contact() {
   const contact=e=>{e.preventDefault();location.href='mailto:info@metaalmeesters.eu?subject='+encodeURIComponent('Contactaanvraag MetaalMeesters - '+name)+'&body='+encodeURIComponent('Naam: '+name+'\nE-mail: '+email+'\n\n'+message);};
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">LATEN WE PRATEN</span><h1>Een goed project<br/><em>begint met een gesprek.</em></h1><p>Heeft u een vraag of een bijzonder idee? We helpen u graag verder.</p></div>
     <div className="container contact-layout"><div className="contact-details"><h3>Contactgegevens</h3><a href="mailto:info@metaalmeesters.eu"><Mail/> info@metaalmeesters.eu</a><a href="tel:+32472864888"><Phone/> +32 472 86 48 88</a><p><MapPin/> Smoutpot, Zwijndrecht</p><div className="contact-aside"><span className="eyebrow">LIEVER EEN DEUR ONTWERPEN?</span><h3>Bekijk het eerst in 3D.</h3><a className="text-link" href={pageHref('configurator')}>Open de deurconfigurator <ArrowUpRight size={16}/></a></div></div>
-    <form className="contact-form" onSubmit={contact}><h3>Stuur ons een bericht</h3><label>Uw naam<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Voor- en achternaam"/></label><label>E-mailadres<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label><label>Uw bericht<textarea required rows="6" value={message} onChange={e=>setMessage(e.target.value)} placeholder="Waarmee kunnen wij u helpen?"/></label><button className="btn btn-dark" type="submit">Open e-mailprogramma <ArrowUpRight size={17}/></button><small>Uw e-mailprogramma wordt geopend. Controleer en verstuur het bericht zelf.</small></form></div>
+    <form className="contact-form" onSubmit={contact}><h3>Stuur ons een bericht</h3><label>Uw naam<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Voor- en achternaam"/></label><label>E-mailadres<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="uw@email.be"/></label><label>Uw bericht<textarea required rows="6" value={message} onChange={e=>setMessage(e.target.value)} placeholder="Waarmee kunnen wij u helpen?"/></label><button className="btn btn-dark" type="submit">Open e-mailprogramma <ArrowUpRight size={17}/></button><small>Uw e-mailprogramma wordt geopend. Controleer en verstuur het bericht zelf. Lees onze <a href={pageHref('privacy')}>privacyverklaring</a>.</small></form></div>
   </main>;
 }
 const steps=STEPS.map((s,i)=>[String(i+1).padStart(2,'0'),s.title]);
@@ -361,5 +363,5 @@ export default function App({initialRoute}) {
   const current=indexableRoutes.has(route)||route==='beheer'?route:'home';
   const portfolio=portfolioProjects.find(p=>'portfolio/'+p.slug===current);
   const activeNav=portfolio?'projecten':current;
-  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<Configurator/>}<Footer/></>;
+  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='privacy'?<PrivacyPage/>:current==='cookies'?<CookiePage/>:current==='bedrijfsgegevens'?<CompanyPage/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<Configurator/>}<Footer/></>;
 }

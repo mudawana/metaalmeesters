@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import {Send,ShieldCheck} from 'lucide-react';
 import {capturePreviewImage} from './previewCapture.js';
 import {onsiteMeasureNote} from './measurement-units.mjs';
+import {pageHref} from './seo-routes.js';
 
 export default function QuoteForm({design}) {
   const [name,setName]=useState(''),[email,setEmail]=useState(''),[phone,setPhone]=useState(''),[city,setCity]=useState(''),[notes,setNotes]=useState(''),[consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[success,setSuccess]=useState(false),[website,setWebsite]=useState('');
@@ -33,7 +34,7 @@ export default function QuoteForm({design}) {
     <div className="field-grid"><label>Telefoonnummer<input type="tel" autoComplete="tel" maxLength={100} value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+32 ..."/></label><label>Gemeente<input maxLength={150} value={city} onChange={e=>setCity(e.target.value)} placeholder="Waar komt de deur?"/></label></div>
     <label>Extra informatie<textarea value={notes} maxLength={1800} onChange={e=>setNotes(e.target.value)} rows="3" placeholder="Vertel gerust wat meer over uw project..."/></label>
     <div className="mm-honeypot" aria-hidden="true"><label>Laat dit veld leeg<input tabIndex="-1" autoComplete="off" value={website} onChange={e=>setWebsite(e.target.value)}/></label></div>
-    <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>Ik ga akkoord dat MetaalMeesters mijn contactgegevens, afmetingen en afbeelding van mijn ontwerp opslaat om deze offerteaanvraag te behandelen.</span></label>
+    <label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>Ik heb de <a href={pageHref('privacy')} target="_blank" rel="noopener noreferrer">privacyverklaring</a> gelezen. Ik begrijp dat MetaalMeesters mijn contactgegevens en deurontwerp (met eventuele woningfoto in de afbeelding) verwerkt om mijn offerteaanvraag te behandelen. *</span></label>
     <button type="submit" disabled={busy||!consent||success||isStaticDemo} className="btn btn-dark submit-btn">{isStaticDemo?'Aanvragen binnenkort beschikbaar':busy?'Aanvraag veilig opslaan...':success?'Aanvraag opgeslagen':'Verzend offerteaanvraag'} <Send size={17}/></button>
     {status&&<p className={'form-status '+(!success?'form-status-error':'')} role="status">{status}</p>}
   </form>;

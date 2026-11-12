@@ -157,6 +157,25 @@ export const pages = [
     "title": "Project Kontich | MetaalMeesters",
     "description": "Metalen balustrades met gelaagd glas en een metaalconstructie met terrassen bij een residentieel gebouw."
   }
+,
+  {
+    "route": "privacy",
+    "path": "/privacy/",
+    "title": "Privacyverklaring | MetaalMeesters",
+    "description": "Lees hoe MetaalMeesters omgaat met contactgegevens, offertes, deurontwerpen en uw eigen woningfoto's."
+  },
+  {
+    "route": "cookies",
+    "path": "/cookies/",
+    "title": "Cookies en browseropslag | MetaalMeesters",
+    "description": "Ontdek welke cookies en functionele browseropslag MetaalMeesters gebruikt."
+  },
+  {
+    "route": "bedrijfsgegevens",
+    "path": "/bedrijfsgegevens/",
+    "title": "Bedrijfsgegevens en contact | MetaalMeesters",
+    "description": "Bedrijfs- en contactgegevens van MetaalMeesters."
+  }
 ];
 
 export const indexableRoutes = new Set(pages.map(p=>p.route));

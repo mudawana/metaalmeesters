@@ -4,6 +4,7 @@ import {createServer} from 'vite';
 import React from 'react';
 import {renderToString} from 'react-dom/server';
 import {pages} from '../src/seo-routes.js';
+import {LEGAL_APPROVED,isLegalPage} from '../src/legal-profile.mjs';
 
 const target='dist';
 const template=await fs.readFile(path.join(target,'index.html'),'utf8');
@@ -40,7 +41,7 @@ try{
       :'';
     const head=[
       '<meta name="description" content="'+htmlEscape(page.description)+'">',
-      '<meta name="robots" content="'+(isPreview?'noindex,follow':'index,follow')+'">',
+      '<meta name="robots" content="'+(isPreview||(!LEGAL_APPROVED&&isLegalPage(page.route))?'noindex,follow':'index,follow')+'">',
       '<link rel="canonical" href="'+htmlEscape(canonical)+'">',
       '<meta property="og:type" content="website">',
       '<meta property="og:locale" content="nl_BE">',
@@ -62,7 +63,7 @@ try{
 }finally{await vite.close();}
 const sitemap='<?xml version="1.0" encoding="UTF-8"?>\n'+
 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
-pages.map(p=>'  <url><loc>'+origin+p.path+'</loc></url>').join('\n')+
+pages.filter(p=>LEGAL_APPROVED||!isLegalPage(p.route)).map(p=>'  <url><loc>'+origin+p.path+'</loc></url>').join('\n')+
 '\n</urlset>\n';
 await fs.writeFile(path.join(target,'sitemap.xml'),sitemap);
 await fs.writeFile(path.join(target,'robots.txt'),isPreview
