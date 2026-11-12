@@ -152,7 +152,7 @@ export default function BalustradeScene({design}) {
     <ContactShadows position={[0,-.32,0]} opacity={.22} scale={12}
       blur={2.8} far={7}/>
     <OrbitControls makeDefault enablePan={false} minDistance={2.6} maxDistance={20}
-      target={[0,.5,0]} minPolarAngle={.25} maxPolarAngle={Math.PI/2.08}/>
+      target={[0,height*.44,-depth*.38]} minPolarAngle={.25} maxPolarAngle={Math.PI/2.08}/>
     <CameraFrame width={width} height={height} depth={depth}/>
   </Canvas>;
 }
