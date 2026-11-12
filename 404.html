@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,follow"/>
+  <meta name="theme-color" content="#1b2921"/>
+  <title>Pagina niet gevonden | MetaalMeesters</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f1f0ea;font-family:Arial,Helvetica,sans-serif;color:#25372b}
+    main{max-width:690px;margin:min(12vh,130px) auto;padding:30px}
+    .label{color:#94764c;letter-spacing:.18em;font-size:12px;font-weight:800}
+    h1{font-size:clamp(34px,6vw,65px);line-height:1.12;letter-spacing:-.04em;margin:25px 0 20px}
+    p{line-height:1.8;color:#5a675d;font-size:15px;max-width:510px}
+    a{display:inline-flex;align-items:center;min-height:48px;padding:14px 20px;margin:16px 10px 0 0;text-decoration:none;background:#25372b;color:#fff;font-weight:800}
+    a.secondary{background:transparent;border:1px solid #7d9180;color:#25372b}
+    a:focus-visible{outline:3px solid #b09b73;outline-offset:4px}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="label">METAALMEESTERS · ANTWERPEN</div>
+    <h1>Deze pagina bestaat niet (meer).</h1>
+    <p>Misschien is de link verouderd of werd de pagina verplaatst. U kunt terug naar de homepage, onze stalen deuren bekijken of contact opnemen.</p>
+    <a data-url="/" href="/">Naar de homepage</a>
+    <a data-url="/stalen-deuren-op-maat/" class="secondary" href="/stalen-deuren-op-maat/">Bekijk stalen deuren</a>
+    <a data-url="/contact/" class="secondary" href="/contact/">Contact</a>
+  </main>
+  <script>
+    (function(){
+      var prefix=location.hostname.endsWith('github.io')?'/metaalmeesters':'';
+      document.querySelectorAll('[data-url]').forEach(function(a){
+        a.href=prefix+a.getAttribute('data-url');
+      });
+    }());
+  </script>
+</body>
+</html>
