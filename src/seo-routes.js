@@ -177,7 +177,7 @@ export const pages = [
     "path": "/bedrijfsgegevens/",
     "title": "Bedrijfsgegevens en contact | MetaalMeesters",
     "description": "Bedrijfs- en contactgegevens van MetaalMeesters."
-  }
+  },
   ...servicePages.map(p=>({route:p.route,path:p.path,title:p.title,description:p.description}))
 ];
 
