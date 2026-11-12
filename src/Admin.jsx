@@ -1,6 +1,7 @@
 import React, {useCallback,useEffect,useRef,useState} from 'react';
 import {GLASSES,FRAMES,HANDLES,CLOSURES,PANEL_LAYOUTS} from './product-options.mjs';
 import {cmLabel} from './measurement-units.mjs';
+import {hasLeftReturn,hasRightReturn,totalRailingLengthMm} from './balustrade-geometry.mjs';
 import {balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_LAYOUTS,BAL_GLASS,BAL_HANDRAILS,BAL_MOUNT} from './balustrade-options.mjs';
 import {ArrowLeft,ArrowRight,Archive,CheckCircle2,Clock3,Download,Eye,Inbox,LockKeyhole,LogOut,Mail,Phone,RefreshCcw,Search,ShieldCheck,Trash2, X} from 'lucide-react';
 
@@ -47,7 +48,10 @@ function Detail({quote,onBack,onChanged}) {
             ['Type',balustradeTypeLabel(quote.design?.type)],
             ['Toepassing',quote.design?.placement==='buiten'?'Buiten':'Binnen'],
             ['Verloop',quote.design?.type==='trap'?'Rechte trapbalustrade':BAL_LAYOUTS.find(x=>x.id===(quote.design?.layout||'recht'))?.label||'Rechte opstelling'],
-            ['Totale lengte (indicatie)',cmLabel(quote.design?.length)],
+            ['Voorzijde (indicatie)',cmLabel(quote.design?.length)],
+            ...(hasLeftReturn(quote.design?.layout)?[['Linkerzijde (indicatie)',cmLabel(quote.design?.sideLeft)]]:[]),
+            ...(hasRightReturn(quote.design?.layout)?[['Rechterzijde (indicatie)',cmLabel(quote.design?.sideRight)]]:[]),
+            ['Totale lengte (indicatie)',cmLabel(totalRailingLengthMm(quote.design||{}))],
             ['Gewenste hoogte (indicatie)',cmLabel(quote.design?.height)],
             ['Invulling',balustradeInfillLabel(quote.design?.infill)],
             ...(quote.design?.infill==='glas'?[['Glasuitstraling',BAL_GLASS.find(x=>x.id===quote.design?.glass)?.label||'Nader te bepalen']]:[]),

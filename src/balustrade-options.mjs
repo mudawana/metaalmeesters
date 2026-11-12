@@ -10,7 +10,8 @@ export const BAL_TYPES=[
 export const BAL_LAYOUTS=[
   {id:'recht',label:'Rechte opstelling',hint:'Eén doorlopende lijn'},
   {id:'hoek-links',label:'Hoek links',hint:'Een L-vorm met de retour links'},
-  {id:'hoek-rechts',label:'Hoek rechts',hint:'Een L-vorm met de retour rechts'}
+  {id:'hoek-rechts',label:'Hoek rechts',hint:'Een L-vorm met de retour rechts'},
+  {id:'u',label:'U-vorm · drie zijden',hint:'Voorzijde met twee zijden, zoals een balkon of terras'}
 ];
 export const BAL_INFILL=[
   {id:'verticaal',label:'Verticale spijlen',hint:'Tijdloos, verfijnd staalwerk'},
@@ -42,7 +43,7 @@ export const BAL_COLORS=[
   {id:'andere',label:'Andere kleur op aanvraag',color:'#a39d92'}
 ];
 export const initialBalustrade={
-  category:'balustrade',type:'trap',layout:'recht',length:3000,height:1000,
+  category:'balustrade',type:'trap',layout:'recht',length:3000,sideLeft:1800,sideRight:1800,height:1000,
   placement:'binnen',infill:'verticaal',color:'zwart',customColor:'',
   glass:'helder',mount:'advies',handrail:'vlak'
 };
@@ -53,13 +54,23 @@ export const safeBalustradeDesign=design=>{
   if(!design||typeof design!=='object'||Array.isArray(design))return null;
   if(design.category!=='balustrade')return null;
   const safe={...initialBalustrade,...design};
+  // Earlier L-shaped designs stored one total length. Preserve that total
+  // when loading an old saved design which lacks explicit return lengths.
+  if(['hoek-links','hoek-rechts'].includes(design.layout) &&
+     !Object.hasOwn(design,'sideLeft')&&!Object.hasOwn(design,'sideRight') &&
+     Number.isSafeInteger(design.length)&&design.length>0) {
+    const front=Math.round(design.length*.63);
+    safe.length=front;
+    if(design.layout==='hoek-links')safe.sideLeft=design.length-front;
+    else safe.sideRight=design.length-front;
+  }
   const picks={type:BAL_TYPES,layout:BAL_LAYOUTS,placement:[{id:'binnen'},{id:'buiten'}],
     infill:BAL_INFILL,color:BAL_COLORS,glass:BAL_GLASS,
     mount:BAL_MOUNT,handrail:BAL_HANDRAILS};
   for(const [key,items] of Object.entries(picks))
     if(!items.some(item=>item.id===safe[key]))return null;
   // 0 means "still to be measured"; generous ceiling allows a real quote enquiry.
-  if(!['length','height'].every(k=>Number.isSafeInteger(safe[k])&&safe[k]>=0&&safe[k]<=1000000000))return null;
+  if(!['length','height','sideLeft','sideRight'].every(k=>Number.isSafeInteger(safe[k])&&safe[k]>=0&&safe[k]<=1000000000))return null;
   if(typeof safe.customColor!=='string'||safe.customColor.length>70)return null;
   return Object.fromEntries(Object.keys(initialBalustrade).map(k=>[k,safe[k]]));
 };

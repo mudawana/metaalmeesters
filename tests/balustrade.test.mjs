@@ -9,7 +9,7 @@ test('balustrade catalogue has the requested models and options',()=>{
  assert.ok(BAL_INFILL.some(x=>x.id==='glas'));
  assert.ok(BAL_INFILL.some(x=>x.id==='verticaal'));
  assert.ok(BAL_INFILL.some(x=>x.id==='horizontaal'));
- assert.deepEqual(BAL_LAYOUTS.map(x=>x.id),['recht','hoek-links','hoek-rechts']);
+ assert.deepEqual(BAL_LAYOUTS.map(x=>x.id),['recht','hoek-links','hoek-rechts','u']);
  assert.ok(BAL_MOUNT.length>=3);
  assert.ok(BAL_COLORS.length>=5);
 });
@@ -21,6 +21,10 @@ test('safe balustrade quote accepts unknown or arbitrarily entered measurements'
  assert.equal(safeBalustradeDesign(legacy).layout,'recht','existing saved designs remain readable');
  assert.equal(safeBalustradeDesign({...initialBalustrade,layout:'hoek-links'}).layout,'hoek-links');
  assert.equal(safeBalustradeDesign({...initialBalustrade,layout:'hoek-rechts'}).layout,'hoek-rechts');
+ assert.equal(safeBalustradeDesign({...initialBalustrade,layout:'u',sideLeft:1900,sideRight:2100}).sideRight,2100);
+ const {sideLeft,sideRight,...previousDesign}=initialBalustrade;
+ assert.deepEqual(safeBalustradeDesign(previousDesign),initialBalustrade,'old saved designs acquire safe default returns');
+
 });
 test('invalid or poisoned balustrade designs are rejected',()=>{
  assert.equal(safeBalustradeDesign({...initialBalustrade,category:'deur'}),null);
@@ -58,7 +62,7 @@ test('3D model preserves the WebGL buffer for an actual quote image',async()=>{
  assert.match(scene,/Architecture/);
  assert.match(scene,/Glass/);
  assert.match(scene,/CylindricalHandrail/);
- assert.match(scene,/corner/);
+ assert.match(scene,/omitCornerPost/);
  assert.match(config,/id="balustrade-canvas"/);
  assert.match(config,/QuoteForm design=\{design\} product="balustrade"/);
 });

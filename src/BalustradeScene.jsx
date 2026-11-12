@@ -2,6 +2,7 @@ import React,{useEffect} from 'react';
 import {Canvas,useThree} from '@react-three/fiber';
 import {OrbitControls,ContactShadows} from '@react-three/drei';
 import {BAL_COLORS} from './balustrade-options.mjs';
+import {previewRailingRuns} from './balustrade-geometry.mjs';
 
 // A material study, not a structural drawing: dimensions and joint details
 // are explicitly illustrative until the atelier verifies the installation.
@@ -30,7 +31,7 @@ function Glass({position,width,height,angle,kind}) {
       clearcoat={.42} clearcoatRoughness={.12} depthWrite={false} side={2}/>
   </mesh>;
 }
-function RailRun({length,height,design,slope=0}) {
+function RailRun({length,height,design,slope=0,omitCornerPost=false}) {
   const steel=BAL_COLORS.find(x=>x.id===design.color)?.color||'#252826';
   const count=Math.max(2,Math.ceil(length/1.05)+1);
   const posts=Array.from({length:count},(_,i)=>-length/2+i*length/(count-1));
@@ -40,7 +41,7 @@ function RailRun({length,height,design,slope=0}) {
   const hasHandrail=design.handrail!=='geen';
   const hasGlass=design.infill==='glas';
   return <group>
-    {posts.map((x,i)=><group key={'post-'+i}>
+    {posts.filter((_,i)=>!omitCornerPost||i!==0).map((x,i)=><group key={'post-'+i}>
       <Metal color={steel} position={[x,riseAt(x)+height/2,0]} dimensions={[.052,height+.025,.052]}/>
       {design.mount==='bovenop'&&<Metal color={steel} position={[x,riseAt(x)+.015,0]} dimensions={[.13,.022,.13]}/>}
       {design.mount==='zijkant'&&<Metal color={steel} position={[x,riseAt(x)+.095,-.105]} dimensions={[.12,.18,.032]}/>}
@@ -69,15 +70,16 @@ function RailRun({length,height,design,slope=0}) {
       dimensions={[railLength,.038,.05]}/>}
   </group>;
 }
-function Architecture({width,slope,corner}) {
+function Architecture({width,slope,depth}) {
   const floorWidth=Math.max(5,width+1.4);
+  const floorDepth=Math.max(3.2,depth+1.2);
   return <group>
     {/* Real-scale architectural context: plaster wall, warm stone floor and plinth. */}
     <mesh position={[0,2.0,-3.7]} receiveShadow>
       <planeGeometry args={[28,12]}/>
       <meshStandardMaterial color="#dedbd3" roughness={1}/>
     </mesh>
-    <mesh position={[0,-.27,-.8]} rotation={[-Math.PI/2,0,0]} receiveShadow>
+    <mesh position={[0,-.27,-depth/2]} rotation={[-Math.PI/2,0,0]} receiveShadow>
       <planeGeometry args={[28,24]}/>
       <meshStandardMaterial color="#eae6dd" roughness={.95}/>
     </mesh>
@@ -94,47 +96,47 @@ function Architecture({width,slope,corner}) {
         </mesh>;
       })}
     </group> : <group>
-      <mesh position={[0,-.17,0]} receiveShadow castShadow>
-        <boxGeometry args={[floorWidth,.2,corner?4.6:2.8]}/>
+      <mesh position={[0,-.17,-depth/2]} receiveShadow castShadow>
+        <boxGeometry args={[floorWidth,.2,floorDepth]}/>
         <meshStandardMaterial color="#d3cdc2" roughness={.89}/>
       </mesh>
-      <mesh position={[0,-.055,0]} receiveShadow>
-        <boxGeometry args={[floorWidth,.028,corner?4.6:2.8]}/>
+      <mesh position={[0,-.055,-depth/2]} receiveShadow>
+        <boxGeometry args={[floorWidth,.028,floorDepth]}/>
         <meshStandardMaterial color="#eeeae0" roughness={.78}/>
       </mesh>
     </group>}
   </group>;
 }
-function Railing({design,width,height}) {
+function Railing({design,runs,height}) {
+  const front=runs[0].lengthM;
   const stairs=design.type==='trap';
-  const slope=stairs?Math.min(.73,width*.22):0;
-  const corner=!stairs&&design.layout&&design.layout!=='recht';
-  const primary=corner?width*.63:width;
-  const secondary=corner?width-primary:0;
-  const joint=design.layout==='hoek-links'?-primary/2:primary/2;
+  const slope=stairs?Math.min(.73,front*.22):0;
+  const depth=Math.max(0,...runs.filter(run=>run.id!=='voorzijde').map(run=>run.lengthM));
   return <group position={[0,-height*.12,0]}>
-    <Architecture width={primary} slope={slope} corner={corner}/>
-    <RailRun length={primary} height={height} slope={slope} design={design}/>
-    {corner&&<group position={[joint,0,-secondary/2]} rotation={[0,Math.PI/2,0]}>
-      <RailRun length={secondary} height={height} design={design}/>
-    </group>}
+    <Architecture width={front} slope={slope} depth={depth}/>
+    {runs.map(run=><group key={run.id} position={[run.xM,0,run.zM]} rotation={[0,run.rotationY,0]}>
+      <RailRun length={run.lengthM} height={height} slope={run.id==='voorzijde'?slope:0}
+        omitCornerPost={run.id!=='voorzijde'} design={design}/>
+    </group>)}
   </group>;
 }
-function CameraFrame({width,height}) {
+function CameraFrame({width,height,depth}) {
   const {camera,controls,invalidate}=useThree();
   useEffect(()=>{
-    const distance=Math.max(5.5,width*1.55);
-    camera.position.set(Math.max(2.5,width*.38),Math.max(2.25,height+1.45),distance);
-    if(controls){controls.target.set(0,height*.46,0);controls.update();}
+    const distance=Math.max(5.5,width*1.35+depth*.65);
+    camera.position.set(Math.max(2.35,width*.45),Math.max(2.35,height+1.65),distance);
+    if(controls){controls.target.set(0,height*.44,-depth*.38);controls.update();}
     camera.updateProjectionMatrix();
     invalidate();
-  },[camera,controls,invalidate,width,height]);
+  },[camera,controls,invalidate,width,height,depth]);
   return null;
 }
 export default function BalustradeScene({design}) {
   // Only the *preview* is capped to fit the scene; the submitted measurements
   // are not changed or validated as structurally safe.
-  const width=clamp(design.length||3000,800,6500)/1000;
+  const runs=previewRailingRuns(design);
+  const width=runs[0].lengthM;
+  const depth=Math.max(0,...runs.slice(1).map(run=>run.lengthM));
   const height=clamp(design.height||1000,700,1450)/1000;
   return <Canvas shadows dpr={[1,1.5]}
     camera={{position:[4,2.8,7],fov:39,near:.1,far:100}}
@@ -146,11 +148,11 @@ export default function BalustradeScene({design}) {
     <directionalLight position={[2.8,6,4.5]} intensity={2} castShadow
       shadow-mapSize={[1024,1024]} shadow-bias={-.0004}/>
     <directionalLight position={[-4,3,-4]} intensity={.52} color="#f8eadc"/>
-    <Railing design={design} width={width} height={height}/>
+    <Railing design={design} runs={runs} height={height}/>
     <ContactShadows position={[0,-.32,0]} opacity={.22} scale={12}
       blur={2.8} far={7}/>
     <OrbitControls makeDefault enablePan={false} minDistance={2.6} maxDistance={20}
-      target={[0,.5,0]} minPolarAngle={.25} maxPolarAngle={Math.PI/2.08}/>
-    <CameraFrame width={width} height={height}/>
+      target={[0,height*.44,-depth*.38]} minPolarAngle={.25} maxPolarAngle={Math.PI/2.08}/>
+    <CameraFrame width={width} height={height} depth={depth}/>
   </Canvas>;
 }
