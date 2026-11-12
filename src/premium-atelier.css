@@ -229,3 +229,23 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible { 
 @media(prefers-reduced-motion:reduce) {
  .product-choice-card,.product-choice-card img,.service-photo img,.small-round {transition:none;}
 }
+
+/* Mobile quick navigation keeps the 3D preview accessible without hiding the
+   live canvas (quote screenshots must still capture the actual WebGL scene). */
+.bal-mobile-jump {display:none;}
+@media(max-width:1000px){
+  .bal-config-page {padding-bottom:118px;}
+  .bal-mobile-jump {display:grid;grid-template-columns:1fr 1fr;gap:9px;position:fixed;z-index:70;
+    bottom:0;left:0;right:0;padding:11px max(16px,env(safe-area-inset-right))
+    calc(11px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+    background:#fdfcf9;box-shadow:0 -8px 28px #1f30201f;border-top:1px solid #d9d7cd;}
+  .bal-mobile-jump button {min-height:48px;border:1px solid #c4c9be;background:#f7f6f0;
+    color:#293d31;display:flex;align-items:center;justify-content:center;gap:9px;
+    font-size:12px;font-weight:800;letter-spacing:.02em;}
+  .bal-mobile-jump button:last-child {background:#283c30;color:#fff;border-color:#283c30;}
+}
+.bal-config-card,.bal-preview-wrap {scroll-margin-top:15px;}
+.admin-list-tools select[aria-label="Filter op product"] {min-width:150px;}
+@media(max-width:720px){
+  .admin-list-tools select[aria-label="Filter op product"] {min-width:0;width:100%;}
+}
