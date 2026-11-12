@@ -1,7 +1,7 @@
 // The exported image is composited from the actual on-screen photo and 3D renderer.
 // It remains in the browser until explicitly sent with an eventual quote request.
-export async function capturePreviewImage({max=860,quality=.78}={}) {
-  const stage=document.querySelector('#door-canvas');
+export async function capturePreviewImage({max=860,quality=.78,stageId='door-canvas'}={}) {
+  const stage=document.getElementById(stageId==='balustrade-canvas'?'balustrade-canvas':'door-canvas');
   const source=stage?.querySelector('canvas');
   if(!stage||!source||!source.width||!source.height)throw Error('De 3D-weergave is nog niet klaar. Probeer opnieuw.');
   const bounds=stage.getBoundingClientRect();
@@ -33,6 +33,6 @@ export async function capturePreviewImage({max=860,quality=.78}={}) {
     if(visualFilter&&visualFilter!=='none')ctx.filter=visualFilter;
     ctx.drawImage(source,left,top,doorBounds.width,doorBounds.height);
     ctx.restore();
-  }catch{throw Error('De 3D-deur kon niet samen met de foto worden opgeslagen.');}
+  }catch{throw Error('De 3D-voorvertoning kon niet worden opgeslagen.');}
   return output.toDataURL('image/jpeg',quality);
 }

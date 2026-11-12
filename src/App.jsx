@@ -7,9 +7,11 @@ import SeoServicePage from './SeoServicePage.jsx';
 import OverOnsPage from './OverOnsPage.jsx';
 import {servicePages,servicePagesByRoute} from './seo-services.mjs';
 import './admin.css';
+import './balustrade.css';
 // The heavy Three.js preview and private admin app are loaded only when needed.
 const HousePreview=React.lazy(()=>import('./HousePreview.jsx'));
 const Admin=React.lazy(()=>import('./Admin.jsx'));
+const BalustradeConfigurator=React.lazy(()=>import('./BalustradeConfigurator.jsx'));
 import {assets,imageUrl,initialDesign,TYPES,FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS,formatDesign,downloadDesign} from './data.js';
 import {mmAsCm,cmAsMm,cmLabel,onsiteMeasureNote} from './measurement-units.mjs';
 import {STEPS,FAVOURITES,featuredOptions,extraOptions,countExtra,sizesForType} from './configurator-ux.mjs';
@@ -149,8 +151,8 @@ function ProjectDetail({project}) {
 }
 function Offerte() {
   return <main className="interior-page"><div className="container page-intro"><span className="eyebrow">VRIJBLIJVEND MAATWERK</span><h1>Een offerte<br/><em>voor uw project.</em></h1><p>Wilt u een stalen deur of een ander metaalproject laten uitvoeren? Vertel ons wat u zoekt, dan bespreken we samen de mogelijkheden.</p></div>
-    <div className="container quote-landing"><div><h2>Ontwerp uw stalen deur in 3D</h2><p>Stel het type, de afmetingen, glaskeuze en afwerking samen. Bekijk uw ontwerp in 3D of plaats de deur op uw eigen woningfoto.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Op de huidige demo is automatische offerteverzending nog niet beschikbaar.</small></div>
-    <div><h2>Een ander metaalproject?</h2><p>Voor trappen, balustrades, industriële constructies en horecawerken kunt u rechtstreeks contact opnemen.</p><a className="text-link" href={pageHref('contact')}>Contacteer MetaalMeesters <ArrowUpRight size={17}/></a></div></div>
+    <div className="container quote-landing"><div><h2>Ontwerp een deur of balustrade in 3D</h2><p>Kies stalen deur of balustrade en stel de afmetingen, kleur en afwerking samen. Vraag daarna vrijblijvend een offerte aan.</p><a className="btn btn-dark" href={pageHref('configurator')}>Open de 3D-configurator <ArrowUpRight size={17}/></a><small>Op de huidige demo is automatische offerteverzending nog niet beschikbaar.</small></div>
+    <div><h2>Een ander metaalproject?</h2><p>Voor losse trappen, industriële constructies en horecawerken kunt u rechtstreeks contact opnemen.</p><a className="text-link" href={pageHref('contact')}>Contacteer MetaalMeesters <ArrowUpRight size={17}/></a></div></div>
   </main>;
 }
 function Contact() {
@@ -356,7 +358,7 @@ function ConfigControls({d,change,step,setStep}) {
     </div>}
   </div>;
 }
-function Configurator() {
+function Configurator({onBack}) {
   const [d,setD]=useState(()=>{try {const saved=JSON.parse(localStorage.getItem('mm-door-design'));return {...initialDesign,...saved};}catch{return initialDesign;}});
   const [step,setStep]=useState(0),[resetToken,setResetToken]=useState(0),[notice,setNotice]=useState('');
   const moveToStep=(next)=>{
@@ -367,13 +369,38 @@ function Configurator() {
   useEffect(()=>{try{localStorage.setItem('mm-door-design',JSON.stringify(d));}catch{}},[d]);
   const reset=()=>{setD(initialDesign);setResetToken(v=>v+1);setStep(0);};
   return <main className="config-page">
-    <div className="container config-page-heading"><div><span className="eyebrow">METAALMEESTERS · 3D DEURONTWERPER</span><h1>Uw deur in <em>5 stappen.</em></h1><p>Kies een model, geef de maten op en ontdek uw deur in 3D. U hoeft niet alles exact te weten: wij helpen met de details.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
+    <div className="container config-page-heading"><div><button type="button" className="bal-text-back" onClick={onBack}><ChevronLeft size={16}/> Andere productsoort kiezen</button><span className="eyebrow">METAALMEESTERS · 3D DEURONTWERPER</span><h1>Uw deur in <em>5 stappen.</em></h1><p>Kies een model, geef de maten op en ontdek uw deur in 3D. U hoeft niet alles exact te weten: wij helpen met de details.</p></div><button className="reset-design" onClick={reset}><RotateCcw size={16}/> Begin opnieuw</button></div>
     <div className="container config-layout">
       <ConfigControls d={d} change={change} step={step} setStep={moveToStep}/>
       <div id="mm-live-preview"><Suspense fallback={<div className="viewer-loading">De 3D-voorvertoning wordt geladen...</div>}><HousePreview config={d} resetToken={resetToken} onNotice={setNotice} onChange={change}/></Suspense>{notice&&<p className="viewer-notice" role="status">{notice}</p>}</div>
     </div>
     <div className="container config-bottom-note"><span>HANDGEMAAKT. PRECIES ZOALS U HET WILT.</span><a href="mailto:info@metaalmeesters.eu">Hulp nodig? Contacteer ons <ArrowUpRight size={16}/></a></div>
   </main>;
+}
+function ProductConfigurator(){
+  const [product,setProduct]=useState(null);
+  const choose=(name)=>{setProduct(name);window.scrollTo({top:0,behavior:'instant'});};
+  if(product==='deur')return <Configurator onBack={()=>choose(null)}/>;
+  if(product==='balustrade')return <Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Balustradeconfigurator laden...</h1></div></main>}><BalustradeConfigurator onBack={()=>choose(null)}/></Suspense>;
+  return <main className="product-choice-page"><div className="container">
+    <span className="eyebrow product-choice-eyebrow">METAALMEESTERS · 3D CONFIGURATOR</span>
+    <h1>Wat wilt u <em>ontwerpen?</em></h1>
+    <p className="product-choice-intro">Ontwerp uw stalen deur of balustrade in 3D. Kies een product, pas het ontwerp aan en vraag vrijblijvend een offerte. De werkelijke maten en definitieve prijs worden door ons bevestigd.</p>
+    <div className="product-choice-grid">
+      <button type="button" className="product-choice-card" onClick={()=>choose('deur')}>
+        <Img name="door4" alt="Stalen deur met glas" loading="eager"/>
+        <div className="product-choice-card-content"><span>01 · STALEN DEUREN</span><h2>Stalen deur</h2><p>Enkele deur, dubbele deur, pivotdeur, boogdeur of glaswand. Onze vertrouwde volledige deurconfigurator.</p>
+          <div className="product-choice-card-footer">Ontwerp uw deur <ArrowUpRight size={19}/></div>
+        </div>
+      </button>
+      <button type="button" className="product-choice-card" onClick={()=>choose('balustrade')}>
+        <Img name="railing" alt="Balustrade uitgevoerd in staal" loading="eager"/>
+        <div className="product-choice-card-content"><span>02 · BALUSTRADES</span><h2>Balustrade</h2><p>Trap, balkon, terras, vide of raam. Bepaal indicatieve maten, spijlen, glas, kleur en handregel.</p>
+          <div className="product-choice-card-footer">Ontwerp uw balustrade <ArrowUpRight size={19}/></div>
+        </div>
+      </button>
+    </div>
+  </div></main>;
 }
 export default function App({initialRoute}) {
   const [route,setRoute]=useState(()=>initialRoute||routeFromLocation());
@@ -382,5 +409,5 @@ export default function App({initialRoute}) {
   const portfolio=portfolioProjects.find(p=>'portfolio/'+p.slug===current);
   const seoService=servicePagesByRoute.get(current);
   const activeNav=portfolio?'projecten':current;
-  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:seoService?<SeoServicePage page={seoService}/>:current==='over-ons'?<OverOnsPage/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='privacy'?<PrivacyPage/>:current==='cookies'?<CookiePage/>:current==='bedrijfsgegevens'?<CompanyPage/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<Configurator/>}<Footer/></>;
+  return <><Header route={activeNav}/>{portfolio?<ProjectDetail project={portfolio}/>:seoService?<SeoServicePage page={seoService}/>:current==='over-ons'?<OverOnsPage/>:current==='home'?<Home/>:current==='diensten'?<Diensten/>:current==='projecten'?<Projecten/>:current==='contact'?<Contact/>:current==='offerte'?<Offerte/>:current==='privacy'?<PrivacyPage/>:current==='cookies'?<CookiePage/>:current==='bedrijfsgegevens'?<CompanyPage/>:current==='beheer'?<Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Beheerportaal laden...</h1></div></main>}><Admin/></Suspense>:<ProductConfigurator/>}<Footer/></>;
 }
