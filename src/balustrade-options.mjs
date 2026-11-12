@@ -7,6 +7,11 @@ export const BAL_TYPES=[
   {id:'vide',label:'Vide of overloop',hint:'Open verdieping of overloop'},
   {id:'raam',label:'Raambalustrade',hint:'Afscherming voor een raamopening'}
 ];
+export const BAL_LAYOUTS=[
+  {id:'recht',label:'Rechte opstelling',hint:'Eén doorlopende lijn'},
+  {id:'hoek-links',label:'Hoek links',hint:'Een L-vorm met de retour links'},
+  {id:'hoek-rechts',label:'Hoek rechts',hint:'Een L-vorm met de retour rechts'}
+];
 export const BAL_INFILL=[
   {id:'verticaal',label:'Verticale spijlen',hint:'Tijdloos, verfijnd staalwerk'},
   {id:'horizontaal',label:'Horizontale liggers',hint:'Strak lijnenspel · veiligheid te beoordelen'},
@@ -37,7 +42,7 @@ export const BAL_COLORS=[
   {id:'andere',label:'Andere kleur op aanvraag',color:'#a39d92'}
 ];
 export const initialBalustrade={
-  category:'balustrade',type:'trap',length:3000,height:1000,
+  category:'balustrade',type:'trap',layout:'recht',length:3000,height:1000,
   placement:'binnen',infill:'verticaal',color:'zwart',customColor:'',
   glass:'helder',mount:'advies',handrail:'vlak'
 };
@@ -47,13 +52,14 @@ export const balustradeColorLabel=id=>BAL_COLORS.find(x=>x.id===id)?.label||'Nad
 export const safeBalustradeDesign=design=>{
   if(!design||typeof design!=='object'||Array.isArray(design))return null;
   if(design.category!=='balustrade')return null;
-  const picks={type:BAL_TYPES,placement:[{id:'binnen'},{id:'buiten'}],
+  const safe={...initialBalustrade,...design};
+  const picks={type:BAL_TYPES,layout:BAL_LAYOUTS,placement:[{id:'binnen'},{id:'buiten'}],
     infill:BAL_INFILL,color:BAL_COLORS,glass:BAL_GLASS,
     mount:BAL_MOUNT,handrail:BAL_HANDRAILS};
   for(const [key,items] of Object.entries(picks))
-    if(!items.some(item=>item.id===design[key]))return null;
+    if(!items.some(item=>item.id===safe[key]))return null;
   // 0 means "still to be measured"; generous ceiling allows a real quote enquiry.
-  if(!['length','height'].every(k=>Number.isSafeInteger(design[k])&&design[k]>=0&&design[k]<=1000000000))return null;
-  if(typeof design.customColor!=='string'||design.customColor.length>70)return null;
-  return Object.fromEntries(Object.keys(initialBalustrade).map(k=>[k,design[k]]));
+  if(!['length','height'].every(k=>Number.isSafeInteger(safe[k])&&safe[k]>=0&&safe[k]<=1000000000))return null;
+  if(typeof safe.customColor!=='string'||safe.customColor.length>70)return null;
+  return Object.fromEntries(Object.keys(initialBalustrade).map(k=>[k,safe[k]]));
 };
