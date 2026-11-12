@@ -4,6 +4,7 @@ import {createServer} from 'vite';
 import React from 'react';
 import {renderToString} from 'react-dom/server';
 import {pages} from '../src/seo-routes.js';
+import {servicePagesByRoute} from '../src/seo-services.mjs';
 import {LEGAL_APPROVED,isLegalPage} from '../src/legal-profile.mjs';
 
 const target='dist';
@@ -15,14 +16,17 @@ const htmlEscape=(s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').r
 const localBusiness={
   '@context':'https://schema.org',
   '@type':'LocalBusiness',
+  '@id':origin+'/#company',
   name:'MetaalMeesters',
   legalName:'Metaalmeesters BV',
   vatID:'BE1035390965',
+  identifier:'1035390965',
   url:origin+'/',
   telephone:'+32472864888',
   email:'info@metaalmeesters.eu',
   address:{'@type':'PostalAddress',streetAddress:'Lange Lobroekstraat 58',postalCode:'2060',addressLocality:'Antwerpen',addressRegion:'Antwerpen',addressCountry:'BE'},
-  areaServed:{'@type':'AdministrativeArea',name:'Antwerpen'}
+  areaServed:{'@type':'AdministrativeArea',name:'Antwerpen'},
+  image:origin+'/images/Metaalmeesters_Home_04.jpg'
 };
 const vite=await createServer({
   server:{middlewareMode:true,hmr:false},
@@ -38,9 +42,35 @@ try{
       :renderToString(React.createElement(App,{initialRoute:page.route}));
     if(!markup.includes('<h1'))throw Error('No SEO heading on '+page.path);
     const canonical=origin+page.path;
-    const jsonLd=page.route==='home'||page.route==='contact'
-      ? '<script type="application/ld+json">'+JSON.stringify(localBusiness).replaceAll('<','\\u003c')+'</script>'
-      :'';
+    const service=servicePagesByRoute.get(page.route);
+    const schema=[];
+    if(page.route==='home'||page.route==='contact'){
+      schema.push(localBusiness);
+      if(page.route==='home')schema.push({
+        '@context':'https://schema.org','@type':'WebSite',
+        '@id':origin+'/#website',url:origin+'/',name:'MetaalMeesters',
+        inLanguage:'nl-BE',publisher:{'@id':origin+'/#company'}
+      });
+    }
+    if(service){
+      schema.push({
+        '@context':'https://schema.org','@type':'Service',
+        '@id':canonical+'#service',name:service.h1,serviceType:service.h1,
+        description:service.description,url:canonical,
+        provider:{'@id':origin+'/#company'},
+        areaServed:{'@type':'AdministrativeArea',name:'Antwerpen'}
+      });
+      schema.push({
+        '@context':'https://schema.org','@type':'BreadcrumbList',
+        itemListElement:[
+          {'@type':'ListItem',position:1,name:'Home',item:origin+'/'},
+          {'@type':'ListItem',position:2,name:'Diensten',item:origin+'/diensten/'},
+          {'@type':'ListItem',position:3,name:service.h1,item:canonical}
+        ]
+      });
+    }
+    const jsonLd=schema.map(node=>'<script type="application/ld+json">'+
+       JSON.stringify(node).replaceAll('<','\\u003c')+'</script>').join('\n    ');
     const head=[
       '<meta name="description" content="'+htmlEscape(page.description)+'">',
       '<meta name="robots" content="'+(isPreview||(!LEGAL_APPROVED&&isLegalPage(page.route))?'noindex,follow':'index,follow')+'">',
@@ -51,9 +81,13 @@ try{
       '<meta property="og:title" content="'+htmlEscape(page.title)+'">',
       '<meta property="og:description" content="'+htmlEscape(page.description)+'">',
       '<meta property="og:url" content="'+htmlEscape(canonical)+'">',
+      '<meta property="og:image" content="'+origin+'/images/Metaalmeesters_Home_04.jpg">',
+      '<meta property="og:image:alt" content="Maatwerk in staal en glas van MetaalMeesters">',
+      '<meta name="twitter:card" content="summary_large_image">',
       jsonLd
     ].filter(Boolean).join('\n    ');
     let html=template.replace(/<title>[^<]*<\/title>/,'<title>'+htmlEscape(page.title)+'</title>');
+    html=html.replace(/<meta name="description" content="[^"]*"\s*\/>/,'');
     html=html.replace('</head>','    '+head+'\n  </head>');
     html=html.replace('<div id="root"></div>','<div id="root" data-ssr="'+(!isInteractive)+'">'+markup+'</div>');
     if(!html.includes('data-ssr=')||!html.includes('rel="canonical"'))throw Error('SEO HTML generation incomplete: '+page.path);
@@ -71,7 +105,7 @@ await fs.writeFile(path.join(target,'sitemap.xml'),sitemap);
 await fs.writeFile(path.join(target,'robots.txt'),isPreview
   ?'User-agent: *\nDisallow: /metaalmeesters/\n'
   :'User-agent: *\nAllow: /\nSitemap: '+origin+'/sitemap.xml\n');
-const expected=['/','/diensten/','/projecten/','/contact/','/offerte/','/configurator/','/portfolio/project-kontich/'];
+const expected=['/','/diensten/','/projecten/','/contact/','/offerte/','/configurator/','/portfolio/project-kontich/',...Array.from(servicePagesByRoute.values(),p=>p.path)];
 for(const slug of expected){
   const p=path.join(target,slug.replace(/^\/|\/$/g,''),'index.html');
   const html=await fs.readFile(p,'utf8');

@@ -1,4 +1,4 @@
-name: Deploy MetaalMeesters demo to GitHub Pages
+name: Deploy MetaalMeesters preview to GitHub Pages
 on:
   push:
     branches: [main]
@@ -46,6 +46,11 @@ jobs:
           for legal in privacy cookies bedrijfsgegevens; do
             test -f "dist/$legal/index.html" || { echo "Missing built legal page: $legal"; exit 1; }
           done
+          for seo in stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren; do
+            test -f "dist/$seo/index.html" || { echo "Missing SEO page: $seo"; exit 1; }
+          done
+          # Never let the GitHub preview compete with the real production domain.
+          grep -q "noindex,follow" dist/stalen-deuren-op-maat/index.html
           if grep -q 'src/main.jsx' dist/index.html; then
             echo 'ERROR: attempted to publish uncompiled React source'
             exit 1
@@ -60,7 +65,7 @@ jobs:
           cp -R dist/assets/. assets/
           if [ -d dist/images ]; then cp -R dist/images/. images/; fi
           if [ -d dist/homes ]; then cp -R dist/homes/. homes/; fi
-          for page in diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens; do
+          for page in diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren; do
             if [ -d "dist/$page" ]; then mkdir -p "$page"; cp -R "dist/$page/." "$page/"; fi
           done
           cp dist/robots.txt robots.txt
@@ -68,7 +73,7 @@ jobs:
           touch .nojekyll
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html assets images homes diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens robots.txt sitemap.xml .nojekyll
+          git add index.html assets images homes diensten projecten contact offerte configurator portfolio privacy cookies bedrijfsgegevens stalen-deuren-op-maat pivotdeuren boogdeuren stalen-glaswanden glas-voor-stalen-deuren prijs-stalen-deuren robots.txt sitemap.xml .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "Publish compiled MetaalMeesters website [skip ci]"
             git push

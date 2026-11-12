@@ -1,3 +1,5 @@
+import {servicePages} from './seo-services.mjs';
+
 // Canonical public paths are kept identical to the original MetaalMeesters URLs.
 // Changes to these paths require a matching migration redirect and Search Console review.
 export const projects = [
@@ -70,13 +72,13 @@ export const pages = [
   {
     "route": "home",
     "path": "/",
-    "title": "MetaalMeesters | Metaalbewerking op maat in Antwerpen",
-    "description": "MetaalMeesters uit regio Antwerpen ontwerpt en vervaardigt stalen deuren, balustrades, trappen en metaalconstructies op maat. Bekijk realisaties en ontwerp uw deur."
+    "title": "Stalen deuren op maat Antwerpen | MetaalMeesters",
+    "description": "Stalen deuren en glaswanden op maat in Antwerpen. Ontdek enkele deuren, pivotdeuren, boogdeuren, glasopties en de 3D-configurator van MetaalMeesters."
   },
   {
     "route": "diensten",
     "path": "/diensten/",
-    "title": "Stalen deuren, trappen en balustrades op maat | MetaalMeesters",
+    "title": "Stalen deuren en metaalwerken op maat | MetaalMeesters",
     "description": "Ontdek metaalwerk op maat voor particulieren, industrie, recreatie en horeca: stalen deuren, trappen, balustrades en constructies in de regio Antwerpen."
   },
   {
@@ -89,7 +91,7 @@ export const pages = [
     "route": "contact",
     "path": "/contact/",
     "title": "Contact | MetaalMeesters metaalbewerking Antwerpen",
-    "description": "Contacteer MetaalMeesters voor vragen over stalen deuren, balustrades, metaalconstructies en maatwerk. Gevestigd in Zwijndrecht bij Antwerpen."
+    "description": "Vraag advies over stalen deuren en metaalwerk op maat bij MetaalMeesters BV in Antwerpen. Contacteer ons voor uw ontwerp en een vrijblijvende offerte."
   },
   {
     "route": "offerte",
@@ -176,6 +178,7 @@ export const pages = [
     "title": "Bedrijfsgegevens en contact | MetaalMeesters",
     "description": "Bedrijfs- en contactgegevens van MetaalMeesters."
   }
+  ...servicePages.map(p=>({route:p.route,path:p.path,title:p.title,description:p.description}))
 ];
 
 export const indexableRoutes = new Set(pages.map(p=>p.route));

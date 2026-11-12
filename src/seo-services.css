@@ -1,0 +1,71 @@
+/* Human-first SEO hubs: substantive copy, crawlable links and clean mobile hierarchy. */
+.seo-service-page{padding-bottom:0}
+.seo-service-head{background:#e9e9e3;padding:32px 0 70px}
+.seo-breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:#727b71;font-size:11px;margin-bottom:40px}
+.seo-breadcrumb a{text-decoration:underline;text-underline-offset:3px}
+.seo-breadcrumb [aria-current="page"]{font-weight:800;color:#3c4e3f}
+.seo-service-head-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,42%);align-items:center;gap:9%}
+.seo-service-head h1{font-size:clamp(42px,4.5vw,68px);letter-spacing:-.065em;line-height:1.1;margin:20px 0 25px}
+.seo-service-head p{color:#526152;line-height:1.85;font-size:15px;max-width:650px}
+.seo-hero-actions{display:flex;gap:23px;align-items:center;flex-wrap:wrap;margin-top:30px}
+.seo-hero-actions .btn{gap:11px}
+.seo-text-link{display:inline-flex;gap:12px;align-items:center;border-bottom:1px solid #7c8a7c;padding-bottom:7px;font-size:12px;font-weight:800}
+.seo-service-visual{position:relative;min-height:360px;overflow:hidden;background:#d0d0c9}
+.seo-service-visual img{height:100%;width:100%;position:absolute;inset:0;object-fit:cover}
+.seo-service-visual>span{position:absolute;bottom:15px;left:16px;background:#f5f3ed;padding:10px 12px;letter-spacing:.11em;font-size:9px;font-weight:800;color:#364638}
+.seo-service-content{display:grid;grid-template-columns:minmax(0,1fr) 275px;gap:8%;align-items:start;padding-top:65px}
+.seo-text-section{padding:0 0 44px;margin-bottom:42px;border-bottom:1px solid #d6d9d2}
+.seo-text-section h2,.seo-faq-section h2{font-size:clamp(25px,2.9vw,40px);letter-spacing:-.045em;line-height:1.23;margin:15px 0 20px}
+.seo-text-section p{font-size:14px;color:#526152;line-height:1.95;margin:0 0 18px}
+.seo-section-kicker{font-size:10px;font-weight:800;letter-spacing:.12em;color:#977a54}
+.seo-inline-links{display:flex;flex-wrap:wrap;gap:11px 24px;margin:27px 0 0}
+.seo-inline-links a{display:inline-flex;gap:8px;align-items:center;font-size:12px;color:#476c51;text-decoration:underline;font-weight:800;text-underline-offset:3px}
+.seo-service-aside{position:sticky;top:24px;display:grid;gap:16px}
+.seo-aside-content{background:#25352d;color:#f6f5ef;padding:25px;display:flex;flex-direction:column;gap:13px}
+.seo-aside-content.secondary{background:#e6e9e0;color:#2a4432}
+.seo-aside-content>strong{font-family:Manrope,sans-serif;font-size:16px;line-height:1.45}
+.seo-aside-content p{font-size:12px;line-height:1.8;color:#c8d0c8;margin:0}
+.seo-aside-content.secondary p{color:#657266}
+.seo-aside-content a{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #ffffff30;padding-top:15px;font-size:11px;font-weight:800}
+.seo-aside-content.secondary a{border-top-color:#bbc6b9}
+.seo-faq-section{margin:65px 0 85px}
+.seo-faq-item{border-bottom:1px solid #d4d9d0}
+.seo-faq-item>summary{list-style:none;position:relative;padding:19px 35px 19px 0;cursor:pointer;font-size:14px;font-weight:800;color:#324535;line-height:1.6}
+.seo-faq-item>summary::-webkit-details-marker{display:none}
+.seo-faq-item>summary:after{content:'+';font-size:22px;position:absolute;right:10px;top:15px}
+.seo-faq-item[open]>summary:after{content:'−'}
+.seo-faq-item>p{font-size:13px;line-height:1.85;color:#526152;padding:0 15px 22px 0;margin:0}
+.seo-faq-item>summary:focus-visible{outline:3px solid #af9260;outline-offset:3px}
+.seo-related{border-top:1px solid #ccd2c9;padding:53px 0 80px}
+.seo-related h2{font-size:30px;margin:13px 0 23px}
+.seo-related-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.seo-related-grid a{border:1px solid #cdd4c9;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-weight:750;font-size:13px}
+.seo-related-grid a:hover{background:#e8eee4}
+.seo-final-cta{background:#1c2922;color:#f5f2e9;padding:65px 0}
+.seo-final-cta-inner{display:flex;justify-content:space-between;align-items:center;gap:30px}
+.seo-final-cta h2{font-size:clamp(29px,3vw,43px);max-width:680px;line-height:1.2;margin:15px 0}
+.seo-final-cta p{font-size:12px;color:#cbd1c9;max-width:550px;margin:0}
+.seo-final-cta .btn{flex-shrink:0}
+.seo-final-cta h2 em{font-style:normal;color:#d6b78d}
+.seo-hub-links{background:#f2f1ec;padding:60px 0}
+.seo-hub-links h2{font-size:clamp(30px,3.3vw,48px);margin:14px 0 26px}
+.seo-hub-links-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.seo-hub-links-grid>a{border:1px solid #d2d5cb;padding:22px 19px;display:flex;justify-content:space-between;gap:14px;align-items:center;background:#faf9f5;font-weight:800;font-size:13px;line-height:1.5}
+.seo-hub-links-grid>a:hover{background:#e9eee5}
+.seo-hub-links-grid a svg{flex-shrink:0}
+@media(max-width:950px){.seo-service-head-grid{grid-template-columns:1fr;gap:35px}.seo-service-visual{min-height:315px;max-height:380px}
+.seo-service-content{grid-template-columns:1fr;padding-top:45px}
+.seo-service-aside{position:static;grid-row:1;grid-template-columns:1fr 1fr;margin-bottom:26px}
+.seo-hub-links-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.seo-service-head{padding:16px 0 36px}.seo-breadcrumb{margin-bottom:25px;font-size:10px}
+.seo-service-head h1{font-size:39px}.seo-service-head p{font-size:13px}.seo-service-visual{min-height:240px}
+.seo-service-head-grid{gap:25px}.seo-service-aside{grid-template-columns:1fr}
+.seo-text-section{padding-bottom:24px;margin-bottom:27px}.seo-text-section p{font-size:13px}
+.seo-faq-section{margin:30px 0 50px}.seo-related{padding:40px 0 48px}.seo-related h2{font-size:25px}
+.seo-related-grid,.seo-hub-links-grid{grid-template-columns:1fr}
+.seo-final-cta{padding:44px 0}.seo-final-cta-inner{align-items:flex-start;flex-direction:column}
+.seo-hub-links{padding:38px 0}.seo-hub-links h2{font-size:30px}}
+
+.seo-diensten-links{margin-bottom:52px;padding-top:16px}
+.seo-diensten-links h2{font-size:clamp(30px,3vw,45px);margin:13px 0}
+.seo-diensten-links>p{max-width:740px;color:#687568;font-size:13px;line-height:1.8;margin-bottom:23px}
