@@ -3,7 +3,7 @@ import {authorized,safeOrigin,apiJSON} from '../lib/session.mjs';
 import {putQuote,getQuote,listQuotes,deleteQuote,STAGES} from '../lib/quotes-data.mjs';
 import {FRAMES,GLASSES,HANDLES,CLOSURES,PANEL_LAYOUTS} from '../../src/product-options.mjs';
 import {cmLabel,onsiteMeasureNote} from '../../src/measurement-units.mjs';
-import {safeBalustradeDesign,balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_HANDRAILS,BAL_MOUNT,BAL_GLASS} from '../../src/balustrade-options.mjs';
+import {safeBalustradeDesign,balustradeTypeLabel,balustradeInfillLabel,balustradeColorLabel,BAL_LAYOUTS,BAL_HANDRAILS,BAL_MOUNT,BAL_GLASS} from '../../src/balustrade-options.mjs';
 
 const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const permitted={
@@ -59,6 +59,7 @@ async function mailNotification(quote,req) {
     'Locatie: '+(quote.city||'-'),
     'Type: '+balustradeTypeLabel(d.type),
     'Toepassing: '+(d.placement==='buiten'?'Buiten':'Binnen'),
+    'Verloop: '+(d.type==='trap'?'Rechte trapbalustrade':BAL_LAYOUTS.find(x=>x.id===(d.layout||'recht'))?.label||'Rechte opstelling'),
     'Lengte (schatting): '+cmLabel(d.length),
     'Hoogte (schatting): '+cmLabel(d.height),
     'Invulling: '+balustradeInfillLabel(d.infill),
@@ -123,7 +124,7 @@ async function processSubmission(req) {
   if(!consent || !clean(name,151) || clean(name,151).length>150 || !emailPattern.test(clean(email,260)) ||
     (kind==='balustrade'?!balustrade:!validDesign(design)))return error('Controleer uw contactgegevens en ontwerp.');
   const photo=safeImage(image);
-  if(!photo)return error('De foto van uw 3D-deur ontbreekt. Probeer opnieuw, bij voorkeur in een moderne browser.');
+  if(!photo)return error('De afbeelding van uw 3D-ontwerp ontbreekt. Probeer opnieuw, bij voorkeur in een moderne browser.');
   // Rudimentary abuse limit. Use managed CAPTCHA or a transactional store for production at scale.
   const fingerprint=clean(req.headers.get('x-nf-client-connection-ip')||req.headers.get('x-forwarded-for')||'unknown',150);
   const fingerprintKey=createHash('sha256').update(fingerprint).digest('hex');
