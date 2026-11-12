@@ -1,0 +1,31 @@
+name: Validate luxury studio (no deploy)
+on:
+  push:
+    branches:
+      - design/luxe-metaalmeesters-configurator
+    paths:
+      - .github/workflows/luxe-studio-check.yml
+      - src/**
+      - netlify/**
+      - tests/**
+      - package.json
+      - scripts/**
+jobs:
+  check:
+    name: Verify tests and production build, no deployment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout design branch
+        uses: actions/checkout@v4
+      - name: Install Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Check unit tests
+        run: npm run test:api
+      - name: Check production compilation
+        run: npm run build
