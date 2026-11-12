@@ -15,11 +15,11 @@ test('legal pages are registered as direct, canonical website routes',()=>{
   assert.ok(matches[0].title.includes('MetaalMeesters'));
  }
 });
-test('unverified business identity cannot silently be presented as approved',()=>{
+test('verified business identity does not imply legal policy approval',()=>{
  assert.equal(LEGAL_APPROVED,false);
- assert.equal(BUSINESS_DETAILS.officialName,null);
- assert.equal(BUSINESS_DETAILS.enterpriseNumber,null);
- assert.equal(BUSINESS_DETAILS.vatNumber,null);
+ assert.equal(BUSINESS_DETAILS.officialName,'Metaalmeesters BV');
+ assert.equal(BUSINESS_DETAILS.enterpriseNumber,'1035.390.965');
+ assert.equal(BUSINESS_DETAILS.vatNumber,'BE 1035.390.965');
 });
 test('each legal page actually renders and links to the other legal pages',async()=>{
  const vite=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom',logLevel:'error'});
