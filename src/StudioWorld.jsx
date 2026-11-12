@@ -2,6 +2,7 @@ import React,{useEffect,useMemo} from 'react';
 import * as THREE from 'three';
 import {Environment,Lightformer} from '@react-three/drei';
 import {archPoints} from './arch-geometry.mjs';
+import {MarbleFloor} from './MarbleFloor.jsx';
 
 const stone='#d7d2c8';
 function SurfaceBlock({x=0,y=0,z=0,size,color=stone,roughness=.94}) {
@@ -47,19 +48,17 @@ export function InstalledStudio({room,width,height,topShape='recht',archHeight=3
  const opening=width+clearance,wallWidth=Math.max(8,opening+2.6);
  const wing=(wallWidth-opening)/2,wallHeight=Math.max(3.7,height+1.1);
  const wallColor=neutral?'#e6e5e2':'#d3cec5';
- const floorColor=neutral?'#d0d0cb':'#b7a48c';
  const ceiling=wallHeight+.05;
  return <>
    <color attach="background" args={[neutral?'#e5e6e3':'#e9e6e0']}/>
    <group>
-   <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.026,0]} receiveShadow>
-     <planeGeometry args={[Math.max(26,wallWidth+4),24]}/>
-     <meshStandardMaterial color={floorColor} roughness={neutral?.87:.74} metalness={0}/>
-   </mesh>
-   {!neutral&&Array.from({length:23},(_,i)=>(
-      <SurfaceBlock key={'wood'+i} x={0} y={-.012} z={-7.0+i*.61}
-        size={[wallWidth+3,.0025,.008]} color={i%3===0?'#8b806e':'#a19585'}/>
-   ))}
+   {/* Polished natural marble with veins and genuine-looking 1m slab joints. */}
+   <MarbleFloor width={Math.max(26,wallWidth+4)} depth={24}/>
+   {/* Shallow marble skirting emphasizes the edge of the walls. */}
+   <SurfaceBlock x={-(opening/2+wing/2)} y={.065} z={.296}
+      size={[Math.max(.1,wing),.13,.039]} color="#e4e1db" roughness={.37}/>
+   <SurfaceBlock x={opening/2+wing/2} y={.065} z={.296}
+      size={[Math.max(.1,wing),.13,.039]} color="#e4e1db" roughness={.37}/>
    {/* Side walls and lintel leave a real opening, not a door pasted onto a wall. */}
    <SurfaceBlock x={-(opening/2+wing/2)} y={wallHeight/2} z={.095}
       size={[wing,wallHeight,.35]} color={wallColor}/>
@@ -75,7 +74,7 @@ export function InstalledStudio({room,width,height,topShape='recht',archHeight=3
       size={[.045,height,.035]} color="#beb7a9"/>
    {topShape!=='boog'&&<SurfaceBlock x={0} y={height+.018} z={.252}
       size={[opening+.08,.045,.035]} color="#bcb5a9"/>}
-   <SurfaceBlock x={0} y={-.008} z={.26} size={[opening+.14,.025,.47]} color="#a99d8d"/>
+   <SurfaceBlock x={0} y={-.008} z={.26} size={[opening+.14,.025,.47]} color="#d5d2cb" roughness={.34}/>
    {/* The room behind the glass supplies natural parallax, shade and context. */}
    <SurfaceBlock x={0} y={ceiling/2} z={-4.2} size={[wallWidth+3,ceiling,.24]}
       color={neutral?'#dedfdc':'#e6e0d6'}/>
