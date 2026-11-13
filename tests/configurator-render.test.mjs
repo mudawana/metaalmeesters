@@ -18,5 +18,10 @@ test('configurator starts with two real product choices',async()=>{
    assert.match(html,/Balustrade/);
    assert.match(html,/Ontwerp uw balustrade/);
    assert.match(html,/product-choice-card/);
+   assert.match(html,/metaalmeesters-deuren-eigen-foto\.avif/);
+   assert.match(html,/atelier-choice-page/);
+   assert.match(html,/atelier-choice-cta/);
+   assert.match(html,/Digitaal sfeerbeeld/);
+
  }finally{await vite.close();}
 });
