@@ -379,29 +379,44 @@ function Configurator({onBack}) {
 }
 function ProductConfigurator(){
   const [product,setProduct]=useState(null);
-  const choose=(name)=>{setProduct(name);window.scrollTo({top:0,behavior:'instant'});};
+  const choose=name=>{setProduct(name);window.scrollTo({top:0,behavior:'instant'});};
   if(product==='deur')return <Configurator onBack={()=>choose(null)}/>;
   if(product==='balustrade')return <Suspense fallback={<main className="interior-page"><div className="container page-intro"><h1>Balustradeconfigurator laden...</h1></div></main>}><BalustradeConfigurator onBack={()=>choose(null)}/></Suspense>;
-  return <main className="product-choice-page"><div className="container">
-    <span className="eyebrow product-choice-eyebrow">DE METAALMEESTERS ONTWERPSTUDIO · 01 / 02</span>
-    <h1>Wat wilt u<br/><em>ontwerpen?</em></h1>
-    <p className="product-choice-intro">Kies waarmee uw ontwerp begint. Ontdek materialen, lijnen en afmetingen in 3D en ontvang daarna een vrijblijvende offerte op maat. Onze vakmensen verzorgen de definitieve opmeting en technische beoordeling.</p>
-    <div className="product-choice-grid">
-      <button type="button" className="product-choice-card" onClick={()=>choose('deur')}>
-        <Img name="door4" alt="Stalen deur met glas" loading="eager"/>
-        <div className="product-choice-card-content"><span>01 · STALEN DEUREN</span><h2>Stalen deuren</h2><p>Enkele deur, dubbele deur, pivotdeur, boogdeur of glaswand. Onze vertrouwde volledige deurconfigurator.</p>
-          <div className="product-choice-card-footer">Ontdek de deurenstudio <ArrowUpRight size={19}/></div>
-        </div>
-      </button>
-      <button type="button" className="product-choice-card" onClick={()=>choose('balustrade')}>
-        <Img name="balustradeConcept" alt="Digitaal sfeerbeeld van een glazen U-vormige balustrade met zwarte stalen profielen op een luxe terras" loading="eager"/>
-        <span className="product-choice-visual-note">Digitaal sfeerbeeld</span>
-        <div className="product-choice-card-content"><span>02 · BALUSTRADES</span><h2>Balustrades</h2><p>Trap, balkon, terras, vide of raam. Bepaal indicatieve maten, spijlen, glas, kleur en handregel.</p>
-          <div className="product-choice-card-footer">Ontwerp uw balustrade <ArrowUpRight size={19}/></div>
-        </div>
-      </button>
+  return <main className="product-choice-page atelier-choice-page">
+    <div className="container atelier-choice-shell">
+      <header className="atelier-choice-intro">
+        <span className="eyebrow atelier-choice-eyebrow">DE METAALMEESTERS ONTWERPSTUDIO</span>
+        <h1>Wat wilt u <em>ontwerpen?</em></h1>
+        <p className="product-choice-intro">Ontdek de mogelijkheden van maatwerk in staal en glas. Kies uw product, stel uw wensen samen in 3D en vraag vrijblijvend een offerte aan.</p>
+      </header>
+      <div className="product-choice-grid atelier-choice-grid">
+        <button type="button" className="product-choice-card atelier-choice-card atelier-choice-card--doors" onClick={()=>choose('deur')} aria-label="Ontwerp uw eigen stalen deur">
+          <span className="atelier-choice-photo">
+            <Img name="clientDoor" alt="Echte MetaalMeesters-realisatie: zwarte stalen glasdeuren naast een houten lattenwand" loading="eager"/>
+          </span>
+          <div className="product-choice-card-content atelier-choice-card-copy">
+            <span className="atelier-choice-kicker">01 / INTERIEUR & MAATWERK</span>
+            <h2>Stalen deuren</h2>
+            <p>Van een verfijnde binnendeur tot een elegante pivotdeur of glaswand. Ontwerp uw eigen indeling, afwerking en details.</p>
+            <span className="product-choice-card-footer atelier-choice-cta">Ontdek de deurenstudio <ArrowUpRight size={20}/></span>
+          </div>
+        </button>
+        <button type="button" className="product-choice-card atelier-choice-card atelier-choice-card--railings" onClick={()=>choose('balustrade')} aria-label="Ontwerp uw eigen balustrade">
+          <span className="atelier-choice-photo">
+            <Img name="balustradeConcept" alt="Sfeerbeeld van een moderne glazen balustrade met zwarte stalen profielen" loading="eager"/>
+            <span className="atelier-choice-photo-note">Digitaal sfeerbeeld</span>
+          </span>
+          <div className="product-choice-card-content atelier-choice-card-copy">
+            <span className="atelier-choice-kicker">02 / ARCHITECTURAAL STAALWERK</span>
+            <h2>Balustrades</h2>
+            <p>Voor een trap, vide, balkon of terras. Kies uw lijnen, materialen en de vorm: recht, een hoek of een U-opstelling.</p>
+            <span className="product-choice-card-footer atelier-choice-cta">Ontwerp uw balustrade <ArrowUpRight size={20}/></span>
+          </div>
+        </button>
+      </div>
+      <p className="atelier-choice-outro">Met oog voor detail ontworpen · Definitieve afmetingen en technische uitvoering na opmeting</p>
     </div>
-  </div></main>;
+  </main>;
 }
 export default function App({initialRoute}) {
   const [route,setRoute]=useState(()=>initialRoute||routeFromLocation());

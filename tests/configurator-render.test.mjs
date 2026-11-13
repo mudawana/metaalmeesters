@@ -1,4 +1,5 @@
 import test from 'node:test';
+import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import React from 'react';
 import {renderToString} from 'react-dom/server';
@@ -7,6 +8,8 @@ import {createServer} from 'vite';
 // The interactive configurator is mounted by the browser.
 // Render the chooser in CI so a broken import does not result in a blank screen.
 test('configurator starts with two real product choices',async()=>{
+ const ownPhoto=await fs.stat('public/images/metaalmeesters-deuren-eigen-foto.avif');
+ assert.ok(ownPhoto.size>10000&&ownPhoto.size<200000,'optimized client photo must exist');
  const vite=await createServer({
    server:{middlewareMode:true,hmr:false},appType:'custom',logLevel:'error'
  });
@@ -18,5 +21,10 @@ test('configurator starts with two real product choices',async()=>{
    assert.match(html,/Balustrade/);
    assert.match(html,/Ontwerp uw balustrade/);
    assert.match(html,/product-choice-card/);
+   assert.match(html,/metaalmeesters-deuren-eigen-foto\.avif/);
+   assert.match(html,/atelier-choice-page/);
+   assert.match(html,/atelier-choice-cta/);
+   assert.match(html,/Digitaal sfeerbeeld/);
+
  }finally{await vite.close();}
 });
