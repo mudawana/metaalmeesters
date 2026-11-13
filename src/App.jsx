@@ -394,24 +394,24 @@ function ProductConfigurator(){
           <span className="atelier-choice-photo">
             <Img name="clientDoor" alt="Echte MetaalMeesters-realisatie: zwarte stalen glasdeuren naast een houten lattenwand" loading="eager"/>
           </span>
-          <span className="product-choice-card-content atelier-choice-card-copy">
+          <div className="product-choice-card-content atelier-choice-card-copy">
             <span className="atelier-choice-kicker">01 / INTERIEUR & MAATWERK</span>
             <h2>Stalen deuren</h2>
             <p>Van een verfijnde binnendeur tot een elegante pivotdeur of glaswand. Ontwerp uw eigen indeling, afwerking en details.</p>
             <span className="product-choice-card-footer atelier-choice-cta">Ontdek de deurenstudio <ArrowUpRight size={20}/></span>
-          </span>
+          </div>
         </button>
         <button type="button" className="product-choice-card atelier-choice-card atelier-choice-card--railings" onClick={()=>choose('balustrade')} aria-label="Ontwerp uw eigen balustrade">
           <span className="atelier-choice-photo">
             <Img name="balustradeConcept" alt="Sfeerbeeld van een moderne glazen balustrade met zwarte stalen profielen" loading="eager"/>
             <span className="atelier-choice-photo-note">Digitaal sfeerbeeld</span>
           </span>
-          <span className="product-choice-card-content atelier-choice-card-copy">
+          <div className="product-choice-card-content atelier-choice-card-copy">
             <span className="atelier-choice-kicker">02 / ARCHITECTURAAL STAALWERK</span>
             <h2>Balustrades</h2>
             <p>Voor een trap, vide, balkon of terras. Kies uw lijnen, materialen en de vorm: recht, een hoek of een U-opstelling.</p>
             <span className="product-choice-card-footer atelier-choice-cta">Ontwerp uw balustrade <ArrowUpRight size={20}/></span>
-          </span>
+          </div>
         </button>
       </div>
       <p className="atelier-choice-outro">Met oog voor detail ontworpen · Definitieve afmetingen en technische uitvoering na opmeting</p>
