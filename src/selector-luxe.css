@@ -92,7 +92,7 @@
   display: block;
   position: relative;
   width: 100%;
-  height: clamp(310px, 33vw, 430px);
+  height: clamp(355px, 37vw, 480px);
   overflow: hidden;
   background: #e0dbd3;
 }
@@ -120,7 +120,7 @@
   transform: scale(1.035);
   filter: saturate(.85) contrast(1.02);
 }
-.atelier-choice-card--doors .atelier-choice-photo img { object-position: center 54%; }
+.atelier-choice-card--doors .atelier-choice-photo img { object-position: center 30%; }
 .atelier-choice-card--railings .atelier-choice-photo img {
   object-position: center 58%;
   filter: saturate(.78) contrast(1.015);
@@ -213,7 +213,7 @@
 @media(max-width: 1000px) {
   .atelier-choice-page { padding-top: 60px; }
   .atelier-choice-grid { gap: 18px; }
-  .atelier-choice-photo { height: 350px; }
+  .atelier-choice-photo { height: 410px; }
   .atelier-choice-card .atelier-choice-card-copy { padding: 25px 26px 25px; }
   .atelier-choice-card-copy h2 { font-size: 37px; }
 }
@@ -226,7 +226,7 @@
   .atelier-choice-intro h1 { font-size: clamp(44px, 10.5vw, 62px); margin: 19px 0 14px; }
   .atelier-choice-intro .product-choice-intro { max-width: 430px; font-size: 12px; line-height: 1.85; }
   .atelier-choice-grid { grid-template-columns: 1fr; gap: 20px; }
-  .atelier-choice-photo { height: clamp(335px, 90vw, 440px); }
+  .atelier-choice-photo { height: clamp(350px, 95vw, 460px); }
   .atelier-choice-card .atelier-choice-card-copy { padding: 23px 24px 25px; }
   .atelier-choice-card-copy h2 { font-size: 37px; }
   .atelier-choice-card-copy p { font-size: 12px; margin-bottom: 20px; }
