@@ -13,7 +13,8 @@ export const assets = {
   door1: 'deuren.jpg',
   door2: 'deuren2.jpg',
   door3: 'deuren3.jpg',
-  door4: 'deuren4.jpg'
+  door4: 'deuren4.jpg',
+  clientDoor: 'metaalmeesters-deuren-eigen-foto.avif'
 };
 
 export const imageUrl = (key) => basePath + 'images/' + assets[key];
